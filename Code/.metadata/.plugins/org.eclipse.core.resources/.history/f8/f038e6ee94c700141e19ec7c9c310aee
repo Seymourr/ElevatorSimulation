@@ -2,7 +2,6 @@ import java.util.ArrayList;
 public class Main {
 
 	private static int simulationDays = 365; //A year
-	private static int periodTime = 2*60*60;
 	private static int lowTraffic = 1000;
 	private static int mediumTraffic = 5000;
 	private static int heavyTraffic = 10000;
@@ -33,14 +32,8 @@ public class Main {
 			boolean traffic = true; //A new day
 			while(traffic) 
 			{
-				for(int i_up = 0; i_up < periodTime; i_up++)
-				{
-					
-					
-				}
 				//While there is still traffic (day not over)
 				//TODO: Split up day, can passengers in e.g. lunch go over to regular? Can be problematic.
-				
 			}
 		}
 	}
