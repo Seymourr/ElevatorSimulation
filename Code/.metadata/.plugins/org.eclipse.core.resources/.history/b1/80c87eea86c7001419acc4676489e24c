@@ -1,0 +1,10 @@
+
+public class TrafficGenerator {
+
+	
+	
+	public TrafficGenerator(TrafficType t)
+	{
+		
+	}
+}

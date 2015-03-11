@@ -1,0 +1,12 @@
+import java.util.ArrayList;
+public class Elevator {
+
+	protected int currentFloor;
+	protected int destinationFloor; //Simplified for first protoype, could be a list with sequential destinations
+	protected ArrayList<Passenger> currentPassengers;
+	
+	public Elevator()
+	{
+		
+	}
+}
