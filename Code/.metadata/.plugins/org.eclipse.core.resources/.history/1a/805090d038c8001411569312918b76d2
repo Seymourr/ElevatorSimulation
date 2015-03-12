@@ -1,0 +1,37 @@
+import java.util.ArrayList;
+
+
+public class ElevatorSpecs {
+
+	
+	private int simulationDays; 
+	private int periodTime;
+	private int lowTraffic;
+	private int mediumTraffic;
+	private int heavyTraffic;
+	private int floors;
+	private int skylobbyfloor;
+	private int distanceBetweenFloors;
+	private int shafts;
+	private int buildingHeight;
+	private int carryCapacity;
+	private int carSpeed;
+	private int floorDelay; //Passenger boarding time
+	private ElevatorType local;
+	private ElevatorType shuttle;
+	
+	
+	
+	public ElevatorSpecs(ArrayList<String> indata)
+	{
+		this.simulationDays = Integer.parseInt(indata.get(0));
+		this.periodTime = Integer.parseInt(indata.get(1));
+		this.lowTraffic = Integer.parseInt(indata.get(2));
+		this.mediumTraffic = Integer.parseInt(indata.get(3));
+		this.heavyTraffic = Integer.parseInt(indata.get(4));
+		this.floors = Integer.parseInt(indata.get(5));
+	}
+	
+
+
+}

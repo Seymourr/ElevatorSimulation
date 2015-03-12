@@ -1,73 +1,71 @@
 import java.util.ArrayList;
 import java.util.Random;
 public class TrafficGenerator {
-
-	private int secondsPerPeriod = 2*60*60; //Passengers are allocated over this timespan
 	
-	
-	private int passengerNumber;
-	private int floors;
-	private int skylobbyfloor;
-	private int shafts;
-	
-	public TrafficGenerator(int passengerNumber, int floors, int skylobbyfloor, int shafts)
+	private ElevatorSpecs specs;
+	public TrafficGenerator(ElevatorSpecs specs)
 	{
-		this.passengerNumber = passengerNumber;
-		this.floors = floors;
-		this.skylobbyfloor = skylobbyfloor;
-		this.shafts = shafts;
+		this.specs = specs;
 	}
 	
 	//Is skylobby a legit destination?
-	public ArrayList<Passenger> getTraffic(TrafficType t, ArrayList<Passenger> pass) throws Exception
+	//Call amount is one of the three traffic weights(1000, 5000, 10000) or a random number (5 % or so so)
+	
+	
+	
+	private int getRandomNumber(int low, int high)
 	{
 		Random r = new Random();
+		int destination = r.nextInt(high-low) + low; 
+		return destination;
+	}
+	
+	public ArrayList<Call> getTraffic(TrafficType t, ArrayList<Call> oldCalls, int callAmount)
+	{
+		ArrayList<Call> newCalls = new ArrayList<Call>(); 
 		
 		switch(t)
 		{
 			case UPPEAK:
 
-				pass = new ArrayList<Passenger>();
-				for(int i = 0; i < passengerNumber; i++)
+				for(int i = 0; i < callAmount; i++)
 				{
-					Passenger p = new Passenger();
-					int Low = 1; //Inclusive
-					int High = floors + 1; //Exclusive
-					int destination = r.nextInt(High-Low) + Low; //check that it behaves correctly
-					p.setFloor(0); //Lobby
-					p.setDestination(destination);
-					pass.add(p);
+					Call c = new Call(getRandomNumber(0, specs.getPeriodTime()), 0, getRandomNumber(1, specs.getFloors() + 1));
+					newCalls.add(c);
 				}
 				break;
 			case LUNCH:
-				for(int i = 0; i < pass.size(); i++)
+				for(int i = 0; i < callAmount; i++)
 				{
-					pass.get(i).setPreviousFloor(pass.get(i).getFloor());
-					pass.get(i).setDestination(0); //Lobby
+					Call c = new Call(getRandomNumber(0, specs.getPeriodTime()), oldCalls.get(i).getDestination(), 0); //Assuming call reached destination
+					newCalls.add(c);
 				}
 				break;
 			case DOWNPEAK:
-				for(int i = 0; i < pass.size(); i++)
+				for(int i = 0; i < callAmount; i++)
 				{
-					pass.get(i).setDestination(0); //Lobby, final destination for the day
+					Call c = new Call(getRandomNumber(0, specs.getPeriodTime()), oldCalls.get(i).getDestination(), 0); //Assuming call reached destination
+					newCalls.add(c);
 				}
 				break;
 			case REGULAR:
-				for(int i = 0; i < pass.size(); i++)
+				for(int i = 0; i < callAmount; i++)
 				{
-					int Low = 0; //Inclusive
-					int High = floors + 1;
-					int destination = r.nextInt(High-Low)+Low;
-					while(destination != pass.get(i).getFloor())
+					int destination = getRandomNumber(1, specs.getFloors() + 1);
+					while(destination != oldCalls.get(i).getDestination())
 					{
-						destination = r.nextInt(High-Low)+Low;
+						destination = getRandomNumber(1, specs.getFloors() + 1);
 					}
-					pass.get(i).setDestination(destination); 		
+					Call c = new Call(getRandomNumber(0, specs.getPeriodTime()), oldCalls.get(i).getDestination(), destination);
+					newCalls.add(c);
 				}
 				break;
-			default: throw new Exception("Wrong traffictype");
+			default: 
+				System.out.println("ERROR IN GET TRAFFIC, ABORTING SIMULATION");
+				System.exit(0);
+				break;
 		}
 		
-		return pass;
+		return newCalls;
 	}
 }

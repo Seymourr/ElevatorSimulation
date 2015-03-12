@@ -1,0 +1,83 @@
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.util.ArrayList;
+public class Main {
+
+	private static ArrayList<Passenger> pass; 
+
+	
+	
+	public static void main(String[] args)
+	{
+		ElevatorSpecs specs;
+		try {
+			specs = getSpecs();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		
+		/*
+		local = new ArrayList<Elevator>(); //Start with simple elevator for now
+		shuttle = new ArrayList<Elevator>();
+		TrafficGenerator gen = new TrafficGenerator(lowTraffic, floors, skylobbyfloor, shafts);
+		
+		
+		for(int i = 0; i < simulationDays; i++)
+		{
+			boolean traffic = true; //A new day
+			while(traffic) 
+			{
+				for(int i_up = 0; i_up < periodTime; i_up++)
+				{
+					
+					
+				}
+				//While there is still traffic (day not over)
+				//TODO: Split up day, can passengers in e.g. lunch go over to regular? Can be problematic.
+				
+			}
+		}
+		*/
+	}
+	
+	
+	/**
+	 * Read all specifications for this simulation from file, and returns an object carrying all these
+	 * in a proper manor. 
+	 * NOTE: The specifications written in the file appear in a certain order, and this order is assumed to be the same
+	 * when creating an object of ElevatorSpecs. In other words, if the order in the file is changed, or if
+	 * stuff gets removed /added, one would have to change in elevatorSpecs as well in order to not get unexpected
+	 * results.
+	 * @return ElevatorSpecs
+	 * @throws FileNotFoundException
+	 */
+	private static ElevatorSpecs getSpecs() throws FileNotFoundException
+	{
+		
+		ArrayList<String> temp = new ArrayList<String>();
+		System.out.printf("%s", System.getProperty("user.dir"));
+		System.out.println();
+		BufferedReader br = new BufferedReader(new FileReader("ElevatorFiles/specs.txt"));
+		try {
+		
+			String line = br.readLine();
+			
+			while(line != null) {
+				line = line.split(" ")[0];
+				temp.add(line);
+				line = br.readLine();
+			}
+		  }	catch (Exception e1) {
+				
+				e1.printStackTrace();
+			}
+		ElevatorSpecs es = new ElevatorSpecs(temp);
+		for(int i = 0; i < temp.size(); i++)
+		{
+			System.out.println(temp.get(i));
+		}
+		return es;
+		
+	}
+}
