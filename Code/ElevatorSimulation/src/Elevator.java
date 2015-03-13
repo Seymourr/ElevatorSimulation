@@ -1,4 +1,9 @@
+
 import java.util.ArrayList;
+
+/**
+ * This class will be used for storing elevator statuses in the simulation process.
+ */
 public class Elevator {
 
 	protected int currentFloor;

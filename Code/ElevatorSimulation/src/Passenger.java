@@ -1,4 +1,7 @@
 
+/**
+ * This class will be used later during the simulation process.
+ */
 public class Passenger {
 	
 	private int currentFloor;

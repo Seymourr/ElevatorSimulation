@@ -1,9 +1,11 @@
+
 import java.util.ArrayList;
 
-
+/**
+ * Objects of this class contains elevator specifications that will be used in the simulation.
+ */
 public class ElevatorSpecs {
-
-	
+	/* Fields */
 	private int simulationDays; 
 	private int periodTime;
 	private int lowTraffic;
@@ -21,11 +23,20 @@ public class ElevatorSpecs {
 	private ElevatorType shuttle;
 	private int numberOfShuttles;
 	
-	//TODO: Number of shuttles
-	//Research low, medium, heavy traffic params
+	//TODO Number of shuttles
+	//TODO Research low, medium, heavy traffic params
 	
-	public ElevatorSpecs(ArrayList<String> indata)
-	{
+	/**
+	 * Creates an object which puts data from the input ArrayList
+	 * into specific field according to the following specification.
+	 * TODO Complete the table below
+	 *
+	 * Index	Field Name		Data
+	 * 0		simulationDays	Amount of days that will be simulated
+	 * 1		periodTime		The amount of seconds that one period of simulation will include
+	 * 2
+	 */
+	public ElevatorSpecs(ArrayList<String> indata) {
 		this.simulationDays = Integer.parseInt(indata.get(0));
 		this.periodTime = Integer.parseInt(indata.get(1));
 		this.lowTraffic = Integer.parseInt(indata.get(2));
@@ -59,83 +70,59 @@ public class ElevatorSpecs {
 		//no consideration to error in reading
 	}
 	
+	/****************************** GET METHODS FOR THE FIELDS *******************/
+	
 	public int getSimulationDays() {
 		return simulationDays;
 	}
-
-
 
 	public int getPeriodTime() {
 		return periodTime;
 	}
 
-
-
 	public int getLowTraffic() {
 		return lowTraffic;
 	}
-
-
 
 	public int getMediumTraffic() {
 		return mediumTraffic;
 	}
 
-
-
 	public int getHeavyTraffic() {
 		return heavyTraffic;
 	}
-
-
 
 	public int getFloors() {
 		return floors;
 	}
 
-
-
 	public int getSkylobbyfloor() {
 		return skylobbyfloor;
 	}
-
-
 
 	public int getDistanceBetweenFloors() {
 		return distanceBetweenFloors;
 	}
 
-
-
 	public int getShafts() {
 		return shafts;
 	}
-
-
 
 	public int getBuildingHeight() {
 		return buildingHeight;
 	}
 
-
-
 	public int getCarryCapacity() {
 		return carryCapacity;
 	}
-
-
 
 	public int getCarSpeed() {
 		return carSpeed;
 	}
 
-
-
 	public int getFloorDelay() {
 		return floorDelay;
 	}
-
-
 
 	public ElevatorType getLocal() {
 		return local;
@@ -148,11 +135,7 @@ public class ElevatorSpecs {
 	}
 
 		
-	public int getNumberOfShuttles()
-	{
+	public int getNumberOfShuttles() {
 		return numberOfShuttles;
 	}
-	
-
-
 }

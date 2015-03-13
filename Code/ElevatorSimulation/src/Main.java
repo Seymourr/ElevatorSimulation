@@ -2,33 +2,18 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.ArrayList;
-public class Main {
 
+/**
+ *
+ */
+public class Main {
+	/* Fields */
 	private static ArrayList<Passenger> passengers; 
 	private static ArrayList<Call> calls;
 	private static ArrayList<Elevator> localElevators;
 	private static ArrayList<Elevator> shuttleElevators;
 	private static TrafficGenerator trafficGen;
 	private static ElevatorSpecs specs;
-	
-	
-	public static void main(String[] args)
-	{
-		localElevators = new ArrayList<Elevator>();
-		shuttleElevators = new ArrayList<Elevator>();
-		calls = new ArrayList<Call>();
-		try {
-			specs = getSpecs();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-		trafficGen = new TrafficGenerator(specs);
-	//	makeElevators();
-	//	startSimulation();
-	//	fancyPrint();  //TODO print results
-		
-	}
-	
 	
 	/**
 	 * Read all specifications for this simulation from file, and returns an object carrying all these
@@ -46,21 +31,36 @@ public class Main {
 		ArrayList<String> temp = new ArrayList<String>();
 		BufferedReader br = new BufferedReader(new FileReader("Src/ElevatorFiles/specs.txt"));
 		try {
-		
 			String line = br.readLine();
-			
 			while(line != null) {
 				line = line.split(" ")[0];
 				temp.add(line);
 				line = br.readLine();
 			}
-		  }	catch (Exception e1) {
-				
-				e1.printStackTrace();
-			}
+		} catch (Exception e1) {	
+			e1.printStackTrace();
+		}
 		ElevatorSpecs es = new ElevatorSpecs(temp);
 		return es;
+	}
+	
+	public static void main(String[] args) {
+		//Fetch elevator specifications from file
+		calls = new ArrayList<Call>();
+		try {
+			specs = getSpecs();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
 		
+		//Create a traffic generator according to the specifications
+		trafficGen = new TrafficGenerator(specs);
+		
+		//	makeElevators();
+		//localElevators = new ArrayList<Elevator>();
+		//shuttleElevators = new ArrayList<Elevator>();
+		//	startSimulation();
+		//	fancyPrint();  //TODO print results
 	}
 	
 	//TODO: Adapt for different elevator types
