@@ -19,8 +19,10 @@ public class ElevatorSpecs {
 	private int floorDelay; //Passenger boarding time
 	private ElevatorType local;
 	private ElevatorType shuttle;
+	private int numberOfShuttles;
 	
-	
+	//TODO: Number of shuttles
+	//Research low, medium, heavy traffic params
 	
 	public ElevatorSpecs(ArrayList<String> indata)
 	{
@@ -51,6 +53,8 @@ public class ElevatorSpecs {
 		} else {
 			shuttle = ElevatorType.DOUBLE;
 		}
+		
+		this.numberOfShuttles = Integer.parseInt(indata.get(15));
 		
 		//no consideration to error in reading
 	}
@@ -144,7 +148,10 @@ public class ElevatorSpecs {
 	}
 
 		
-	
+	public int getNumberOfShuttles()
+	{
+		return numberOfShuttles;
+	}
 	
 
 
