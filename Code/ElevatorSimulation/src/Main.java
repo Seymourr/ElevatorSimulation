@@ -1,3 +1,4 @@
+
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -25,11 +26,9 @@ public class Main {
 	 * @return ElevatorSpecs
 	 * @throws FileNotFoundException
 	 */
-	private static ElevatorSpecs getSpecs() throws FileNotFoundException
-	{
-		
+	private static ElevatorSpecs getSpecs() throws FileNotFoundException {
 		ArrayList<String> temp = new ArrayList<String>();
-		BufferedReader br = new BufferedReader(new FileReader("Src/ElevatorFiles/specs.txt"));
+		BufferedReader br = new BufferedReader(new FileReader("ElevatorFiles/specs.txt"));
 		try {
 			String line = br.readLine();
 			while(line != null) {
@@ -44,6 +43,23 @@ public class Main {
 		return es;
 	}
 	
+	/**
+	 * Method to test the traffic generator
+	 */
+	private static void testTrafficGen() {
+		ArrayList<Call> traffic = trafficGen.getTraffic(TrafficType.LUNCH, 50);
+		for (int i = 0; i < traffic.size(); i++) {
+			Call tempcall = traffic.get(i);
+			System.out.print("Calltime: " + tempcall.getCallTime());
+			System.out.print(" | Origin floor: " + tempcall.getOriginFloor());
+			System.out.print(" | Destination floor: " + tempcall.getDestination());
+			System.out.println();
+		}
+	}
+	
+	/**
+	 * Main method
+	 */
 	public static void main(String[] args) {
 		//Fetch elevator specifications from file
 		calls = new ArrayList<Call>();
@@ -55,6 +71,9 @@ public class Main {
 		
 		//Create a traffic generator according to the specifications
 		trafficGen = new TrafficGenerator(specs);
+		
+		//Test the traffic generator
+		testTrafficGen();
 		
 		//	makeElevators();
 		//localElevators = new ArrayList<Elevator>();

@@ -53,7 +53,7 @@ public class TrafficGenerator {
 	 * @return An ArrayList of Call objects, representing the traffic requested.
 	 */
 	public ArrayList<Call> getTraffic(TrafficType t, int callAmount) {
-		ArrayList<Call> newCalls = new ArrayList<Call>(); //List of calls representing the traffic
+		ArrayList<Call> newCalls = new ArrayList<Call>(callAmount); //List of calls representing the traffic
 		
 		switch(t) {
 			case UPPEAK:
@@ -86,7 +86,7 @@ public class TrafficGenerator {
 				for(int i = 0; i < callAmount; i++) {
 					int destination = getRandomFloor(0, specs.getFloors());
 					int origin = getRandomFloor(0, specs.getFloors());
-					while(destination != origin) {
+					while(destination == origin) {
 						destination = getRandomFloor(1, specs.getFloors());
 					}
 					Call c = new Call(getRandomNumber(0, specs.getPeriodTime()), origin, destination);

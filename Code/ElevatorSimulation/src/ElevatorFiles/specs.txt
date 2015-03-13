@@ -3,8 +3,8 @@
 1000 //Low traffic passenger amount
 5000 //Medium traffic passenger amount
 10000 //Heavy traffic passenger amount
-100 //Number of floors
-45  //Skylobby floor
+10 //Number of floors
+5  //Skylobby floor
 5   //Distance between floors
 60  //Number of shafts
 500 //Building height
