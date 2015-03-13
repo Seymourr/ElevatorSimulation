@@ -46,6 +46,21 @@ public class TrafficGenerator {
 	}
 	
 	/**
+	 * Orders the call objects in the given array from lowest call time to highest.
+	 */
+	private ArrayList<Call> orderCalls(ArrayList<Call> traffic) {
+		for (int i = 1; i < traffic.size(); i++) {
+			Call temp = traffic.get(i);
+			int j;
+			for (j = i - 1; j >= 0 && temp.getCallTime() < traffic.get(j).getCallTime(); j--) {
+				traffic.set(j + 1, traffic.get(j));
+			}
+			traffic.set(j + 1, temp);
+		}
+		return traffic;
+	}
+	
+	/**
 	 * Generates traffic according to the specified TrafficType t.
 	 * The amount of traffic to be generated is specified with the callAmount parameter.
 	 * Traffic will be generated assuming 0 is the lobby floor. This means a building
@@ -98,6 +113,6 @@ public class TrafficGenerator {
 				System.exit(0);
 				break;
 		}
-		return newCalls;
+		return orderCalls(newCalls);
 	}
 }
