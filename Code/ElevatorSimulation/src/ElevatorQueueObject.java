@@ -6,7 +6,7 @@
  */
 public class ElevatorQueueObject {
     /* Fields */
-    Passenger p;
+    private Passenger p;
     private ElevatorAction action;
     private CarPosition car;
 }

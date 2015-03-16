@@ -1,67 +1,30 @@
 
-import java.util.ArrayList;
-
 /**
- * This class will be used for storing elevator statuses in the simulation process.
+ * This class represents an single decked elevator.
  */
-public class Elevator {
+public class Elevator implements ElevatorInterface {
+    /* See ElevatorInterface for details */
+    public Passenger[] disembarkElevator() {
+        return null;
+    }
 
-	protected int currentFloor;
-	protected int destinationFloor; //Simplified for first protoype, could be a list with sequential destinations
-	protected ArrayList<Passenger> currentPassengers;
-	protected ArrayList<Call> currentCalls;
-	
-	public Elevator(int currentFloor)
-	{
-		currentPassengers = new ArrayList<Passenger>();
-		currentCalls = new ArrayList<Call>();
-		this.currentFloor = currentFloor;
-	}
-	
-	public void setFloor(int floor)
-	{
-		currentFloor = floor;
-	}
-	
-	//Ev remove
-	public void setDestination(int floor)
-	{
-		destinationFloor = floor;
-	}
-	
-	public void addPassenger(Passenger p)
-	{
-		currentPassengers.add(p);
-	}
-	
-	public int getFloor()
-	{
-		return currentFloor;
-	}
-	
-	//Ev remove
-	public int getDestination()
-	{
-		return destinationFloor;
-	}
-	
-	public void addCall(Call c)
-	{
-		currentCalls.add(c);
-	}
-	
-	public boolean removeCall(Call c) //Why not just remove first call in sequence?
-	{
-		boolean removed = false;
-		for(int i = 0; i < currentCalls.size(); i++)
-		{
-			if(currentCalls.get(i) == c)
-			{
-				currentCalls.remove(i);
-				removed = true;
-				break;
-			}
-		}
-		return removed;
-	}
+    /* See ElevatorInterface for details */
+    public Passenger[] embarkElevator() {
+        return null;
+    }
+
+    /* See ElevatorInterface for details */
+    public int updateElevator() {
+        return 0;
+    }
+
+    /* See ElevatorInterface for details */
+    public ElevatorQueueObject[] getQueue() {
+        return null;
+    }
+
+    /* See ElevatorInterface for details */
+    public void addToQueue(Passenger p, int index1, int index2, CarPosition c) {
+        
+    }
 }
