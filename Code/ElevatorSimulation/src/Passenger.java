@@ -7,13 +7,14 @@ import java.util.Stack;
  * another. For example, if the passenger if traveling past the sky lobby then
  * a partial goal would be the skylobby.
  *
- * Note that the nextDestination method has to be called before getDestination
- * contains any valid destination.
+ * Note that the constructor automaticly sets the origin and destination to
+ * the first travel.
  */
 public class Passenger {
     /* Fields */
 	private Stack<Integer> destinations = new Stack<Integer>();
     private int currentDestination = -1;
+	private int origin = -1;
     
     /** 
 	 * Constructor 
@@ -23,7 +24,7 @@ public class Passenger {
      */
     public Passenger(Call c, ElevatorSpecs spec) {
         int goal = c.getDestination();
-        int origin = c.getOriginFloor();
+        origin = c.getOriginFloor();
         int skylobby = spec.getSkylobbyfloor();
 		int lobby = spec.getLobbyFloor();
 		
@@ -44,6 +45,8 @@ public class Passenger {
 				destinations.push(skylobby);
 			}
 		}
+		
+		currentDestination = destinations.pop();
     }
 
     /**
@@ -55,8 +58,10 @@ public class Passenger {
      */
     public int nextDestination() {
 		if (!destinations.empty()) {
+			origin = currentDestination;
 			currentDestination = destinations.pop();
 		} else {
+			origin = -1;
 			currentDestination = -1;
 		}
 		return currentDestination;
@@ -67,5 +72,12 @@ public class Passenger {
 	 */
 	public int getDestination() {
 		return currentDestination;
+	}
+	
+	/**
+	 * Return the origin floor for the current travel.
+	 */
+	public int getOrigin() {
+		return origin;
 	}
 }

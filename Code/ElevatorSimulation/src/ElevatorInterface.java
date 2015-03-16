@@ -12,4 +12,8 @@ public interface ElevatorInterface {
 	 *
 	 */
 	public Passenger[] embarkElevator();
+	
+	/**
+	 * Update elevator
+	 */
 }

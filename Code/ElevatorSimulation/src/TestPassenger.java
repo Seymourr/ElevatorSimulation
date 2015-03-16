@@ -39,10 +39,18 @@ public class TestPassenger {
 		
 		for(Call c : calls) {
 			Passenger p = new Passenger(c, specs);
-			System.out.println(p.nextDestination());
-			System.out.println(p.nextDestination());
-			System.out.println(p.nextDestination());
-			System.out.println(p.nextDestination());
+			System.out.println(p.getOrigin());
+			System.out.println(p.getDestination());
+			p.nextDestination();
+			System.out.println(p.getOrigin());
+			System.out.println(p.getDestination());
+			p.nextDestination();
+			System.out.println(p.getOrigin());
+			System.out.println(p.getDestination());
+			p.nextDestination();
+			System.out.println(p.getOrigin());
+			System.out.println(p.getDestination());
+			p.nextDestination();
 			System.out.println();
 		}
 	}
