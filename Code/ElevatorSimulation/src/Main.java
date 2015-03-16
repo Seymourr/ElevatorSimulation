@@ -82,6 +82,55 @@ public class Main {
 		//	fancyPrint();  //TODO print results
 	}
 	
+
+	public static void simulateDay()
+	{
+		int trafficAmount = specs.getLowTraffic;  //CHANGE OR DO SOOMETHING FANCY TO SUPPORT ALL THREE TRAFFIC TYPES
+		ArrayList<Call> traffic = trafficGen.getTraffic(trafficType.UPPEAK, trafficAmount);
+		ArrayList<Call> traffic2 = trafficGen.getTraffic(trafficType.REGULAR, trafficAmount);
+		ArrayList<Call> traffic3 = trafficGen.getTraffic(trafficType.LUNCH, trafficAmount);
+		ArrayList<Call> traffic4 = trafficGen.getTraffic(trafficType.REGULAR, trafficAmount);
+		ArrayList<Call> traffic5 = trafficGen.getTraffic(trafficType.DOWNPEAK, trafficAmount);
+
+		//Call
+
+
+	}
+
+	public static void simulatePeriod(Algorithm alg, TrafficType t, int trafficAmount)
+	{
+		ArrayList<Call> traffic = trafficGen.getTraffic(t, trafficAmount);
+
+		for(int second_i = 0; second_i < specs.getPeriodTime(); second_i++) //i seconds 
+		{
+			//Update position of elevators
+			updateElevatorPosition();
+
+
+			//People get off elevators
+			Passenger[] newCalls = disembarkElevators();
+			
+			//Manage new calls (algorithm call)
+			ArrayList<Elevator> updatedAllocations = alg.manageCalls(traffic, localElevators, shuttleElevators, newCalls); //assumes localElevators come first, then shuttles
+			for(int res_i = 0; res_i < updatedAllocations.size(); res_i++)
+			{
+				if(res_i < localElevators.size())
+				{
+					localElevators.set(res_i, updatedAllocations.get(res_i)); 
+				} else {
+					shuttleElevators.set(res_i, updatedAllocations.get(res_i)); 
+				}
+			}
+
+			//People get on elevators
+			embarkElevators();
+			
+			//TODO: Update waiting/travel time
+
+
+		}
+		ArrayList<Integer> result = alg.simulate(traffic);
+	}
 	//TODO: Adapt for different elevator types
 	/*
 	private static void makeElevators()

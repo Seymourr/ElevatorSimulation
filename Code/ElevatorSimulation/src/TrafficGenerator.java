@@ -18,10 +18,7 @@ public class TrafficGenerator {
 		this.specs = specs;
 	}
 	
-	//Call amount is one of the three traffic weights(1000, 5000, 10000) or a random number (5 % or so so)
-	//TODO Oldcalls should be removed, skylobby should not be legit destination floor. Random calls.
-	//UPDATE: TODO is done.
-	//TODO Index of lobby floor
+	//Call amount is one of the three traffic weights(1000, 5000, 10000) or a random number (5 % or so so
 	
 	/*
 	 * Returns a random number between low (inclusive) and high (exclusive)
