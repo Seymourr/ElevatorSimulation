@@ -1,4 +1,4 @@
 
 public enum TrafficType {
-	UPPEAK, LUNCH, DOWNPEAK, REGULAR
+    UPPEAK, LUNCH, DOWNPEAK, REGULAR
 }

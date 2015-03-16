@@ -1,4 +1,4 @@
 
 public enum CarPosition {
-	UPPER, LOWER, NULL
+    UPPER, LOWER, NULL
 }
