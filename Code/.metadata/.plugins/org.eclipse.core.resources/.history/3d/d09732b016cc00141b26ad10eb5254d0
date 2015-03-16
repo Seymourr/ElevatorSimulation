@@ -1,0 +1,10 @@
+
+public class Algorithm {
+
+	
+	ElevatorSpecs spec;
+	public Algorithm(ElevatorSpecs spec)
+	{
+		this.spec = spec;
+	}
+}

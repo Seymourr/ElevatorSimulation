@@ -85,12 +85,12 @@ public class Main {
 
 	public static void simulateDay()
 	{
-		int trafficAmount = specs.getLowTraffic;  //CHANGE OR DO SOOMETHING FANCY TO SUPPORT ALL THREE TRAFFIC TYPES
-		ArrayList<Call> traffic = trafficGen.getTraffic(trafficType.UPPEAK, trafficAmount);
-		ArrayList<Call> traffic2 = trafficGen.getTraffic(trafficType.REGULAR, trafficAmount);
-		ArrayList<Call> traffic3 = trafficGen.getTraffic(trafficType.LUNCH, trafficAmount);
-		ArrayList<Call> traffic4 = trafficGen.getTraffic(trafficType.REGULAR, trafficAmount);
-		ArrayList<Call> traffic5 = trafficGen.getTraffic(trafficType.DOWNPEAK, trafficAmount);
+		int trafficAmount = specs.getLowTraffic();  //CHANGE OR DO SOOMETHING FANCY TO SUPPORT ALL THREE TRAFFIC TYPES
+		ArrayList<Call> traffic = trafficGen.getTraffic(TrafficType.UPPEAK, trafficAmount);
+		ArrayList<Call> traffic2 = trafficGen.getTraffic(TrafficType.REGULAR, trafficAmount);
+		ArrayList<Call> traffic3 = trafficGen.getTraffic(TrafficType.LUNCH, trafficAmount);
+		ArrayList<Call> traffic4 = trafficGen.getTraffic(TrafficType.REGULAR, trafficAmount);
+		ArrayList<Call> traffic5 = trafficGen.getTraffic(TrafficType.DOWNPEAK, trafficAmount);
 
 		//Call
 
@@ -105,10 +105,9 @@ public class Main {
 		{
 			//Update position of elevators
 			updateElevatorPosition();
-
-
+			
 			//People get off elevators
-			Passenger[] newCalls = disembarkElevators();
+			ArrayList<Passenger> newCalls = disembarkElevators();
 			
 			//Manage new calls (algorithm call)
 			ArrayList<Elevator> updatedAllocations = alg.manageCalls(traffic, localElevators, shuttleElevators, newCalls); //assumes localElevators come first, then shuttles
@@ -129,7 +128,62 @@ public class Main {
 
 
 		}
-		ArrayList<Integer> result = alg.simulate(traffic);
+	}
+	
+	private static void updateElevatorPosition()
+	{
+		for(int i = 0; i < localElevators.size(); i++)
+		{
+			localElevators.get(i).updateElevator();
+		}
+		
+		for(int i = 0; i < shuttleElevators.size(); i++)
+		{
+			shuttleElevators.get(i).updateElevator();
+		}
+	}
+	
+	//TODO update travel time (sum)
+	private static ArrayList<Passenger> disembarkElevators()
+	{
+		ArrayList<Passenger> p = new ArrayList<Passenger>();
+		for(int i = 0; i < localElevators.size(); i++)
+		{
+			Passenger[] temp = localElevators.get(i).disembarkElevator();
+			
+			for(int j = 0;  j < temp.length; j++)
+			{
+				p.add(temp[j]);
+			}
+		}
+		
+		for(int i = 0; i < shuttleElevators.size(); i++)
+		{
+			Passenger[] temp = shuttleElevators.get(i).disembarkElevator();
+			
+			for(int j = 0;  j < temp.length; j++)
+			{
+				p.add(temp[j]);
+			}
+		}
+		return p;
+	}
+	
+	//TODO: Update waitingTime
+	private static void embarkElevators()
+	{
+		for(int i = 0; i < localElevators.size(); i++)
+		{
+			Passenger[] temp = localElevators.get(i).embarkElevator();
+			
+		}
+		
+		for(int i = 0; i < shuttleElevators.size(); i++)
+		{
+			Passenger[] temp = shuttleElevators.get(i).embarkElevator();
+			
+			
+		}
 	}
 	//TODO: Adapt for different elevator types
 	/*

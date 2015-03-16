@@ -1,0 +1,19 @@
+import java.util.ArrayList;
+
+
+public class Algorithm {
+
+	
+	ElevatorSpecs spec;
+	public Algorithm(ElevatorSpecs spec)
+	{
+		this.spec = spec;
+	}
+
+	
+	public ArrayList<Elevator> manageCalls(traffic, localElevators, shuttleElevators, newCalls)
+	{
+		ArrayList<Elevator> allElev = localElevators;
+		allElev.addAll(shuttleElevators);
+	}
+}
