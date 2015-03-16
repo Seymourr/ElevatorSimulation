@@ -6,11 +6,14 @@ import java.util.Stack;
  * store the partial goals for a passenger while traveling from one floors to
  * another. For example, if the passenger if traveling past the sky lobby then
  * a partial goal would be the skylobby.
+ *
+ * Note that the nextDestination method has to be called before getDestination
+ * contains any valid destination.
  */
 public class Passenger {
     /* Fields */
 	private Stack<Integer> destinations = new Stack<Integer>();
-    private int currentDestination;
+    private int currentDestination = -1;
     
     /** 
 	 * Constructor 
