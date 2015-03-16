@@ -47,9 +47,12 @@ public class Elevator implements ElevatorInterface {
     }
 
     /* See ElevatorInterface for details */
-
+<<<<<<< HEAD
+    public ArrayList<Elevator> addToQueue(Passenger p, int index1, int index2, CarPosition c) {
+        
+=======
     public void addToQueue(Passenger p, int index1, int index2, CarPosition c) {
         //TODO
-
+>>>>>>> c6d463a45a48c59c27ad969cb072c7be381d298b
     }
 }
