@@ -12,29 +12,57 @@ public class Passenger {
 	private Stack<Integer> destinations = new Stack<Integer>();
     private int currentDestination;
     
-    /** Constructor 
-     * Calculates the partial goals for the passenger in the given goal toward
-     * his destination and stores them.   
+    /** 
+	 * Constructor 
+     * Calculates the partial goals for the passenger in the given call toward
+     * his/her destination and stores them for access via the nextDestination
+	 * and getDestination methods.
      */
     public Passenger(Call c, ElevatorSpecs spec) {
-        goal = c.getDestination();
+        int goal = c.getDestination();
         int origin = c.getOriginFloor();
         int skylobby = spec.getSkylobbyfloor();
+		int lobby = spec.getLobbyFloor();
+		
+		destinations.push(goal);
+		
         if (goal > skylobby) {
             if (origin < skylobby) {
-                if (origin = spec.getLobbyFloor()) {
-                    destinations = {skylobby};                
-                } else {
-                    destinations = {spec.getLobbyFloor(), skylobby};
+				destinations.push(skylobby);
+                if (origin != lobby) {
+                    destinations.push(lobby);
                 }
             }        
-        }
+        } else {
+			if (origin > skylobby) {
+				if (goal != lobby) {
+					destinations.push(lobby);
+				}
+				destinations.push(skylobby);
+			}
+		}
     }
 
     /**
-     *
+     * Fetches the next partial destination for this Passenger. This function
+	 * also stores this new destination for later access via the getDestination
+	 * method.
+	 *
+	 * @return The next destination for this Passenger or -1 if the final destination has already been reached.
      */
     public int nextDestination() {
-        
+		if (!destinations.empty()) {
+			currentDestination = destinations.pop();
+		} else {
+			currentDestination = -1;
+		}
+		return currentDestination;
     }
+	
+	/**
+	 * Fetches the current destination for this passenger.
+	 */
+	public int getDestination() {
+		return currentDestination;
+	}
 }
