@@ -1,4 +1,6 @@
 
+import java.util.LinkedList;
+
 /**
  * Interface for the elevator implementing classes.
  */
@@ -28,7 +30,7 @@ public interface ElevatorInterface {
      * Returns the current queue of assignments for the elevator. The
      * element at index 0 is handles first and so on.
      */
-    public ElevatorQueueObject[] getQueue();
+    public LinkedList<ElevatorQueueObject> getQueue();
 
     /**
      * Adds Passenger p to the queue. Assigns that p should be picked
