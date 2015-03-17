@@ -48,7 +48,15 @@ public class DDElevator {
 
     /* See ElevatorInterface for details */
     public void addToQueue(Passenger p, int index1, int index2, CarPosition c) {
-        //TODO
+        ElevatorQueueObject q1 = new ElevatorQueueObject(
+            p, ElevatorAction.PICKUP, c
+        );
+        ElevatorQueueObject q2 = new ElevatorQueueObject(
+            p, ElevatorAction.DROPOFF, c
+        );
+        
+        queue.add(index1, q1);
+        queue.add(index2 + 1, q2);
     }
 
         /* See ElevatorInterface for details */

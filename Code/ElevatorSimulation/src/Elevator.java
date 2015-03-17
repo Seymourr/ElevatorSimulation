@@ -47,10 +47,16 @@ public class Elevator implements ElevatorInterface {
     }
 
     /* See ElevatorInterface for details */
-
     public void addToQueue(Passenger p, int index1, int index2, CarPosition c) {
-        //TODO
-
+        ElevatorQueueObject q1 = new ElevatorQueueObject(
+            p, ElevatorAction.PICKUP, CarPosition.NULL
+        );
+        ElevatorQueueObject q2 = new ElevatorQueueObject(
+            p, ElevatorAction.DROPOFF, CarPosition.NULL
+        );
+        
+        queue.add(index1, q1);
+        queue.add(index2 + 1, q2);
     }
     
     /* See ElevatorInterface for details */
