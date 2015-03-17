@@ -52,4 +52,10 @@ public class Elevator implements ElevatorInterface {
         //TODO
 
     }
+    
+    /* See ElevatorInterface for details */
+    public ElevatorStatusObject getStatus() {
+        //TODO
+        return null;
+    }
 }

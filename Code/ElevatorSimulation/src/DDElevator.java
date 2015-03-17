@@ -50,4 +50,10 @@ public class DDElevator {
     public void addToQueue(Passenger p, int index1, int index2, CarPosition c) {
         //TODO
     }
+
+        /* See ElevatorInterface for details */
+    public ElevatorStatusObject getStatus() {
+        //TODO
+        return null;
+    }
 }

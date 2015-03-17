@@ -41,4 +41,10 @@ public interface ElevatorInterface {
      * is single decked, the CarPosition is irrelevant.
      */
     public void addToQueue(Passenger p, int index1, int index2, CarPosition c);
+    
+    /**
+     * Returns the current status of the elevator. See the description
+     * of ElevatorStatusObject for details.
+     */
+    public ElevatorStatusObject getStatus();
 }
