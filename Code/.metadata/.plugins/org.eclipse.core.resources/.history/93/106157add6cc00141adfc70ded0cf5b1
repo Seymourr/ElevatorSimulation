@@ -15,8 +15,6 @@ public class Main {
 	private static ArrayList<Elevator> shuttleElevators;
 	private static TrafficGenerator trafficGen;
 	private static ElevatorSpecs specs;
-	private static int travellingTime;
-	private static int waitingTime;
 	
 	/**
 	 * Read all specifications for this simulation from file, and returns an object carrying all these
@@ -85,29 +83,26 @@ public class Main {
 	}
 	
 
-	public static void simulateDay(Algorithm alg, int trafficAmount)
+	public static void simulateDay()
 	{
-		travellingTime = 0;
-		waitingTime = 0;
-		simulatePeriod(alg, TrafficType.UPPEAK, trafficAmount);
-		simulatePeriod(alg, TrafficType.REGULAR, trafficAmount);
-		simulatePeriod(alg, TrafficType.LUNCH, trafficAmount);
-		simulatePeriod(alg, TrafficType.REGULAR, trafficAmount);
-		simulatePeriod(alg, TrafficType.DOWNPEAK, trafficAmount);
-		
-		//printResults();
+		int trafficAmount = specs.getLowTraffic();  //CHANGE OR DO SOOMETHING FANCY TO SUPPORT ALL THREE TRAFFIC TYPES
+		ArrayList<Call> traffic = trafficGen.getTraffic(TrafficType.UPPEAK, trafficAmount);
+		ArrayList<Call> traffic2 = trafficGen.getTraffic(TrafficType.REGULAR, trafficAmount);
+		ArrayList<Call> traffic3 = trafficGen.getTraffic(TrafficType.LUNCH, trafficAmount);
+		ArrayList<Call> traffic4 = trafficGen.getTraffic(TrafficType.REGULAR, trafficAmount);
+		ArrayList<Call> traffic5 = trafficGen.getTraffic(TrafficType.DOWNPEAK, trafficAmount);
+
+		//Call
+
 
 	}
 
-	
-	//Could return int, showing periodvalues.. Reset value between each period??
 	public static void simulatePeriod(Algorithm alg, TrafficType t, int trafficAmount)
 	{
 		ArrayList<Call> traffic = trafficGen.getTraffic(t, trafficAmount);
 		alg.setTraffic(traffic);
 		SingleAutomatic algForShuttle = new SingleAutomatic(specs);
 		algForShuttle.setTraffic(traffic);
-		
 		for(int second_i = 0; second_i < specs.getPeriodTime(); second_i++) //i seconds 
 		{
 			//Update position of elevators
@@ -121,8 +116,7 @@ public class Main {
 			shuttleElevators = algForShuttle.manageShuttleCalls(second_i, shuttleElevators, newCalls);
 			
 			
-			//TODO: Update waiting/travel time, calculate by looking through all elevators:
-			// calculateNextTime(....); 
+			//TODO: Update waiting/travel time
 
 
 		}

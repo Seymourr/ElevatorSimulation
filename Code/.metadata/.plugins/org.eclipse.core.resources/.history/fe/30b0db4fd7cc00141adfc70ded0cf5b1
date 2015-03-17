@@ -87,15 +87,8 @@ public class Main {
 
 	public static void simulateDay(Algorithm alg, int trafficAmount)
 	{
-		travellingTime = 0;
-		waitingTime = 0;
-		simulatePeriod(alg, TrafficType.UPPEAK, trafficAmount);
-		simulatePeriod(alg, TrafficType.REGULAR, trafficAmount);
-		simulatePeriod(alg, TrafficType.LUNCH, trafficAmount);
-		simulatePeriod(alg, TrafficType.REGULAR, trafficAmount);
-		simulatePeriod(alg, TrafficType.DOWNPEAK, trafficAmount);
-		
-		//printResults();
+		int 
+
 
 	}
 

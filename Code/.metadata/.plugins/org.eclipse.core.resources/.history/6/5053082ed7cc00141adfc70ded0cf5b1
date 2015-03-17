@@ -87,20 +87,18 @@ public class Main {
 
 	public static void simulateDay(Algorithm alg, int trafficAmount)
 	{
-		travellingTime = 0;
-		waitingTime = 0;
-		simulatePeriod(alg, TrafficType.UPPEAK, trafficAmount);
-		simulatePeriod(alg, TrafficType.REGULAR, trafficAmount);
-		simulatePeriod(alg, TrafficType.LUNCH, trafficAmount);
-		simulatePeriod(alg, TrafficType.REGULAR, trafficAmount);
-		simulatePeriod(alg, TrafficType.DOWNPEAK, trafficAmount);
-		
-		//printResults();
+		int trafficAmount = specs.getLowTraffic();  //CHANGE OR DO SOOMETHING FANCY TO SUPPORT ALL THREE TRAFFIC TYPES
+		ArrayList<Call> traffic = trafficGen.getTraffic(TrafficType.UPPEAK, trafficAmount);
+		ArrayList<Call> traffic2 = trafficGen.getTraffic(TrafficType.REGULAR, trafficAmount);
+		ArrayList<Call> traffic3 = trafficGen.getTraffic(TrafficType.LUNCH, trafficAmount);
+		ArrayList<Call> traffic4 = trafficGen.getTraffic(TrafficType.REGULAR, trafficAmount);
+		ArrayList<Call> traffic5 = trafficGen.getTraffic(TrafficType.DOWNPEAK, trafficAmount);
+
+		//Call
+
 
 	}
 
-	
-	//Could return int, showing periodvalues.. Reset value between each period??
 	public static void simulatePeriod(Algorithm alg, TrafficType t, int trafficAmount)
 	{
 		ArrayList<Call> traffic = trafficGen.getTraffic(t, trafficAmount);
