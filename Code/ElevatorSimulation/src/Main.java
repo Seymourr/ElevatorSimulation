@@ -100,7 +100,7 @@ public class Main {
 	public static void simulatePeriod(Algorithm alg, TrafficType t, int trafficAmount)
 	{
 		ArrayList<Call> traffic = trafficGen.getTraffic(t, trafficAmount);
-
+		alg.setTraffic(traffic);
 		for(int second_i = 0; second_i < specs.getPeriodTime(); second_i++) //i seconds 
 		{
 			//Update position of elevators
@@ -110,17 +110,9 @@ public class Main {
 			ArrayList<Passenger> newCalls = disembarkElevators();
 			
 			//Manage new calls (algorithm call)
-			ArrayList<Elevator> updatedAllocations = alg.manageCalls(traffic, localElevators, shuttleElevators, newCalls); //assumes localElevators come first, then shuttles
-			for(int res_i = 0; res_i < updatedAllocations.size(); res_i++)
-			{
-				if(res_i < localElevators.size())
-				{
-					localElevators.set(res_i, updatedAllocations.get(res_i)); 
-				} else {
-					shuttleElevators.set(res_i, updatedAllocations.get(res_i)); 
-				}
-			}
-
+			localElevators = alg.manageCalls(second_i, localElevators, newCalls); //assumes localElevators come first, then shuttles
+			shuttleElevators = SingleAutomatic.manageShuttleCalls(second_i, shuttleElevators, newCalls);
+			
 			//People get on elevators
 			embarkElevators();
 			

@@ -1,0 +1,22 @@
+import java.util.ArrayList;
+
+
+public class SingleAutomatic extends Algorithm{
+	
+	public SingleAutomatic(ElevatorSpecs spec)
+	{
+		this.spec = spec;
+		
+	}
+	
+	public void setTraffic(ArrayList<Call> traffic)
+	{
+		
+	}
+	public ArrayList<Elevator> manageCalls(ArrayList<Elevator> localElevators, ArrayList<Elevator>shuttleElevators, ArrayList<Passenger>newCalls)
+	{
+		ArrayList<Elevator> allElev = localElevators;
+		allElev.addAll(shuttleElevators);
+		return allElev;
+	}
+}

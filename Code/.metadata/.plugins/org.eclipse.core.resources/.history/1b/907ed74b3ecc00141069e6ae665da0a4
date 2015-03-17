@@ -1,0 +1,99 @@
+import java.util.ArrayList;
+
+
+public class SingleAutomatic extends Algorithm{
+	
+	public SingleAutomatic(ElevatorSpecs spec)
+	{
+		this.spec = spec;
+		
+	}
+	
+	
+	private int getBestElevator(ArrayList<Elevator> elev)
+	{
+		int lowestQueue = elev.get(0).getQueue().length();
+		Elevator temp = elev.get(0);
+		int index = 0;
+			for(int i = 0; i < elev.size(); i++) 
+			{
+				if(elev.get(i).getQueue().size() < lowestQueue)
+					{
+						lowestQueue = elev.get(i).getQueue().length;
+						temp = elev.get(i);
+						index = i;
+				}
+			}
+			return index;
+	}
+
+	public ArrayList<Elevator> manageShuttleCalls(int second, ArrayList<Elevator> shuttle, ArrayList<Passenger> newCalls)
+	{
+		int counter = 0;
+		while(!traffic.isEmpty() && traffic.get(counter).getCallTime() == second)
+		{
+			//Time to create a passenger
+			Passenger p = new Passenger(traffic.get(counter), spec);
+			if(p.getDestination() == spec.getSkylobbyfloor() || p.getDestination() == spec.getLobbyFloor())
+			{
+				//Find best shuttle
+				int shuttleIndex = getBestShuttle(ArrayList<Elevator> shuttle);
+
+				//Now have best available shuttle.. //TODO: Check if double decked, passenger need to know top or down in that case
+				shuttle.get(shuttleIndex).addToQueue(p, p.getOrigin(), p.getDestination(), null);
+				traffic.remove(counter);
+			}
+			counter += 1;
+		}
+
+		//Now handling newCalls
+		for(int i = 0; i < newCalls.size(); i++)
+		{
+			if(newCalls.get(i).getDestination() == spec.getSkylobbyfloor() || newCalls.get(i).getDestination() == spec.getLobbyFloor())
+			{
+				int shuttleIndex = getBestShuttle(ArrayList<Elevator> shuttle);
+				shuttle.get(shuttleIndex.addToQueue(p, p.getOrigin(), p.getDestination(), null)); //TODO: SEE ABOVE
+			}
+		}
+		return shuttle;
+	}
+
+
+
+
+
+
+	public ArrayList<Elevator> manageCalls(int second, ArrayList<Elevator> localElevators, ArrayList<Passenger>newCalls)
+	{
+		while(!traffic.isEmpty() && traffic.get(0).getCallTime() == second)
+		{
+			//Time to create a passenger
+			Passenger p = new Passenger(traffic.get(0), spec);
+			if(p.getDestination() == spec.getSkylobbyfloor() || p.getDestination() == spec.getLobbyFloor())
+			{
+				int lowestQueue = 0;
+				Elevator temp;
+				for(int i = 0; i < shuttleElevators.size(); i++)
+				{
+					if(shuttleElevators.get(i).getQueue().length == 0)
+					{
+						//Good to go
+						//Need something from Passenger to check if double decked, and if so, top or bottom (?)
+						shuttleElevators.get(i).addToQueue(p, p.getOrigin(), p.getDestination(),null);
+						break;
+					} else {
+						lowestQueue = shuttleElevators.get(i.getQueue())
+					}
+				}
+			}
+		}
+		ArrayList<Elevator> allElev = localElevators;
+		allElev.addAll(shuttleElevators);
+		return allElev;
+	}
+	
+	public void setTraffic(ArrayList<Call> traffic)
+	{
+		this.traffic = traffic;
+	}
+}

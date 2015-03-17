@@ -6,7 +6,7 @@ import java.util.LinkedList;
  */
 public interface ElevatorInterface {
     /** 
-     * Return a list of passengers that disembarks on the current floor.
+     * Return a list of passengers that disembark on the current floor.
      * Null will be returned if no passengers are leaving on this floor
      * or if the elevator is not currently at any floor.
      */
