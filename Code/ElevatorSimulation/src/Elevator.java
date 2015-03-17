@@ -10,7 +10,7 @@ public class Elevator implements ElevatorInterface {
     private ElevatorSpecs specs;
     private int[] floors;
     private LinkedList<ElevatorQueueObject> queue;
-    private int currentPassengers;
+    private LinkedList<Passenger> currentPassengers;
     private int waitingTime;
     private float currentFloor;
     private final float distancePerFloor;
@@ -23,7 +23,7 @@ public class Elevator implements ElevatorInterface {
     public Elevator(ElevatorSpecs spec, int[] floors, float currentFloor) {
         specs = spec;
         this.floors = floors;
-        currentPassengers = 0;
+        currentPassengers = new LinkedList<Passenger>();
         queue = new LinkedList<ElevatorQueueObject>();
         waitingTime = 0;
         this.currentFloor = currentFloor;
@@ -31,15 +31,59 @@ public class Elevator implements ElevatorInterface {
     }
     
     /* See ElevatorInterface for details */
-    public Passenger[] disembarkElevator() {
-        //TODO
-        return null;
-    }
-
-    /* See ElevatorInterface for details */
-    public Passenger[] embarkElevator() {
-        //TODO
-        return null;
+    public Passenger[] openDoors() {
+        //Check if currently at a floor
+        int floor = Math.round(currentFloor);
+        if (floor != currentFloor) {
+            return new Passenger[0];
+        }
+        
+        //TODO Flytta kod om väntesekunder hit
+        
+        //Disembarking
+        LinkedList<Passenger> retPas = new LinkedList<Passenger>();
+        Passenger[] temp = new Passenger[currentPassengers.size()];
+        for (int i = 0; i < currentPassengers.size(); i++) {
+            temp[i] = currentPassengers.get(i);
+        }
+        
+        //Update queue, elevator and fill return list
+        for (int i = 0; i < temp.length; i++) {
+            if (temp[i].getDestination() == currentFloor) {
+                currentPassengers.remove(temp[i]); //Remove from elevator
+                retPas.add(temp[i]);
+                for (int j = 0; j < queue.size(); j++) {
+                    ElevatorQueueObject q = queue.get(j);
+                    if (q.getPassenger() == temp[i] && q.getActionType() == ElevatorAction.DROPOFF) {
+                        queue.remove(q); //Remove from queue
+                        break;
+                    }
+                }
+            }
+        }
+        
+        //Embarking
+        while (currentPassengers.size() < specs.getCarryCapacity() && queue.size() > 0) {
+            ElevatorQueueObject q = queue.getFirst();
+            if (q.getActionType() == ElevatorAction.PICKUP) {
+                if(q.getPassenger().getOrigin() == floor) {
+                    currentPassengers.add(q.getPassenger());
+                    queue.removeFirst();
+                } else {
+                    break;
+                }
+            } else {
+                break;
+            }
+        }
+        
+        //Return disembarking passengers as an array
+        Passenger[] retArr = new Passenger[retPas.size()];
+        for (int i = 0; i < retPas.size(); i++) {
+            retArr[i] = retPas.get(i);
+        }
+        
+        return retArr;
     }
 
     /* See ElevatorInterface for details */
@@ -64,6 +108,7 @@ public class Elevator implements ElevatorInterface {
         }
             
         //Update Elevator Position 
+        //TODO om hissen är full, ta endast DROPOFF typ
         float newFloor = currentFloor;
         if (dest > currentFloor) { //Going up
             newFloor += (specs.getCarSpeed() / distancePerFloor);
@@ -113,6 +158,8 @@ public class Elevator implements ElevatorInterface {
         queue.add(index1, q1);
         queue.add(index2 + 1, q2);
         
+        //TODO Make sure last index work
+        
         return true;
     }
     
@@ -135,6 +182,6 @@ public class Elevator implements ElevatorInterface {
             dir = -1;
         }
         
-        return new ElevatorStatusObject(currentFloor, dir, dest, currentPassengers);
+        return new ElevatorStatusObject(currentFloor, dir, dest, currentPassengers.size());
     }
 }

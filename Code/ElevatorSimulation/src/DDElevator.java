@@ -34,15 +34,8 @@ public class DDElevator {
     }
     
     /* See ElevatorInterface for details */
-    public Passenger[] disembarkElevator() {
-        //TODO
-        return null;
-    }
-
-    /* See ElevatorInterface for details */
-    public Passenger[] embarkElevator() {
-        //TODO
-        return null;
+    public Passenger[] openDoors() {
+        return new Passenger[0];
     }
 
     /* See ElevatorInterface for details */

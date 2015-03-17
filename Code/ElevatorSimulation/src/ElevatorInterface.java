@@ -6,17 +6,13 @@ import java.util.LinkedList;
  */
 public interface ElevatorInterface {
     /** 
-     * Return a list of passengers that disembarks on the current floor.
-     * Null will be returned if no passengers are leaving on this floor
-     * or if the elevator is not currently at any floor.
+     * Allows passengers to embark and disembark on the current floor
+     * of the elevator. All passengers inside the elevator will disembark
+     * if the stop is at their destination floor. However, only passengers
+     * who are at the beginning of the queue will embark the elevator.
+     * Returns a list of the passengers who disembarks.
      */
-    public Passenger[] disembarkElevator();
-
-    /**
-     * Return a list of passengers that embarks on the current floor,
-     * if any. Returns null otherwise.
-     */
-    public Passenger[] embarkElevator();
+    public Passenger[] openDoors();
 
     /**
      * Update elevator with one second of travel time.
