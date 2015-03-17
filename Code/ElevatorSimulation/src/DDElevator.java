@@ -1,5 +1,6 @@
 
 import java.util.LinkedList;
+import java.util.Arrays;
 
 /**
  * This class represents a double decked elevator.
@@ -36,9 +37,9 @@ public class DDElevator {
     }
 
     /* See ElevatorInterface for details */
-    public int updateElevator() {
+    public boolean updateElevator() {
         //TODO
-        return 0;
+        return true;
     }
 
     /* See ElevatorInterface for details */
@@ -47,16 +48,25 @@ public class DDElevator {
     }
 
     /* See ElevatorInterface for details */
-    public void addToQueue(Passenger p, int index1, int index2, CarPosition c) {
+    public boolean addToQueue(Passenger p, int index1, int index2, CarPosition c) {
+        if (!Arrays.asList(floors).contains(p.getOrigin())) {
+            return false;
+        }        
+        if (!Arrays.asList(floors).contains(p.getDestination())) {
+            return false;
+        }
+        
         ElevatorQueueObject q1 = new ElevatorQueueObject(
-            p, ElevatorAction.PICKUP, c
+            p, ElevatorAction.PICKUP, CarPosition.NULL
         );
         ElevatorQueueObject q2 = new ElevatorQueueObject(
-            p, ElevatorAction.DROPOFF, c
+            p, ElevatorAction.DROPOFF, CarPosition.NULL
         );
         
         queue.add(index1, q1);
         queue.add(index2 + 1, q2);
+        
+        return true;
     }
 
         /* See ElevatorInterface for details */
