@@ -101,20 +101,20 @@ public class Main {
 	{
 		ArrayList<Call> traffic = trafficGen.getTraffic(t, trafficAmount);
 		alg.setTraffic(traffic);
+		SingleAutomatic algForShuttle = new SingleAutomatic(specs);
+		algForShuttle.setTraffic(traffic);
 		for(int second_i = 0; second_i < specs.getPeriodTime(); second_i++) //i seconds 
 		{
 			//Update position of elevators
 			updateElevatorPosition();
 			
 			//People get off elevators
-			ArrayList<Passenger> newCalls = disembarkElevators();
+			ArrayList<Passenger> newCalls = updateElevatorOnOff();
 			
 			//Manage new calls (algorithm call)
 			localElevators = alg.manageCalls(second_i, localElevators, newCalls); //assumes localElevators come first, then shuttles
-			shuttleElevators = SingleAutomatic.manageShuttleCalls(second_i, shuttleElevators, newCalls);
+			shuttleElevators = algForShuttle.manageShuttleCalls(second_i, shuttleElevators, newCalls);
 			
-			//People get on elevators
-			embarkElevators();
 			
 			//TODO: Update waiting/travel time
 
@@ -136,12 +136,12 @@ public class Main {
 	}
 	
 	//TODO update travel time (sum)
-	private static ArrayList<Passenger> disembarkElevators()
+	private static ArrayList<Passenger> updateElevatorOnOff()
 	{
 		ArrayList<Passenger> p = new ArrayList<Passenger>();
 		for(int i = 0; i < localElevators.size(); i++)
 		{
-			Passenger[] temp = localElevators.get(i).disembarkElevator();
+			Passenger[] temp = localElevators.get(i).openDoors();
 			
 			for(int j = 0;  j < temp.length; j++)
 			{
@@ -151,32 +151,27 @@ public class Main {
 		
 		for(int i = 0; i < shuttleElevators.size(); i++)
 		{
-			Passenger[] temp = shuttleElevators.get(i).disembarkElevator();
+			Passenger[] temp = shuttleElevators.get(i).openDoors();
 			
 			for(int j = 0;  j < temp.length; j++)
 			{
 				p.add(temp[j]);
 			}
 		}
+		
+		for(int i = 0; i < p.size(); i++)
+		{
+			int destination = p.get(i).nextDestination();
+			if(destination == -1)
+			{
+				//remove passeger
+			    p.remove(i);
+			}
+		}
+
 		return p;
 	}
 	
-	//TODO: Update waitingTime
-	private static void embarkElevators()
-	{
-		for(int i = 0; i < localElevators.size(); i++)
-		{
-			Passenger[] temp = localElevators.get(i).embarkElevator();
-			
-		}
-		
-		for(int i = 0; i < shuttleElevators.size(); i++)
-		{
-			Passenger[] temp = shuttleElevators.get(i).embarkElevator();
-			
-			
-		}
-	}
 	//TODO: Adapt for different elevator types
 	/*
 	private static void makeElevators()

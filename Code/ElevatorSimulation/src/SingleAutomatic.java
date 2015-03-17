@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Random;
 
 
 public class SingleAutomatic extends Algorithm{
@@ -9,43 +10,51 @@ public class SingleAutomatic extends Algorithm{
 		
 	}
 	
-	//Best elevator is either the idle one, or the one on the same floor. No other exceptions.
-	private int getBestElevator(ArrayList<Elevator> elev)
+	private int getSomeElevator(ArrayList<Elevator> elev)
+	{
+		Random r = new Random();
+		int number = r.nextInt(elev.size()); 
+		return number;
+	}
+	
+	
+	//The best shuttle is the one at the same floor. If none are at the same floor, take the one in the list that has fewest allocations
+	private int getBestShuttle(ArrayList<Elevator> elev, Passenger p)
 	{
 		int lowestQueue = elev.get(0).getQueue().size();
-		Elevator temp = elev.get(0);
 		int index = 0;
 			for(int i = 0; i < elev.size(); i++) 
 			{
+				if(elev.get(i).getStatus().floor == p.getOrigin())
+				{
+					//Closest elevator is the best to take at the moment. Check if not full!
+					if(elev.get(i).getStatus().passengers != spec.getCarryCapacity())
+					{
+						return i;
+					}
+				}
 				if(elev.get(i).getQueue().size() < lowestQueue)
 					{
 						lowestQueue = elev.get(i).getQueue().size();
-						temp = elev.get(i);
 						index = i;
 				}
 			}
 			return index;
 	}
-	
-	
-	//The best shuttle is the one at the same floor. If none are at the same floor, take the next one in the list that has fewest allocations
-	private int getBestShuttle(ArrayList<Elevator> elev)
+
+	private ArrayList<Elevator> assignToElevator(int index, Passenger p, ArrayList<Elevator> elevatorList, CarPosition pos)
 	{
-		int lowestQueue = elev.get(0).getQueue().size();
-		Elevator temp = elev.get(0); //EV REMOVE
-		int index = 0;
-			for(int i = 0; i < elev.size(); i++) 
-			{
-				if(elev.get(i).getQueue().size() < lowestQueue)
-					{
-						lowestQueue = elev.get(i).getQueue().size();
-						temp = elev.get(i);
-						index = i;
-				}
-			}
-			return index;
+		int positionPickup = elevatorList.get(index).getQueue().size();
+		if(elevatorList.get(index).getStatus().floor == p.getOrigin() && elevatorList.get(index).getStatus().direction == 0)
+		{
+			positionPickup = 0; //Assigned elevator is present, board it immediatley.
+		}
+		//Now have best available shuttle.. //TODO: Check if double decked, passenger need to know top or down in that case
+		elevatorList.get(index).addToQueue(p, positionPickup, elevatorList.get(index).getQueue().size() + 1, pos); //True for single automatic
+		return elevatorList;
 	}
-//TODO, Imply algorithm correctly (if not on floor, dont do shit)
+	
+	
 	public ArrayList<Elevator> manageShuttleCalls(int second, ArrayList<Elevator> shuttles, ArrayList<Passenger> newCalls)
 	{
 		int counter = 0;
@@ -56,10 +65,8 @@ public class SingleAutomatic extends Algorithm{
 			if(p.getDestination() == spec.getSkylobbyfloor() || p.getDestination() == spec.getLobbyFloor())
 			{
 				//Find best shuttle
-				int shuttleIndex = getBestShuttle(shuttles);
-
-				//Now have best available shuttle.. //TODO: Check if double decked, passenger need to know top or down in that case
-				shuttles.get(shuttleIndex).addToQueue(p, p.getOrigin(), p.getDestination(), null);
+				int shuttleIndex = getBestShuttle(shuttles, p);
+				shuttles = assignToElevator(shuttleIndex, p, shuttles, CarPosition.NULL); //Modify to support dd
 				traffic.remove(counter);
 			}
 			counter += 1;
@@ -70,16 +77,16 @@ public class SingleAutomatic extends Algorithm{
 		{
 			if(newCalls.get(i).getDestination() == spec.getSkylobbyfloor() || newCalls.get(i).getDestination() == spec.getLobbyFloor())
 			{
-				int shuttleIndex = getBestShuttle(shuttles);
-				shuttles.get(shuttleIndex).addToQueue(newCalls.get(i), newCalls.get(i).getOrigin(), newCalls.get(i).getDestination(), null); //TODO: SEE ABOVE
+				int shuttleIndex = getBestShuttle(shuttles, newCalls.get(i));
+				shuttles = assignToElevator(shuttleIndex, newCalls.get(i), shuttles, CarPosition.NULL); //Modify to support dd
 			}
 		}
 		return shuttles;
 	}
 
-
+	//Eventually used, should be quite lame
 	public ArrayList<Elevator> manageCalls(int second, ArrayList<Elevator> localElevators, ArrayList<Passenger>newCalls)
-{
+	{
 		int counter = 0;
 		while(!traffic.isEmpty() && traffic.get(counter).getCallTime() == second)
 		{
@@ -88,10 +95,8 @@ public class SingleAutomatic extends Algorithm{
 			if(p.getDestination() != spec.getSkylobbyfloor() && p.getDestination() != spec.getLobbyFloor())
 			{
 				//Find best shuttle
-				int localIndex = getBestElevator(localElevators);
-
-				//Now have best available shuttle.. //TODO: Check if double decked, passenger need to know top or down in that case
-				localElevators.get(localIndex).addToQueue(p, p.getOrigin(), p.getDestination(), null);
+				int localIndex = getSomeElevator(localElevators);
+				localElevators = assignToElevator(localIndex, p, localElevators, CarPosition.NULL); //Mod to support dd
 				traffic.remove(counter);
 			}
 			counter += 1;
@@ -100,10 +105,10 @@ public class SingleAutomatic extends Algorithm{
 		//Now handling newCalls
 		for(int i = 0; i < newCalls.size(); i++)
 		{
-			if(newCalls.get(i).getDestination() == spec.getSkylobbyfloor() || newCalls.get(i).getDestination() == spec.getLobbyFloor())
+			if(newCalls.get(i).getDestination() != spec.getSkylobbyfloor() && newCalls.get(i).getDestination() != spec.getLobbyFloor())
 			{
-				int localIndex = getBestElevator(localElevators);
-				localElevators.get(localIndex).addToQueue(newCalls.get(i), newCalls.get(i).getOrigin(), newCalls.get(i).getDestination(), null); //TODO: SEE ABOVE
+				int localIndex = getSomeElevator(localElevators); 
+				localElevators = assignToElevator(localIndex, newCalls.get(i), localElevators, CarPosition.NULL); //Mod to support dd
 			}
 		}
 		return localElevators;
