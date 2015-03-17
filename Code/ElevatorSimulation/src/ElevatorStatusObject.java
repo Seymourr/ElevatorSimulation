@@ -11,14 +11,16 @@
  */
 public class ElevatorStatusObject {
     /* Fields */
-    public final float floor;
-    public final int direction;
-    public final int destination;
+    public final float floor; //Current floor
+    public final int direction; //Up or down
+    public final int destination; //Headed to which floor
+    public final int passengers; //Passengers inside
 
     /* Constructor */
-    public ElevatorStatusObject(float f, int dir, int dest) {
+    public ElevatorStatusObject(float f, int dir, int dest, int cont) {
        floor = f;
        direction = dir;
        destination = dest;
+       passengers = cont;
     }
 }

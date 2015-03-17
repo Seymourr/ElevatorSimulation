@@ -13,7 +13,7 @@ public class Elevator implements ElevatorInterface {
     private int currentPassengers;
     private int waitingTime;
     private float currentFloor;
-    private int distancePerFloor;
+    private final int distancePerFloor;
     
     /**
      * Constructor 
@@ -83,9 +83,6 @@ public class Elevator implements ElevatorInterface {
             } else {
                 currentFloor = newFloor;
             }
-        } else {
-            //Set waiting time for embarking/disembarking
-            waitingTime = specs.getFloorDelay();
         }
         
         //Everything okay
@@ -121,7 +118,23 @@ public class Elevator implements ElevatorInterface {
     
     /* See ElevatorInterface for details */
     public ElevatorStatusObject getStatus() {
-        //TODO
-        return null;
+        //Fetch destination
+        ElevatorQueueObject q = queue.getFirst();
+        int dest = 0;
+        if (q.getActionType() == ElevatorAction.PICKUP) {
+            dest = q.getPassenger().getOrigin();
+        } else {
+            dest = q.getPassenger().getDestination();
+        }
+        
+        //Calculate direction
+        int dir = 0;
+        if (dest > currentFloor) {
+            dir = 1;
+        } else if (dest < currentFloor) {
+            dir = -1;
+        }
+        
+        return new ElevatorStatusObject(currentFloor, dir, dest, currentPassengers);
     }
 }
