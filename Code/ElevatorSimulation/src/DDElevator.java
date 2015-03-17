@@ -14,7 +14,7 @@ public class DDElevator {
     private int upperCarPassengers;
     private int waitingTime;
     private float currentFloor; //Upper Car
-    private final int distancePerFloor;
+    private final float distancePerFloor;
     
     /**
      * Constructor 
@@ -30,7 +30,7 @@ public class DDElevator {
         queue = new LinkedList<ElevatorQueueObject>();
         waitingTime = 0;
         this.currentFloor = currentFloor;
-        distancePerFloor = specs.getBuildingHeight() / specs.getFloors();
+        distancePerFloor = (float)specs.getBuildingHeight() / (float)specs.getFloors();
     }
     
     /* See ElevatorInterface for details */
