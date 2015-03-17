@@ -19,12 +19,11 @@ public interface ElevatorInterface {
     public Passenger[] embarkElevator();
 
     /**
-     * Update elevator with one second of travel time. Return the floor
-     * reached, if any. If the elevator did not reach a floor, -1 will
-     * be returned. For elevators or more than one deck, return the floor
-     * the upper car reaches, if any.
+     * Update elevator with one second of travel time.
+     *
+     * @return true if successful.
      */
-    public int updateElevator();
+    public boolean updateElevator();
 
     /**
      * Returns the current queue of assignments for the elevator. The
@@ -39,6 +38,14 @@ public interface ElevatorInterface {
      * compensated for in the method. For decks with multiple positions
      * the CarPositions can be set to UPPER or LOWER. If the elevator
      * is single decked, the CarPosition is irrelevant.
+     *
+     * @return true if the additions were successful.
      */
-    public void addToQueue(Passenger p, int index1, int index2, CarPosition c);
+    public boolean addToQueue(Passenger p, int index1, int index2, CarPosition c);
+    
+    /**
+     * Returns the current status of the elevator. See the description
+     * of ElevatorStatusObject for details.
+     */
+    public ElevatorStatusObject getStatus();
 }
