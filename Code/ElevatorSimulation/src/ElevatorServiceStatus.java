@@ -18,4 +18,14 @@ public class ElevatorServiceStatus {
         travelingDistance = td;
         ridesServed = rs;
     }
+    
+    /* Converts this ElevatorServiceStatus to a nice little String */
+    public String getStringRepresentation() {
+        String s = "*********** SERVICE RECORDS ********** \n" +
+            "Total waiting time: " + waitingTime.toString() + "\n" +
+            "Total traveling time: " + travelingTime.toString() + "\n" +
+            "Total distance traveled: " + travelingDistance.toString() + "\n" +
+            "Number of Rides completed: " + ridesServed.toString();
+        return s;
+    }
 }
