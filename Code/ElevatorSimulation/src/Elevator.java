@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 public class Elevator implements ElevatorInterface {
     /* Fields */
     private ElevatorSpecs specs;
-    private int[] floors;
+    public int[] floors; //EDIT TEMPORARY
     private LinkedList<ElevatorQueueObject> queue;
     private LinkedList<Passenger> currentPassengers;
     private int waitingTime;
@@ -42,8 +42,10 @@ public class Elevator implements ElevatorInterface {
     
     /* See ElevatorInterface for details */
     public Passenger[] openDoors() {
+    	//System.out.println(queue.size());
         //Check if currently at a floor
         int floor = Math.round(currentFloor);
+        
         if (floor != currentFloor) {
             return new Passenger[0];
         }
@@ -72,6 +74,7 @@ public class Elevator implements ElevatorInterface {
         }
         
         //Embarking
+      
         while (currentPassengers.size() < specs.getCarryCapacity() && queue.size() > 0) {
             ElevatorQueueObject q = queue.getFirst();
             if (q.getActionType() == ElevatorAction.PICKUP) {
@@ -96,7 +99,10 @@ public class Elevator implements ElevatorInterface {
     }
 
     /* See ElevatorInterface for details */
-    public boolean updateElevator() {       
+    public boolean updateElevator() {    
+    	if(queue.isEmpty()){
+    		return true;
+    	}
         //Update total wait time
         for (int i = 0; i < queue.size(); i++) {
             if (queue.get(i).getActionType() == ElevatorAction.PICKUP) {
@@ -171,21 +177,39 @@ public class Elevator implements ElevatorInterface {
         return queue;
     }
 
+    private boolean checker(int[] temp, int origin)
+    {
+    	boolean exists = false;
+    	for(int i = 0; i < temp.length; i++)
+    	{
+    		if(temp[i] == origin)
+    		{
+    			exists = true;
+    			break;
+    		}
+    	}
+    	return exists;
+    }
     /* See ElevatorInterface for details */
     public boolean addToQueue(Passenger p, int index1, int index2, CarPosition c) {
-        if (!Arrays.asList(floors).contains(p.getOrigin())) {
+        if (!checker(floors, p.getOrigin())) { 
+        	System.out.println("1!!");
             return false;
         }        
-        if (!Arrays.asList(floors).contains(p.getDestination())) {
+        if (!checker(floors, p.getDestination())) {
+        	System.out.println("2!!");
             return false;
         }
         if (index2 <= index1) {
+        	System.out.println("3!!");
             return false;
         }
         if (index1 < 0 || index1 > queue.size()) {
+        	System.out.println("4!!");
             return false;
         }
         if (index2 < 0 || index2 > queue.size() + 1) {
+        	System.out.println("5!!");
             return false;
         }
         
@@ -198,13 +222,16 @@ public class Elevator implements ElevatorInterface {
         
         queue.add(index1, q1);
         queue.add(index2, q2);
-
         return true;
     }
     
     /* See ElevatorInterface for details */
     public ElevatorStatusObject getStatus() {
         //Fetch destination
+    	if(queue.isEmpty()) {
+    		return new ElevatorStatusObject(currentFloor, 0, -1, currentPassengers.size());
+    	}
+    	
         ElevatorQueueObject q = queue.getFirst();
         int dest = 0;
         if (q.getActionType() == ElevatorAction.PICKUP) {

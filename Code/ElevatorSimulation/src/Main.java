@@ -11,12 +11,14 @@ public class Main {
 	/* Fields */
 	private static ArrayList<Passenger> passengers; 
 	private static ArrayList<Call> calls;
-	private static ArrayList<Elevator> localElevators;
+	private static ArrayList<Elevator> localElevatorsBottom;
+	private static ArrayList<Elevator> localElevatorsTop;
 	private static ArrayList<Elevator> shuttleElevators;
 	private static TrafficGenerator trafficGen;
 	private static ElevatorSpecs specs;
 	private static int travellingTime;
 	private static int waitingTime;
+	private static SingleAutomatic algForShuttle;
 	
 	/**
 	 * Read all specifications for this simulation from file, and returns an object carrying all these
@@ -30,7 +32,7 @@ public class Main {
 	 */
 	private static ElevatorSpecs getSpecs() throws FileNotFoundException {
 		ArrayList<String> temp = new ArrayList<String>();
-		BufferedReader br = new BufferedReader(new FileReader("ElevatorFiles/specs.txt"));
+		BufferedReader br = new BufferedReader(new FileReader("Src/ElevatorFiles/specs.txt")); //src måste vara med i eclipse
 		try {
 			String line = br.readLine();
 			while(line != null) {
@@ -59,6 +61,19 @@ public class Main {
 		}
 	}
 	
+	
+	/**
+	 * Method to see the values of a specific, pre-generated traffic.
+	 */
+	private static void testTraffic(ArrayList<Call> traffic){
+		for (int i = 0; i < traffic.size(); i++) {
+			Call tempcall = traffic.get(i);
+			System.out.print("Calltime: " + tempcall.getCallTime());
+			System.out.print(" | Origin floor: " + tempcall.getOriginFloor());
+			System.out.print(" | Destination floor: " + tempcall.getDestination());
+			System.out.println();
+	}
+	}
 	/**
 	 * Main method
 	 */
@@ -70,45 +85,141 @@ public class Main {
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
-		
+		algForShuttle = new SingleAutomatic(specs);
 		//Create a traffic generator according to the specifications
 		trafficGen = new TrafficGenerator(specs);
 		
 		//Test the traffic generator
-		testTrafficGen();
+	//	testTrafficGen();
 		
-		//	makeElevators();
-		//localElevators = new ArrayList<Elevator>();
-		//shuttleElevators = new ArrayList<Elevator>();
-		//	startSimulation();
-		//	fancyPrint();  //TODO print results
-	}
 	
+			createElevators();
+			simulateDay(new SingleAutomatic(specs), 4); 
 
+		
+	}
+
+	/**
+	 * Create the elevators used in this simulation. 
+	 * Floor parameters from the specs are used here.
+	 */
+	private static void createElevators()
+	{
+		localElevatorsBottom = new ArrayList<Elevator>();
+		localElevatorsTop = new ArrayList<Elevator>();
+		shuttleElevators = new ArrayList<Elevator>();
+		int numberOfShuttles = specs.getNumberOfShuttles(); //Edit with proper coding to support different implementations
+		
+		int[] bottomfloors = new int[specs.getSkylobbyfloor()];
+		for(int i = 0; i < specs.getSkylobbyfloor(); i++)
+		{
+			bottomfloors[i] = i;
+		}
+		
+		int[] shuttleFloors = new int[2];
+		shuttleFloors[0] = specs.getLobbyFloor();
+		shuttleFloors[1] = specs.getSkylobbyfloor();
+		
+		int[] topfloors = new int[(specs.getFloors() - bottomfloors.length)];
+		
+		for(int i = 0; i < topfloors.length; i++)
+		{
+			topfloors[i] = specs.getSkylobbyfloor() + i;
+		}
+		
+		for(int i = 0; i < specs.getShafts() - numberOfShuttles;i++)
+		{
+			localElevatorsBottom.add(new Elevator(specs, bottomfloors, 0)); //Begin with start 0 for simplicity
+			localElevatorsTop.add(new Elevator(specs, topfloors, specs.getSkylobbyfloor())); 
+		}
+		
+		for(int i = 0; i < numberOfShuttles; i++)
+		{
+			shuttleElevators.add(new Elevator(specs, shuttleFloors, 0));
+		}
+		
+	}
+
+	/**
+	 * Simulate a day of elevator activity. Consists of 5 different periods.
+	 * @param alg
+	 * @param trafficAmount
+	 */
 	public static void simulateDay(Algorithm alg, int trafficAmount)
 	{
-		travellingTime = 0;
-		waitingTime = 0;
 		simulatePeriod(alg, TrafficType.UPPEAK, trafficAmount);
-		simulatePeriod(alg, TrafficType.REGULAR, trafficAmount);
-		simulatePeriod(alg, TrafficType.LUNCH, trafficAmount);
-		simulatePeriod(alg, TrafficType.REGULAR, trafficAmount);
-		simulatePeriod(alg, TrafficType.DOWNPEAK, trafficAmount);
+	//	simulatePeriod(alg, TrafficType.REGULAR, trafficAmount);
+	//	simulatePeriod(alg, TrafficType.LUNCH, trafficAmount);
+	//	simulatePeriod(alg, TrafficType.REGULAR, trafficAmount);
+	//	simulatePeriod(alg, TrafficType.DOWNPEAK, trafficAmount);
 		
-		//printResults();
-
+	//	handleRestCalls(alg); // Extra time needed to empty system
+	
+		//TODO: Something to manage time from this day
+	}
+	
+	/**
+	 * Further simulates remaining passengers traveling. Extra time is added to the total time.
+	 */
+	public static int handleRestCalls(Algorithm alg)
+	{
+		int secondsElapsed = 0;
+		while(!systemEmpty())
+		{
+			updateElevatorPosition();
+			ArrayList<Passenger> newCalls = updateElevatorOnOff();
+			localElevatorsBottom = alg.manageNewLocalCalls(localElevatorsBottom, newCalls);
+			localElevatorsTop = alg.manageNewLocalCalls(localElevatorsTop, newCalls);
+			shuttleElevators = alg.manageNewShuttleCalls(shuttleElevators, newCalls);
+			secondsElapsed += 1;
+		}
+		return secondsElapsed;
 	}
 
+	/**
+	 * Checks if the system of elevators is free of calls.
+	 * @return True or False
+	 */
+	public static boolean systemEmpty()
+	{
+		ArrayList<Elevator> localElevators = localElevatorsBottom;
+		localElevators.addAll(localElevatorsTop);
+		boolean isEmpty = true;
+		for(int i = 0; i < localElevators.size(); i++)
+		{
+			if(localElevators.get(i).getQueue().size() > 0)
+			{
+				isEmpty = false;
+				return isEmpty;
+			}
+		}
+		
+		for(int i = 0; i < shuttleElevators.size(); i++)
+		{
+			if(shuttleElevators.get(i).getQueue().size() > 0)
+			{
+				isEmpty = false;
+				return isEmpty;
+			}
+		}
+		
+		return isEmpty;
+	}
 	
-	//Could return int, showing periodvalues.. Reset value between each period??
+	/**
+	 * Simulates a period of elevator traffic.
+	 * @param alg
+	 * @param t
+	 * @param trafficAmount
+	 */
 	public static void simulatePeriod(Algorithm alg, TrafficType t, int trafficAmount)
 	{
-		ArrayList<Call> traffic = trafficGen.getTraffic(t, trafficAmount);
-		alg.setTraffic(traffic);
-		SingleAutomatic algForShuttle = new SingleAutomatic(specs);
-		algForShuttle.setTraffic(traffic);
+		ArrayList<Call> traffic = trafficGen.getTraffic(t, trafficAmount); //Create traffic for this period
+		alg.setTraffic(traffic); //Pass the planned traffic to the algorithm
+		algForShuttle.setTraffic(traffic); //Pass the planned traffic to shuttleAlgorithm too
+		testTraffic(traffic); //Debugging
 		
-		for(int second_i = 0; second_i < specs.getPeriodTime(); second_i++) //i seconds 
+		for(int second_i = 0; second_i < specs.getPeriodTime(); second_i++)
 		{
 			//Update position of elevators
 			updateElevatorPosition();
@@ -116,8 +227,13 @@ public class Main {
 			//People get off elevators
 			ArrayList<Passenger> newCalls = updateElevatorOnOff();
 			
+			if(newCalls.size() > 0)
+			{
+				System.out.println("Newcalls size: " + newCalls.size());
+			}
 			//Manage new calls (algorithm call)
-			localElevators = alg.manageCalls(second_i, localElevators, newCalls); //assumes localElevators come first, then shuttles
+			localElevatorsBottom = alg.manageCalls(second_i, localElevatorsBottom, newCalls); //assumes localElevators come first, then shuttles
+			localElevatorsTop = alg.manageCalls(second_i, localElevatorsTop, newCalls); //assumes localElevators come first, then shuttles
 			shuttleElevators = algForShuttle.manageShuttleCalls(second_i, shuttleElevators, newCalls);
 			
 			
@@ -128,11 +244,23 @@ public class Main {
 		}
 	}
 	
+	/**
+	 * Update the position of every elevator by calling its update function.
+	 */
 	private static void updateElevatorPosition()
 	{
-		for(int i = 0; i < localElevators.size(); i++)
+		
+		for(int i = 0; i < localElevatorsBottom.size(); i++)
 		{
-			localElevators.get(i).updateElevator();
+			localElevatorsBottom.get(i).updateElevator();
+			
+		}
+		
+
+		for(int i = 0; i < localElevatorsTop.size(); i++)
+		{
+			localElevatorsTop.get(i).updateElevator();
+			
 		}
 		
 		for(int i = 0; i < shuttleElevators.size(); i++)
@@ -141,13 +269,28 @@ public class Main {
 		}
 	}
 	
-	//TODO update travel time (sum)
+	/**
+	 * Open elevator doors and allow passengers to enter or exit. For all passengers that exit, either remove
+	 * them if they have completed their travel, or return them in a list.
+	 * @return An ArrayList containing people who will continue their traveling. 
+	 */
 	private static ArrayList<Passenger> updateElevatorOnOff()
 	{
 		ArrayList<Passenger> p = new ArrayList<Passenger>();
-		for(int i = 0; i < localElevators.size(); i++)
+		
+		for(int i = 0; i < localElevatorsBottom.size(); i++)
 		{
-			Passenger[] temp = localElevators.get(i).openDoors();
+			Passenger[] temp = localElevatorsBottom.get(i).openDoors();
+			
+			for(int j = 0;  j < temp.length; j++)
+			{
+				p.add(temp[j]);
+			}
+		}
+		
+		for(int i = 0; i < localElevatorsTop.size(); i++)
+		{
+			Passenger[] temp = localElevatorsTop.get(i).openDoors();
 			
 			for(int j = 0;  j < temp.length; j++)
 			{
@@ -178,39 +321,5 @@ public class Main {
 		return p;
 	}
 	
-	//TODO: Adapt for different elevator types
-	/*
-	private static void makeElevators()
-	{
-		int numberOfShuttles = 8; //Edit with proper coding to support different implementations
-		for(int i = 0; i < specs.getShafts() - numberOfShuttles;i++)
-		{
-			localElevators.add(new Elevator(0));
-		}
-		
-		for(int i = 0; i < numberOfShuttles; i++)
-		{
-			shuttleElevators.add(new Elevator(0));
-		}
-		
-		for(int i = 0; i < specs.getShafts() - numberOfShuttles; i++)
-		{
-			localElevators.add(new Elevator(specs.getSkylobbyfloor())); //Begin in skylobby? Discuss!
-		}
-	}
 
-	private static void startSimulation()
-	{
-		for(int i = 0; i < specs.getSimulationDays(); i++)
-		{
-			calls = trafficGen.getTraffic(TrafficType.UPPEAK, null, specs.getLowTraffic());
-			
-			//What should we do next? Pre assign an elevator to a passenger? 
-			// In real life, without the system knowing where passengers wants aforehand, a passenger walk to the nearby elevators. (60 elevators is a lot to choose from)
-			//Best solution: System answer calls by assigning elevators to floors via own method. Maybe cut down amount of elevators.
-			//After selection is made, let all passengers board elevators, and move it up each iteration step(which probably is a loop over each second)
-			
-		}
-	}
-		*/
 }

@@ -5,7 +5,7 @@ import java.util.Arrays;
 /**
  * This class represents a double decked elevator.
  */
-public class DDElevator {   
+public class DDElevator implements ElevatorInterface{   
     /* Fields */
     private ElevatorSpecs specs;
     private int[] floors;

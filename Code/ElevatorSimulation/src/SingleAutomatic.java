@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 
 
@@ -25,12 +26,17 @@ public class SingleAutomatic extends Algorithm{
 		int index = 0;
 			for(int i = 0; i < elev.size(); i++) 
 			{
-				if(elev.get(i).getStatus().floor == p.getOrigin())
+				if(!Arrays.asList(elev.get(i).floors).contains(p.getOrigin())) {
+					continue;
+				}
 				{
-					//Closest elevator is the best to take at the moment. Check if not full!
-					if(elev.get(i).getStatus().passengers != spec.getCarryCapacity())
+					if(elev.get(i).getStatus().floor == p.getOrigin())
 					{
-						return i;
+						//Closest elevator is the best to take at the moment. Check if not full!
+						if(elev.get(i).getStatus().passengers != spec.getCarryCapacity())
+						{
+							return i;
+						}
 					}
 				}
 				if(elev.get(i).getQueue().size() < lowestQueue)
@@ -51,28 +57,112 @@ public class SingleAutomatic extends Algorithm{
 		}
 		//Now have best available shuttle.. //TODO: Check if double decked, passenger need to know top or down in that case
 		elevatorList.get(index).addToQueue(p, positionPickup, elevatorList.get(index).getQueue().size() + 1, pos); //True for single automatic
+
 		return elevatorList;
 	}
 	
 	
 	public ArrayList<Elevator> manageShuttleCalls(int second, ArrayList<Elevator> shuttles, ArrayList<Passenger> newCalls)
 	{
-		int counter = 0;
-		while(!traffic.isEmpty() && traffic.get(counter).getCallTime() == second)
+
+		for(int i = 0; i < traffic.size(); i++)
 		{
-			//Time to create a passenger
-			Passenger p = new Passenger(traffic.get(counter), spec);
-			if(p.getDestination() == spec.getSkylobbyfloor() || p.getDestination() == spec.getLobbyFloor())
+			if(traffic.get(i).getCallTime() == second)
 			{
-				//Find best shuttle
-				int shuttleIndex = getBestShuttle(shuttles, p);
-				shuttles = assignToElevator(shuttleIndex, p, shuttles, CarPosition.NULL); //Modify to support dd
-				traffic.remove(counter);
+				Passenger p = new Passenger(traffic.get(i), spec);
+			
+				if(p.getDestination() == spec.getSkylobbyfloor() || p.getDestination() == spec.getLobbyFloor())
+				{
+					//Find best shuttle
+					int shuttleIndex = getBestShuttle(shuttles, p);
+					shuttles = assignToElevator(shuttleIndex, p, shuttles, CarPosition.NULL); //Modify to support dd
+				
+				} 
 			}
-			counter += 1;
 		}
+	
+		
+		ArrayList<Call> temp = new ArrayList<Call>();
+		
+		for(Call c : traffic)
+		{
+			if(c.getCallTime() > second)
+			{
+				temp.add(c);
+			}
+		}
+		traffic = temp;
 
 		//Now handling newCalls
+		return manageNewShuttleCalls(shuttles, newCalls);
+	}
+
+	private boolean checker(int[] temp, int origin)
+	{
+		boolean exists = false;
+		for(int i = 0; i < temp.length; i++){
+			if(temp[i] == origin)
+			{
+				exists = true;
+				break;
+			}
+		}
+		return exists;
+	}
+	//Eventually used, should be quite lame
+	public ArrayList<Elevator> manageCalls(int second, ArrayList<Elevator> localElevators, ArrayList<Passenger>newCalls)
+	{
+		for(int i = 0; i < traffic.size(); i++)
+		{
+			if(traffic.get(i).getCallTime() == second && checker(localElevators.get(0).floors, traffic.get(i).getOriginFloor()))
+			{
+				//Time to create a passenger
+				Passenger p = new Passenger(traffic.get(i), spec);
+			
+			//	System.out.println(p.getOrigin() + " " + p.getDestination());
+				if(p.getDestination() != spec.getSkylobbyfloor() && p.getDestination() != spec.getLobbyFloor())
+				{
+				
+					//Find best shuttle
+					int localIndex = getSomeElevator(localElevators);
+					localElevators = assignToElevator(localIndex, p, localElevators, CarPosition.NULL); //Mod to support dd
+
+				}
+			}
+		}
+		
+		ArrayList<Call> temp = new ArrayList<Call>();
+		
+		for(Call c : traffic)
+		{
+			if(c.getCallTime() > second)
+			{
+				temp.add(c);
+			}
+		}
+		traffic = temp;
+
+
+		return manageNewLocalCalls(localElevators, newCalls);
+	}
+	
+	public ArrayList<Elevator> manageNewLocalCalls(ArrayList<Elevator> localElevators, ArrayList<Passenger> newCalls)
+	{
+		for(int i = 0; i < newCalls.size(); i++)
+		{
+		//	System.out.println(newCalls.get(i).getDestination());
+			if(newCalls.get(i).getDestination() != spec.getSkylobbyfloor() && newCalls.get(i).getDestination() != spec.getLobbyFloor() && checker(localElevators.get(0).floors, newCalls.get(i).getOrigin()))
+			{
+				System.out.println(newCalls.get(i).getDestination());
+				int localIndex = getSomeElevator(localElevators); 
+				localElevators = assignToElevator(localIndex, newCalls.get(i), localElevators, CarPosition.NULL); //Mod to support dd
+			}
+		}
+		return localElevators;	
+	}
+	
+	public ArrayList<Elevator> manageNewShuttleCalls(ArrayList<Elevator> shuttles, ArrayList<Passenger> newCalls)
+	{
 		for(int i = 0; i < newCalls.size(); i++)
 		{
 			if(newCalls.get(i).getDestination() == spec.getSkylobbyfloor() || newCalls.get(i).getDestination() == spec.getLobbyFloor())
@@ -82,36 +172,6 @@ public class SingleAutomatic extends Algorithm{
 			}
 		}
 		return shuttles;
-	}
-
-	//Eventually used, should be quite lame
-	public ArrayList<Elevator> manageCalls(int second, ArrayList<Elevator> localElevators, ArrayList<Passenger>newCalls)
-	{
-		int counter = 0;
-		while(!traffic.isEmpty() && traffic.get(counter).getCallTime() == second)
-		{
-			//Time to create a passenger
-			Passenger p = new Passenger(traffic.get(counter), spec);
-			if(p.getDestination() != spec.getSkylobbyfloor() && p.getDestination() != spec.getLobbyFloor())
-			{
-				//Find best shuttle
-				int localIndex = getSomeElevator(localElevators);
-				localElevators = assignToElevator(localIndex, p, localElevators, CarPosition.NULL); //Mod to support dd
-				traffic.remove(counter);
-			}
-			counter += 1;
-		}
-
-		//Now handling newCalls
-		for(int i = 0; i < newCalls.size(); i++)
-		{
-			if(newCalls.get(i).getDestination() != spec.getSkylobbyfloor() && newCalls.get(i).getDestination() != spec.getLobbyFloor())
-			{
-				int localIndex = getSomeElevator(localElevators); 
-				localElevators = assignToElevator(localIndex, newCalls.get(i), localElevators, CarPosition.NULL); //Mod to support dd
-			}
-		}
-		return localElevators;
 	}
 	
 	public void setTraffic(ArrayList<Call> traffic)
