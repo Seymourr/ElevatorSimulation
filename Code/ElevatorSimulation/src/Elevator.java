@@ -1,6 +1,8 @@
 
 import java.util.LinkedList;
 import java.util.Arrays;
+import java.math.BigInteger;
+import java.math.BigDecimal;
 
 /**
  * This class represents an single decked elevator.
@@ -14,6 +16,10 @@ public class Elevator implements ElevatorInterface {
     private int waitingTime;
     private float currentFloor;
     private final float distancePerFloor;
+    private BigInteger totalWaitTime;
+    private BigInteger totalTravelTime;
+    private BigDecimal totalTravelDistance;
+    private BigInteger passengersServed;
     
     /**
      * Constructor 
@@ -28,6 +34,10 @@ public class Elevator implements ElevatorInterface {
         waitingTime = 0;
         this.currentFloor = currentFloor;
         distancePerFloor = (float)specs.getBuildingHeight() / (float)specs.getFloors();
+        totalWaitTime = new BigInteger("0");
+        totalTravelTime = new BigInteger("0");
+        totalTravelDistance = new BigDecimal("0");
+        passengersServed = new BigInteger("0");
     }
     
     /* See ElevatorInterface for details */
@@ -50,6 +60,7 @@ public class Elevator implements ElevatorInterface {
             if (temp[i].getDestination() == currentFloor) {
                 currentPassengers.remove(temp[i]); //Remove from elevator
                 retPas.add(temp[i]); //Add to return list
+                passengersServed.add(BigInteger.ONE); //Update service counter
                 for (int j = 0; j < queue.size(); j++) {
                     ElevatorQueueObject q = queue.get(j);
                     if (q.getPassenger() == temp[i] && q.getActionType() == ElevatorAction.DROPOFF) {
@@ -85,8 +96,18 @@ public class Elevator implements ElevatorInterface {
     }
 
     /* See ElevatorInterface for details */
-    public boolean updateElevator() {
-        //Passenger boarding time
+    public boolean updateElevator() {       
+        //Update total wait time
+        for (int i = 0; i < queue.size(); i++) {
+            if (queue.get(i).getActionType() == ElevatorAction.PICKUP) {
+                totalWaitTime.add(BigInteger.ONE);
+            }
+        }
+        
+        //Update total travel time
+        totalTravelTime.add(BigInteger.valueOf(currentPassengers.size()));
+        
+        //Passengers boarding, no movement
         if (waitingTime > 0) {
             waitingTime -= 1;
             return true;
@@ -114,12 +135,13 @@ public class Elevator implements ElevatorInterface {
         if (!Arrays.asList(floors).contains(dest)) {
             return false;
         }
-            
-        //Update Elevator Position 
+ 
+        //Update Elevator Position
+        float tempFloor = currentFloor;
         float newFloor = currentFloor;
         if (dest > currentFloor) { //Going up
             newFloor += (specs.getCarSpeed() / distancePerFloor);
-            if (dest <= newFloor) { //Reached destination?
+            if (dest <= newFloor) { //Reached destination
                 currentFloor = dest;
                 //Set waiting time for embarking/disembarking
                 waitingTime = specs.getFloorDelay();
@@ -136,6 +158,9 @@ public class Elevator implements ElevatorInterface {
                 currentFloor = newFloor;
             }
         }
+
+        //Update travel distance
+        totalTravelDistance.add(BigDecimal.valueOf(Math.abs(tempFloor - currentFloor)));
         
         //Everything okay
         return true;
@@ -201,6 +226,7 @@ public class Elevator implements ElevatorInterface {
     
     /* See ElevatorInterface for details */
     public ElevatorServiceStatus getRecords() {
-        return null;
+        return new ElevatorServiceStatus(totalWaitTime, totalTravelTime, 
+            totalTravelDistance.toBigInteger(), passengersServed);
     }
 }
