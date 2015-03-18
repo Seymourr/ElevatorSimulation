@@ -32,7 +32,7 @@ public class SingleAutomatic extends Algorithm{
 		for(int i = 0; i < traffic.size(); i++){
 			if(traffic.get(i).getCallTime() == second){
 				Passenger p = new Passenger(traffic.get(i), spec);
-				if(checker(shuttles.get(0).floors, p.getOrigin(), p.getDestination())){
+				if(p.getDestination() == spec.getSkylobbyfloor() || p.getDestination() == spec.getLobbyFloor()){
 					int shuttleIndex = getBestShuttle(shuttles, p);
 					shuttles = assignToElevator(shuttleIndex, p, shuttles, CarPosition.NULL); //Modify to support dd	
 				} 
@@ -69,8 +69,26 @@ public class SingleAutomatic extends Algorithm{
 			}
 		}
 		
-		//An optimal elevator was not found.. pick a random one
-		return getSomeElevator(elev);
+		
+		
+		int lowestQueue = elev.get(0).getQueue().size();
+		int index = 0;
+			for(int i = 0; i < elev.size(); i++){
+				if(!Arrays.asList(elev.get(i).floors).contains(p.getOrigin())) {
+					continue;
+				}
+					if(elev.get(i).getStatus().floor == p.getOrigin()){
+						//Closest elevator is the best to take at the moment. Check if not full!
+						if(elev.get(i).getStatus().passengers != spec.getCarryCapacity()){
+							return i;
+						}
+					}
+				if(elev.get(i).getQueue().size() < lowestQueue){
+						lowestQueue = elev.get(i).getQueue().size();
+						index = i;
+				}
+			}
+			return index;
 	}
 
 	private ArrayList<Elevator> assignToElevator(int index, Passenger p, ArrayList<Elevator> elevatorList, CarPosition pos){

@@ -10,14 +10,23 @@ public class SingleAutomatic extends Algorithm{
 			if(traffic.get(i).getCallTime() == second) {
 				Passenger p = new Passenger(traffic.get(i), spec);
 				if(checker(localElevators.get(0).floors, p.getOrigin(), p.getDestination())){
-					int localIndex = getSomeElevator(localElevators);
-					localElevators = assignToElevator(localIndex, p, localElevators, CarPosition.NULL); //Edit to support DD
+					
 				}
 			} else {
 				break; 
 			}
-		}
+			
+			
+			if(traffic.get(i).getCallTime() == second && checker(localElevators.get(0).floors, traffic.get(i).getOriginFloor(), traffic.get(i)) {
+			
+				if(p.getDestination() != spec.getSkylobbyfloor() && p.getDestination() != spec.getLobbyFloor()) {
+					int localIndex = getSomeElevator(localElevators);
+					localElevators = assignToElevator(localIndex, p, localElevators, CarPosition.NULL); //Mod to support dd
+				}
+			}
+		}	
 		ArrayList<Call> temp = new ArrayList<Call>();
+		
 		for(Call c : traffic){
 			if(c.getCallTime() > second){
 				temp.add(c);
@@ -32,7 +41,7 @@ public class SingleAutomatic extends Algorithm{
 		for(int i = 0; i < traffic.size(); i++){
 			if(traffic.get(i).getCallTime() == second){
 				Passenger p = new Passenger(traffic.get(i), spec);
-				if(checker(shuttles.get(0).floors, p.getOrigin(), p.getDestination())){
+				if(p.getDestination() == spec.getSkylobbyfloor() || p.getDestination() == spec.getLobbyFloor()){
 					int shuttleIndex = getBestShuttle(shuttles, p);
 					shuttles = assignToElevator(shuttleIndex, p, shuttles, CarPosition.NULL); //Modify to support dd	
 				} 
@@ -61,16 +70,24 @@ public class SingleAutomatic extends Algorithm{
 	
 	//The best shuttle is the one at the same floor. If none are at the same floor, take the one in the list that has fewest allocations
 	private int getBestShuttle(ArrayList<Elevator> elev, Passenger p){
-		for(int i = 0; i < elev.size(); i++){
-			if(elev.get(i).getStatus().floor == p.getOrigin()){
-				if(elev.get(i).getStatus().direction == 0 && elev.get(i).getStatus().passengers < spec.getCarryCapacity()) {
-					return i;
+		int lowestQueue = elev.get(0).getQueue().size();
+		int index = 0;
+			for(int i = 0; i < elev.size(); i++){
+				if(!Arrays.asList(elev.get(i).floors).contains(p.getOrigin())) {
+					continue;
+				}
+					if(elev.get(i).getStatus().floor == p.getOrigin()){
+						//Closest elevator is the best to take at the moment. Check if not full!
+						if(elev.get(i).getStatus().passengers != spec.getCarryCapacity()){
+							return i;
+						}
+					}
+				if(elev.get(i).getQueue().size() < lowestQueue){
+						lowestQueue = elev.get(i).getQueue().size();
+						index = i;
 				}
 			}
-		}
-		
-		//An optimal elevator was not found.. pick a random one
-		return getSomeElevator(elev);
+			return index;
 	}
 
 	private ArrayList<Elevator> assignToElevator(int index, Passenger p, ArrayList<Elevator> elevatorList, CarPosition pos){
@@ -87,31 +104,25 @@ public class SingleAutomatic extends Algorithm{
 	
 	
 	private boolean checker(int[] temp, int origin, int destination){
-		boolean inOrigin = false;
-		boolean goingToDestination = false;
+		boolean exists = false;
 		for(int i = 0; i < temp.length; i++){
 			if(temp[i] == origin){
-				inOrigin = true;
+				exists = true;
 				break;
 			}
 		}
-		
-		for(int i = 0; i < temp.length; i++){
-			if(temp[i] == destination){
-				goingToDestination = true;
-				break;
-			}
-		}
-		return (inOrigin && goingToDestination);
+		return exists;
 	}
 	
 
 	
 	public ArrayList<Elevator> manageNewLocalCalls(ArrayList<Elevator> localElevators, ArrayList<Passenger> newCalls){
 		for(int i = 0; i < newCalls.size(); i++){
-			if(checker(localElevators.get(0).floors, newCalls.get(i).getOrigin(), newCalls.get(i).getDestination())){
-				int localIndex = getSomeElevator(localElevators);
-				localElevators = assignToElevator(localIndex, newCalls.get(i), localElevators, CarPosition.NULL);
+		//	System.out.println(newCalls.get(i).getDestination());
+			if(newCalls.get(i).getDestination() != spec.getSkylobbyfloor() && newCalls.get(i).getDestination() != spec.getLobbyFloor() && checker(localElevators.get(0).floors, newCalls.get(i).getOrigin())){
+				System.out.println(newCalls.get(i).getDestination());
+				int localIndex = getSomeElevator(localElevators); 
+				localElevators = assignToElevator(localIndex, newCalls.get(i), localElevators, CarPosition.NULL); //Mod to support dd
 			}
 		}
 		return localElevators;	
@@ -119,7 +130,7 @@ public class SingleAutomatic extends Algorithm{
 	
 	public ArrayList<Elevator> manageNewShuttleCalls(ArrayList<Elevator> shuttles, ArrayList<Passenger> newCalls){
 		for(int i = 0; i < newCalls.size(); i++){
-			if(checker(shuttles.get(0).floors, newCalls.get(i).getOrigin(), newCalls.get(i).getDestination())){
+			if(newCalls.get(i).getDestination() == spec.getSkylobbyfloor() || newCalls.get(i).getDestination() == spec.getLobbyFloor()){
 				int shuttleIndex = getBestShuttle(shuttles, newCalls.get(i));
 				shuttles = assignToElevator(shuttleIndex, newCalls.get(i), shuttles, CarPosition.NULL); //Modify to support dd
 			}
