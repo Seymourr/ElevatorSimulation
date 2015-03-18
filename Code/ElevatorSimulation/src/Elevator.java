@@ -38,8 +38,6 @@ public class Elevator implements ElevatorInterface {
             return new Passenger[0];
         }
         
-        //TODO Flytta kod om väntesekunder hit
-        
         //Disembarking
         LinkedList<Passenger> retPas = new LinkedList<Passenger>();
         Passenger[] temp = new Passenger[currentPassengers.size()];
@@ -47,11 +45,11 @@ public class Elevator implements ElevatorInterface {
             temp[i] = currentPassengers.get(i);
         }
         
-        //Update queue, elevator and fill return list
+        //(Disembarking) Update queue, elevator and fill return list
         for (int i = 0; i < temp.length; i++) {
             if (temp[i].getDestination() == currentFloor) {
                 currentPassengers.remove(temp[i]); //Remove from elevator
-                retPas.add(temp[i]);
+                retPas.add(temp[i]); //Add to return list
                 for (int j = 0; j < queue.size(); j++) {
                     ElevatorQueueObject q = queue.get(j);
                     if (q.getPassenger() == temp[i] && q.getActionType() == ElevatorAction.DROPOFF) {
@@ -88,13 +86,23 @@ public class Elevator implements ElevatorInterface {
 
     /* See ElevatorInterface for details */
     public boolean updateElevator() {
+        //Passenger boarding time
         if (waitingTime > 0) {
             waitingTime -= 1;
             return true;
         }
         
-        //Fetch next destination
         ElevatorQueueObject q = queue.getFirst();
+        
+        //If the elevator is full, fetch the next non-PICKUP type
+        int index = 1;
+        while (currentPassengers.size() == specs.getCarryCapacity() 
+            && q.getActionType() == ElevatorAction.PICKUP) {
+            q = queue.get(index);
+            index += 1;
+        }
+        
+        //Fetch next destination
         int dest = 0;
         if (q.getActionType() == ElevatorAction.PICKUP) {
             dest = q.getPassenger().getOrigin();
@@ -108,7 +116,6 @@ public class Elevator implements ElevatorInterface {
         }
             
         //Update Elevator Position 
-        //TODO om hissen är full, ta endast DROPOFF typ
         float newFloor = currentFloor;
         if (dest > currentFloor) { //Going up
             newFloor += (specs.getCarSpeed() / distancePerFloor);
@@ -147,6 +154,15 @@ public class Elevator implements ElevatorInterface {
         if (!Arrays.asList(floors).contains(p.getDestination())) {
             return false;
         }
+        if (index2 <= index1) {
+            return false;
+        }
+        if (index1 < 0 || index1 > queue.size()) {
+            return false;
+        }
+        if (index2 < 0 || index2 > queue.size() + 1) {
+            return false;
+        }
         
         ElevatorQueueObject q1 = new ElevatorQueueObject(
             p, ElevatorAction.PICKUP, CarPosition.NULL
@@ -156,10 +172,8 @@ public class Elevator implements ElevatorInterface {
         );
         
         queue.add(index1, q1);
-        queue.add(index2 + 1, q2);
-        
-        //TODO Make sure last index work
-        
+        queue.add(index2, q2);
+
         return true;
     }
     
