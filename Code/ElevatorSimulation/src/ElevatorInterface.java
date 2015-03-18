@@ -44,4 +44,10 @@ public interface ElevatorInterface {
      * of ElevatorStatusObject for details.
      */
     public ElevatorStatusObject getStatus();
+    
+    /**
+     * Returns an ElevatorServiceStatus which shows various service records
+     * for the elevator. See documentation for ElevatorServiceStatus for details.
+     */
+    public ElevatorServiceStatus getRecords();
 }

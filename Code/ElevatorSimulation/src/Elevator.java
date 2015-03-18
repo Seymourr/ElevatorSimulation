@@ -198,4 +198,9 @@ public class Elevator implements ElevatorInterface {
         
         return new ElevatorStatusObject(currentFloor, dir, dest, currentPassengers.size());
     }
+    
+    /* See ElevatorInterface for details */
+    public ElevatorServiceStatus getRecords() {
+        return null;
+    }
 }

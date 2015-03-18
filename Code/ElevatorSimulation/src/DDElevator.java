@@ -118,9 +118,14 @@ public class DDElevator {
         return true;
     }
 
-        /* See ElevatorInterface for details */
+    /* See ElevatorInterface for details */
     public ElevatorStatusObject getStatus() {
         //TODO
+        return null;
+    }
+    
+    /* See ElevatorInterface for details */
+    public ElevatorServiceStatus getRecords() {
         return null;
     }
 }
