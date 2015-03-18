@@ -314,7 +314,6 @@ public class Main {
 			if(destination == -1)
 			{
 				//remove passeger
-				System.out.println("The following passenger finished traveling (he came from here): " + p.get(i).getOrigin());
 			    p.remove(i);
 			}
 		}

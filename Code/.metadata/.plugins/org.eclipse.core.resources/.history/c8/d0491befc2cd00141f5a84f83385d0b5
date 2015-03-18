@@ -36,7 +36,6 @@ public class SingleAutomatic extends Algorithm{
 				if(checker(shuttles.get(0).floors, p.getOrigin(), p.getDestination())){
 					int shuttleIndex = getBestShuttle(shuttles, p);
 					shuttles = assignToElevator(shuttleIndex, p, shuttles, CarPosition.NULL); //Modify to support dd	
-					System.out.println("The passenger from " + traffic.get(i).getOriginFloor() + " to " + traffic.get(i).getDestination() + " was assigned to a shuttle");
 				} 
 			}
 		}
@@ -112,7 +111,6 @@ public class SingleAutomatic extends Algorithm{
 			if(checker(localElevators.get(0).floors, newCalls.get(i).getOrigin(), newCalls.get(i).getDestination())){
 				int localIndex = getSomeElevator(localElevators);
 				localElevators = assignToElevator(localIndex, newCalls.get(i), localElevators, CarPosition.NULL);
-				System.out.println("The newcall passenger from " + newCalls.get(i).getOrigin() + " to " +  newCalls.get(i).getDestination()  + " was assigned");
 			}
 		}
 		return localElevators;	
@@ -123,7 +121,6 @@ public class SingleAutomatic extends Algorithm{
 			if(checker(shuttles.get(0).floors, newCalls.get(i).getOrigin(), newCalls.get(i).getDestination())){
 				int shuttleIndex = getBestShuttle(shuttles, newCalls.get(i));
 				shuttles = assignToElevator(shuttleIndex, newCalls.get(i), shuttles, CarPosition.NULL); //Modify to support dd
-				System.out.println("The newcall shuttle passenger from " + newCalls.get(i).getOrigin() + " to " +  newCalls.get(i).getDestination()  + " was assigned");
 			}
 		}
 		return shuttles;
