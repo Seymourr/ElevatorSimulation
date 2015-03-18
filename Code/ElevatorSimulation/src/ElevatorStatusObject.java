@@ -23,4 +23,14 @@ public class ElevatorStatusObject {
        destination = dest;
        passengers = cont;
     }
+    
+    /* Converts this ElevatorStatusObject to a nice little String */
+    public String getStringRepresentation() {
+        String s = "*********** ELEVATOR STATUS ********** \n" +
+            "Current Floor: " + floor + "\n" +
+            "Current Direction: " + direction + "\n" +
+            "Current Destination: " + destination + "\n" +
+            "Number of Souls Onboard: " + passengers;
+        return s;
+    }
 }
