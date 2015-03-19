@@ -62,34 +62,31 @@ public class Elevator implements ElevatorInterface {
         //(Disembarking) Update queue, elevator and fill return list
         for (int i = 0; i < temp.length; i++) {
             if (temp[i].getDestination() == currentFloor) {
-            	
-         //   	System.out.println("Attempting disembarkment"); // DEBUG UTSKRIFTER HÄR
-            	
                 currentPassengers.remove(temp[i]); //Remove from elevator
                 retPas.add(temp[i]); //Add to return list
-                passengersServed.add(BigInteger.ONE); //Update service counter
+                passengersServed = passengersServed.add(new BigInteger("1")); //Update service counter
+                
+                boolean removed = false;
                 for (int j = 0; j < queue.size(); j++) {
                     ElevatorQueueObject q = queue.get(j);
+
                     if (q.getPassenger() == temp[i] && q.getActionType() == ElevatorAction.DROPOFF) {
-                    	
-       //             	System.out.println("Disembarkment"); // DEBUG UTSKRIFTER HÄR
-                    	
+                    	removed = true;
                         queue.remove(q); //Remove from queue
                         break;
                     }
+                }
+                if (!removed) { //Could not find queue object
+                    throw new RuntimeException("Could not find dismebarking passenger in queue.");
                 }
             }
         }
         
         //Embarking
-      
         while (currentPassengers.size() < specs.getCarryCapacity() && queue.size() > 0) {
-
             ElevatorQueueObject q = queue.getFirst();
             if (q.getActionType() == ElevatorAction.PICKUP) {
                 if(q.getPassenger().getOrigin() == floor) {
-                	
-     //           	System.out.println("Embarkment"); // DEBUG UTSKRIFTER HÄR
                     currentPassengers.add(q.getPassenger());
                     queue.removeFirst();
                 } else {

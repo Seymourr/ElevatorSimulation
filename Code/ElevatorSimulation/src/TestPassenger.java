@@ -41,16 +41,16 @@ public class TestPassenger {
 			Passenger p = new Passenger(c, specs);
 			System.out.println(p.getOrigin());
 			System.out.println(p.getDestination());
-			p.nextDestination();
+			System.out.println("Next: " + p.nextDestination());
 			System.out.println(p.getOrigin());
 			System.out.println(p.getDestination());
-			p.nextDestination();
+			System.out.println("Next: " + p.nextDestination());
 			System.out.println(p.getOrigin());
 			System.out.println(p.getDestination());
-			p.nextDestination();
+			System.out.println("Next: " + p.nextDestination());
 			System.out.println(p.getOrigin());
 			System.out.println(p.getDestination());
-			p.nextDestination();
+			System.out.println("Next: " + p.nextDestination());
 			System.out.println();
 		}
 	}

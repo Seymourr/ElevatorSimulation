@@ -33,7 +33,7 @@ public class Main {
 	 */
 	private static ElevatorSpecs getSpecs() throws FileNotFoundException {
 		ArrayList<String> temp = new ArrayList<String>();
-		BufferedReader br = new BufferedReader(new FileReader("Src/ElevatorFiles/specs.txt")); //src måste vara med i eclipse
+		BufferedReader br = new BufferedReader(new FileReader("ElevatorFiles/specs.txt")); //src måste vara med i eclipse
 		try {
 			String line = br.readLine();
 			while(line != null) {
@@ -93,7 +93,7 @@ public class Main {
 		//Test the traffic generator
 	//	testTrafficGen();
 		createElevators();
-		simulateDay(new SingleAutomatic(specs), 100); 
+		simulateDay(new SingleAutomatic(specs), 1000); 
 	}
 
 	/**
@@ -157,17 +157,27 @@ public class Main {
 	private static void printDayResults(BigInteger passengerAmount){
 		BigInteger totalWaitingTime = new BigInteger("0");
 		BigInteger totalTravelingTime = new BigInteger("0");
+        
+        System.out.println("************** LOCAL BOT ************");
+        
 		for(int i = 0; i < localElevatorsBottom.size(); i++){
+            System.out.println(localElevatorsBottom.get(i).getRecords().getStringRepresentation()); // DEBUG UTSKRIFTER HÄR
 			totalWaitingTime = totalWaitingTime.add(localElevatorsBottom.get(i).getRecords().waitingTime);
 			totalTravelingTime = totalTravelingTime.add(localElevatorsBottom.get(i).getRecords().travelingTime);
 		}
+        
+        System.out.println("************** LOCAL TOP ************");
 		
 		for(int i = 0; i < localElevatorsTop.size(); i++){
+            System.out.println(localElevatorsTop.get(i).getRecords().getStringRepresentation()); // DEBUG UTSKRIFTER HÄR
 			totalWaitingTime = totalWaitingTime.add(localElevatorsTop.get(i).getRecords().waitingTime);
 			totalTravelingTime = totalTravelingTime.add(localElevatorsTop.get(i).getRecords().travelingTime);
 		}
+        
+        System.out.println("************** SHUTTLES ************");
 		
 		for(int i = 0; i < shuttleElevators.size(); i++){
+            System.out.println(shuttleElevators.get(i).getRecords().getStringRepresentation()); // DEBUG UTSKRIFTER HÄR
 			totalWaitingTime = totalWaitingTime.add(shuttleElevators.get(i).getRecords().waitingTime);
 			totalTravelingTime = totalTravelingTime.add(shuttleElevators.get(i).getRecords().travelingTime);
 		}
@@ -234,7 +244,7 @@ public class Main {
 		ArrayList<Call> traffic = trafficGen.getTraffic(t, trafficAmount); //Create traffic for this period
 		alg.setTraffic(traffic); //Pass the planned traffic to the algorithm
 		algForShuttle.setTraffic(traffic); //Pass the planned traffic to shuttleAlgorithm too
-		testTraffic(traffic); //Debugging
+		//testTraffic(traffic); //Debugging
 		
 		for(int second_i = 0; second_i < specs.getPeriodTime(); second_i++){
 			//Update position of elevators

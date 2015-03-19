@@ -6,11 +6,11 @@
 10 //Number of floors
 5  //Skylobby floor
 5   //Distance between floors
-60  //Number of shafts
+2 //Number of shafts
 100 //Building height
 12  //Car carry capacity
 4   //Car speed (Average)
 10  //Floor delay
 single //local elevator
 single //double elevator
-8     //Number of shuttles
+1   //Number of shuttles
