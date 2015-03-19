@@ -20,8 +20,7 @@ public class Elevator implements ElevatorInterface {
     private BigInteger totalTravelTime;
     private BigDecimal totalTravelDistance;
     private BigInteger passengersServed;
-    
-    private int debugInt = 5;
+
     /**
      * Constructor 
      * @param spec The specifications for this elevator.
@@ -38,16 +37,13 @@ public class Elevator implements ElevatorInterface {
         totalWaitTime = new BigInteger("0");
         totalTravelTime = new BigInteger("0");
         totalTravelDistance = new BigDecimal("0");
-        passengersServed = new BigInteger("0");
-        
+        passengersServed = new BigInteger("0");   
     }
     
     /* See ElevatorInterface for details */
     public Passenger[] openDoors() {
-    	//System.out.println(queue.size());
         //Check if currently at a floor
         int floor = Math.round(currentFloor);
-        
         if (floor != currentFloor) {
             return new Passenger[0];
         }
@@ -105,12 +101,26 @@ public class Elevator implements ElevatorInterface {
         
         return retArr;
     }
+    
+    /**
+     * Checks if the elevator currently contains the given passenger
+     */
+    private boolean containsPassenger(Passenger p) {
+        for(int i = 0; i < currentPassengers.size(); i++) {
+            if (currentPassengers.get(i) == p) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     /* See ElevatorInterface for details */
     public boolean updateElevator() {    
-    	if(queue.isEmpty()){
+    	//If no people are waiting, do nothing
+        if (queue.isEmpty()){
     		return true;
     	}
+        
         //Update total wait time
         for (int i = 0; i < queue.size(); i++) {
             if (queue.get(i).getActionType() == ElevatorAction.PICKUP) {
@@ -129,10 +139,11 @@ public class Elevator implements ElevatorInterface {
         
         ElevatorQueueObject q = queue.getFirst();
         
-        //If the elevator is full, fetch the next non-PICKUP type
+        //If the elevator is full, fetch the next passenger DROPOFF
         int index = 1;
         while (currentPassengers.size() == specs.getCarryCapacity() 
-            && q.getActionType() == ElevatorAction.PICKUP) {
+            && q.getActionType() == ElevatorAction.PICKUP
+            && containsPassenger(q.getPassenger())) {
             q = queue.get(index);
             index += 1;
         }
@@ -144,8 +155,9 @@ public class Elevator implements ElevatorInterface {
         } else {
             dest = q.getPassenger().getDestination();
         }
+        
         //Check destination is valid
-        if (!checker(floors, dest)) {
+        if (!containsFloor(floors, dest)) {
             return false;
         }
  
@@ -154,7 +166,6 @@ public class Elevator implements ElevatorInterface {
         float newFloor = currentFloor;
  
         if (dest > currentFloor) { //Going up
-        
             newFloor += (specs.getCarSpeed() / distancePerFloor);
             if (dest <= newFloor) { //Reached destination
                 currentFloor = dest;
@@ -175,15 +186,10 @@ public class Elevator implements ElevatorInterface {
         }
 
         //Update travel distance 
+        totalTravelDistance = totalTravelDistance.add(
+            BigDecimal.valueOf(Math.abs(tempFloor - currentFloor) * distancePerFloor)
+        );
         
-     
-       totalTravelDistance = totalTravelDistance.add(BigDecimal.valueOf(Math.abs(tempFloor - currentFloor)));
-        
-        if(currentPassengers.size() > 1 && debugInt > 0)
-        {
-        //	System.out.println(getStatus().getStringRepresentation());    // DEBUG UTSKRIFTER HÄR
-        	debugInt -= 1;
-        }
         //Everything okay
         return true;
     }
@@ -195,30 +201,22 @@ public class Elevator implements ElevatorInterface {
 
     /**
      * Checks that the given origin is within the floor range.
-     * @param temp
-     * @param origin
-     * @return
      */
-    private boolean checker(int[] temp, int origin)
-    {
-    	boolean exists = false;
-    	for(int i = 0; i < temp.length; i++)
-    	{
-    		if(temp[i] == origin)
-    		{
-    			exists = true;
-    			break;
+    private boolean containsFloor(int[] temp, int origin) {
+    	for(int i = 0; i < temp.length; i++) {
+    		if (temp[i] == origin) {
+    			return true;
     		}
     	}
-    	return exists;
+    	return false;
     }
     /* See ElevatorInterface for details */
     public boolean addToQueue(Passenger p, int index1, int index2, CarPosition c) {
-        if (!checker(floors, p.getOrigin())) { 
+        if (!containsFloor(floors, p.getOrigin())) { 
         	System.out.println("1!!");
             return false;
         }        
-        if (!checker(floors, p.getDestination())) {
+        if (!containsFloor(floors, p.getDestination())) {
         	System.out.println("2!!");
             return false;
         }

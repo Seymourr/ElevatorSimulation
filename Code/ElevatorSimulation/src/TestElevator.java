@@ -146,7 +146,7 @@ public class TestElevator {
         
         //Generate traffic
         TrafficGenerator trafficGen = new TrafficGenerator(specs);
-        LinkedList<Call> traffic = new LinkedList<Call>(trafficGen.getTraffic(TrafficType.UPPEAK, 1000));
+        LinkedList<Call> traffic = new LinkedList<Call>(trafficGen.getTraffic(TrafficType.LUNCH, 500));
         
         /******* CREATE ELEVATORS *********/
         
