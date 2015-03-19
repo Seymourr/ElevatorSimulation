@@ -30,7 +30,8 @@ public class ElevatorStatusObject {
             "Current Floor: " + floor + "\n" +
             "Current Direction: " + direction + "\n" +
             "Current Destination: " + destination + "\n" +
-            "Number of Souls Onboard: " + passengers;
+            "Number of Souls Onboard: " + passengers  + "\n" +
+            "************************************";
         return s;
     }
 }

@@ -21,6 +21,7 @@ public class Elevator implements ElevatorInterface {
     private BigDecimal totalTravelDistance;
     private BigInteger passengersServed;
     
+    private int debugInt = 5;
     /**
      * Constructor 
      * @param spec The specifications for this elevator.
@@ -38,6 +39,7 @@ public class Elevator implements ElevatorInterface {
         totalTravelTime = new BigInteger("0");
         totalTravelDistance = new BigDecimal("0");
         passengersServed = new BigInteger("0");
+        
     }
     
     /* See ElevatorInterface for details */
@@ -60,12 +62,18 @@ public class Elevator implements ElevatorInterface {
         //(Disembarking) Update queue, elevator and fill return list
         for (int i = 0; i < temp.length; i++) {
             if (temp[i].getDestination() == currentFloor) {
+            	
+         //   	System.out.println("Attempting disembarkment"); // DEBUG UTSKRIFTER HÄR
+            	
                 currentPassengers.remove(temp[i]); //Remove from elevator
                 retPas.add(temp[i]); //Add to return list
                 passengersServed.add(BigInteger.ONE); //Update service counter
                 for (int j = 0; j < queue.size(); j++) {
                     ElevatorQueueObject q = queue.get(j);
                     if (q.getPassenger() == temp[i] && q.getActionType() == ElevatorAction.DROPOFF) {
+                    	
+       //             	System.out.println("Disembarkment"); // DEBUG UTSKRIFTER HÄR
+                    	
                         queue.remove(q); //Remove from queue
                         break;
                     }
@@ -76,9 +84,12 @@ public class Elevator implements ElevatorInterface {
         //Embarking
       
         while (currentPassengers.size() < specs.getCarryCapacity() && queue.size() > 0) {
+
             ElevatorQueueObject q = queue.getFirst();
             if (q.getActionType() == ElevatorAction.PICKUP) {
                 if(q.getPassenger().getOrigin() == floor) {
+                	
+     //           	System.out.println("Embarkment"); // DEBUG UTSKRIFTER HÄR
                     currentPassengers.add(q.getPassenger());
                     queue.removeFirst();
                 } else {
@@ -106,12 +117,12 @@ public class Elevator implements ElevatorInterface {
         //Update total wait time
         for (int i = 0; i < queue.size(); i++) {
             if (queue.get(i).getActionType() == ElevatorAction.PICKUP) {
-                totalWaitTime.add(BigInteger.ONE);
+               totalWaitTime = totalWaitTime.add(BigInteger.ONE);
             }
         }
         
         //Update total travel time
-        totalTravelTime.add(BigInteger.valueOf(currentPassengers.size()));
+        totalTravelTime = totalTravelTime.add(BigInteger.valueOf(currentPassengers.size()));
         
         //Passengers boarding, no movement
         if (waitingTime > 0) {
@@ -136,16 +147,17 @@ public class Elevator implements ElevatorInterface {
         } else {
             dest = q.getPassenger().getDestination();
         }
-        
         //Check destination is valid
-        if (!Arrays.asList(floors).contains(dest)) {
+        if (!checker(floors, dest)) {
             return false;
         }
  
         //Update Elevator Position
         float tempFloor = currentFloor;
         float newFloor = currentFloor;
+ 
         if (dest > currentFloor) { //Going up
+        
             newFloor += (specs.getCarSpeed() / distancePerFloor);
             if (dest <= newFloor) { //Reached destination
                 currentFloor = dest;
@@ -165,9 +177,16 @@ public class Elevator implements ElevatorInterface {
             }
         }
 
-        //Update travel distance
-        totalTravelDistance.add(BigDecimal.valueOf(Math.abs(tempFloor - currentFloor)));
+        //Update travel distance 
         
+     
+       totalTravelDistance = totalTravelDistance.add(BigDecimal.valueOf(Math.abs(tempFloor - currentFloor)));
+        
+        if(currentPassengers.size() > 1 && debugInt > 0)
+        {
+        //	System.out.println(getStatus().getStringRepresentation());    // DEBUG UTSKRIFTER HÄR
+        	debugInt -= 1;
+        }
         //Everything okay
         return true;
     }
@@ -177,6 +196,12 @@ public class Elevator implements ElevatorInterface {
         return queue;
     }
 
+    /**
+     * Checks that the given origin is within the floor range.
+     * @param temp
+     * @param origin
+     * @return
+     */
     private boolean checker(int[] temp, int origin)
     {
     	boolean exists = false;

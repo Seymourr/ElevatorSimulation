@@ -3,6 +3,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.math.BigInteger;
 
 /**
  *
@@ -72,7 +73,7 @@ public class Main {
 			System.out.print(" | Origin floor: " + tempcall.getOriginFloor());
 			System.out.print(" | Destination floor: " + tempcall.getDestination());
 			System.out.println();
-	}
+		}
 	}
 	/**
 	 * Main method
@@ -91,28 +92,22 @@ public class Main {
 		
 		//Test the traffic generator
 	//	testTrafficGen();
-		
-	
-			createElevators();
-			simulateDay(new SingleAutomatic(specs), 4); 
-
-		
+		createElevators();
+		simulateDay(new SingleAutomatic(specs), 100); 
 	}
 
 	/**
 	 * Create the elevators used in this simulation. 
 	 * Floor parameters from the specs are used here.
 	 */
-	private static void createElevators()
-	{
+	private static void createElevators(){
 		localElevatorsBottom = new ArrayList<Elevator>();
 		localElevatorsTop = new ArrayList<Elevator>();
 		shuttleElevators = new ArrayList<Elevator>();
 		int numberOfShuttles = specs.getNumberOfShuttles(); //Edit with proper coding to support different implementations
 		
 		int[] bottomfloors = new int[specs.getSkylobbyfloor()];
-		for(int i = 0; i < specs.getSkylobbyfloor(); i++)
-		{
+		for(int i = 0; i < specs.getSkylobbyfloor(); i++){
 			bottomfloors[i] = i;
 		}
 		
@@ -122,19 +117,16 @@ public class Main {
 		
 		int[] topfloors = new int[(specs.getFloors() - bottomfloors.length)];
 		
-		for(int i = 0; i < topfloors.length; i++)
-		{
+		for(int i = 0; i < topfloors.length; i++){
 			topfloors[i] = specs.getSkylobbyfloor() + i;
 		}
 		
-		for(int i = 0; i < specs.getShafts() - numberOfShuttles;i++)
-		{
+		for(int i = 0; i < specs.getShafts() - numberOfShuttles;i++){
 			localElevatorsBottom.add(new Elevator(specs, bottomfloors, 0)); //Begin with start 0 for simplicity
 			localElevatorsTop.add(new Elevator(specs, topfloors, specs.getSkylobbyfloor())); 
 		}
 		
-		for(int i = 0; i < numberOfShuttles; i++)
-		{
+		for(int i = 0; i < numberOfShuttles; i++){
 			shuttleElevators.add(new Elevator(specs, shuttleFloors, 0));
 		}
 		
@@ -145,32 +137,59 @@ public class Main {
 	 * @param alg
 	 * @param trafficAmount
 	 */
-	public static void simulateDay(Algorithm alg, int trafficAmount)
-	{
+	public static void simulateDay(Algorithm alg, int trafficAmount){
 		simulatePeriod(alg, TrafficType.UPPEAK, trafficAmount);
 	//	simulatePeriod(alg, TrafficType.REGULAR, trafficAmount);
 	//	simulatePeriod(alg, TrafficType.LUNCH, trafficAmount);
 	//	simulatePeriod(alg, TrafficType.REGULAR, trafficAmount);
 	//	simulatePeriod(alg, TrafficType.DOWNPEAK, trafficAmount);
-		
-	//	handleRestCalls(alg); // Extra time needed to empty system
+		System.out.println("Now going into rest calls");
+		handleRestCalls(alg); // Extra time needed to empty system
+		System.out.println("Simulation finished, system empty");
+		printDayResults(new BigInteger("" + trafficAmount)); 
+		//TODO: Something to manage time from this day (UPDATE: NOT FINISHED?)
+	}
 	
-		//TODO: Something to manage time from this day
+	/**
+	 * Print out the total waiting and average time of the system, including the average passenger case.
+	 * @param passengerAmount
+	 */
+	private static void printDayResults(BigInteger passengerAmount){
+		BigInteger totalWaitingTime = new BigInteger("0");
+		BigInteger totalTravelingTime = new BigInteger("0");
+		for(int i = 0; i < localElevatorsBottom.size(); i++){
+			totalWaitingTime = totalWaitingTime.add(localElevatorsBottom.get(i).getRecords().waitingTime);
+			totalTravelingTime = totalTravelingTime.add(localElevatorsBottom.get(i).getRecords().travelingTime);
+		}
+		
+		for(int i = 0; i < localElevatorsTop.size(); i++){
+			totalWaitingTime = totalWaitingTime.add(localElevatorsTop.get(i).getRecords().waitingTime);
+			totalTravelingTime = totalTravelingTime.add(localElevatorsTop.get(i).getRecords().travelingTime);
+		}
+		
+		for(int i = 0; i < shuttleElevators.size(); i++){
+			totalWaitingTime = totalWaitingTime.add(shuttleElevators.get(i).getRecords().waitingTime);
+			totalTravelingTime = totalTravelingTime.add(shuttleElevators.get(i).getRecords().travelingTime);
+		}
+		
+		System.out.println("***RESULTS ARE THE FOLLOWING***");
+		System.out.println("Total waiting time: " + totalWaitingTime.toString() + " virtual seconds");
+		System.out.println("Total traveling time: " + totalTravelingTime.toString() + " virtual seconds");
+		System.out.println("Average Total waiting time: " + totalWaitingTime.divide(passengerAmount).toString() + " virtual seconds");
+		System.out.println("Average Total traveling time: " + totalTravelingTime.divide(passengerAmount).toString() + " virtual seconds");
 	}
 	
 	/**
 	 * Further simulates remaining passengers traveling. Extra time is added to the total time.
 	 */
-	public static int handleRestCalls(Algorithm alg)
-	{
+	public static int handleRestCalls(Algorithm alg){
 		int secondsElapsed = 0;
-		while(!systemEmpty())
-		{
+		while(!systemEmpty()){
 			updateElevatorPosition();
 			ArrayList<Passenger> newCalls = updateElevatorOnOff();
 			localElevatorsBottom = alg.manageNewLocalCalls(localElevatorsBottom, newCalls);
 			localElevatorsTop = alg.manageNewLocalCalls(localElevatorsTop, newCalls);
-			shuttleElevators = alg.manageNewShuttleCalls(shuttleElevators, newCalls);
+			shuttleElevators = algForShuttle.manageNewShuttleCalls(shuttleElevators, newCalls);
 			secondsElapsed += 1;
 		}
 		return secondsElapsed;
@@ -180,29 +199,27 @@ public class Main {
 	 * Checks if the system of elevators is free of calls.
 	 * @return True or False
 	 */
-	public static boolean systemEmpty()
-	{
-		ArrayList<Elevator> localElevators = localElevatorsBottom;
-		localElevators.addAll(localElevatorsTop);
+	public static boolean systemEmpty(){
 		boolean isEmpty = true;
-		for(int i = 0; i < localElevators.size(); i++)
-		{
-			if(localElevators.get(i).getQueue().size() > 0)
-			{
+		
+		for(int i = 0; i < localElevatorsBottom.size(); i++){
+			if(localElevatorsBottom.get(i).getQueue().size() > 0){
 				isEmpty = false;
 				return isEmpty;
 			}
 		}
-		
-		for(int i = 0; i < shuttleElevators.size(); i++)
-		{
-			if(shuttleElevators.get(i).getQueue().size() > 0)
-			{
+		for(int i = 0; i < localElevatorsTop.size(); i++){
+			if(localElevatorsTop.get(i).getQueue().size() > 0){
 				isEmpty = false;
 				return isEmpty;
 			}
 		}
-		
+		for(int i = 0; i < shuttleElevators.size(); i++){
+			if(shuttleElevators.get(i).getQueue().size() > 0){
+				isEmpty = false;
+				return isEmpty;
+			}
+		}
 		return isEmpty;
 	}
 	
@@ -219,52 +236,40 @@ public class Main {
 		algForShuttle.setTraffic(traffic); //Pass the planned traffic to shuttleAlgorithm too
 		testTraffic(traffic); //Debugging
 		
-		for(int second_i = 0; second_i < specs.getPeriodTime(); second_i++)
-		{
+		for(int second_i = 0; second_i < specs.getPeriodTime(); second_i++){
 			//Update position of elevators
 			updateElevatorPosition();
 			
 			//People get off elevators
 			ArrayList<Passenger> newCalls = updateElevatorOnOff();
 			
-			if(newCalls.size() > 0)
-			{
-				System.out.println("Newcalls size: " + newCalls.size());
+			if(newCalls.size() > 1){
+		//		System.out.println("Newcalls size: " + newCalls.size());
 			}
 			//Manage new calls (algorithm call)
 			localElevatorsBottom = alg.manageCalls(second_i, localElevatorsBottom, newCalls); //assumes localElevators come first, then shuttles
 			localElevatorsTop = alg.manageCalls(second_i, localElevatorsTop, newCalls); //assumes localElevators come first, then shuttles
 			shuttleElevators = algForShuttle.manageShuttleCalls(second_i, shuttleElevators, newCalls);
 			
-			
 			//TODO: Update waiting/travel time, calculate by looking through all elevators:
 			// calculateNextTime(....); 
-
-
 		}
 	}
 	
 	/**
 	 * Update the position of every elevator by calling its update function.
 	 */
-	private static void updateElevatorPosition()
-	{
-		
-		for(int i = 0; i < localElevatorsBottom.size(); i++)
-		{
+	private static void updateElevatorPosition(){
+		for(int i = 0; i < localElevatorsBottom.size(); i++){
 			localElevatorsBottom.get(i).updateElevator();
 			
 		}
 		
-
-		for(int i = 0; i < localElevatorsTop.size(); i++)
-		{
-			localElevatorsTop.get(i).updateElevator();
-			
+		for(int i = 0; i < localElevatorsTop.size(); i++){
+			localElevatorsTop.get(i).updateElevator();	
 		}
 		
-		for(int i = 0; i < shuttleElevators.size(); i++)
-		{
+		for(int i = 0; i < shuttleElevators.size(); i++){
 			shuttleElevators.get(i).updateElevator();
 		}
 	}
@@ -274,47 +279,38 @@ public class Main {
 	 * them if they have completed their travel, or return them in a list.
 	 * @return An ArrayList containing people who will continue their traveling. 
 	 */
-	private static ArrayList<Passenger> updateElevatorOnOff()
-	{
+	private static ArrayList<Passenger> updateElevatorOnOff(){
 		ArrayList<Passenger> p = new ArrayList<Passenger>();
 		
-		for(int i = 0; i < localElevatorsBottom.size(); i++)
-		{
+		for(int i = 0; i < localElevatorsBottom.size(); i++){
 			Passenger[] temp = localElevatorsBottom.get(i).openDoors();
 			
-			for(int j = 0;  j < temp.length; j++)
-			{
+			for(int j = 0;  j < temp.length; j++){
 				p.add(temp[j]);
 			}
 		}
 		
-		for(int i = 0; i < localElevatorsTop.size(); i++)
-		{
+		for(int i = 0; i < localElevatorsTop.size(); i++){
 			Passenger[] temp = localElevatorsTop.get(i).openDoors();
 			
-			for(int j = 0;  j < temp.length; j++)
-			{
+			for(int j = 0;  j < temp.length; j++){
 				p.add(temp[j]);
 			}
 		}
 		
-		for(int i = 0; i < shuttleElevators.size(); i++)
-		{
+		for(int i = 0; i < shuttleElevators.size(); i++){
 			Passenger[] temp = shuttleElevators.get(i).openDoors();
 			
-			for(int j = 0;  j < temp.length; j++)
-			{
+			for(int j = 0;  j < temp.length; j++){
 				p.add(temp[j]);
 			}
 		}
 		
-		for(int i = 0; i < p.size(); i++)
-		{
+		for(int i = 0; i < p.size(); i++){
 			int destination = p.get(i).nextDestination();
-			if(destination == -1)
-			{
+			if(destination == -1){
 				//remove passeger
-				System.out.println("The following passenger finished traveling (he came from here): " + p.get(i).getOrigin());
+		//		System.out.println("The passenger finished traveling");    // DEBUG UTSKRIFTER HÄR
 			    p.remove(i);
 			}
 		}
