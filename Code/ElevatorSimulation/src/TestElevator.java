@@ -113,22 +113,25 @@ public class TestElevator {
         return disembarked;
     }
     
-    /* Assign passengers */
+    /* Assign passengers in the parameter to elevators by random */
     private static void assignPassengers(LinkedList<Passenger> disembarked) {
         while(!disembarked.isEmpty()) {
             Passenger p = disembarked.removeFirst();
             if (containsFloor(shuttleFloors, p.getOrigin()) && 
                 containsFloor(shuttleFloors, p.getDestination())) {
+                //Shuttle ride
                 int rand = r.nextInt(shuttles.length);
                 Elevator el = shuttles[rand];
                 el.addToQueue(p, el.getQueue().size(), el.getQueue().size() + 1, CarPosition.NULL);
             } else if (containsFloor(botFloors, p.getOrigin()) && 
                 containsFloor(botFloors, p.getDestination())) {
+                //Bot local ride
                 int rand = r.nextInt(botLocals.length);
                 Elevator el = botLocals[rand];
                 el.addToQueue(p, el.getQueue().size(), el.getQueue().size() + 1, CarPosition.NULL);
             } else if (containsFloor(topFloors, p.getOrigin()) && 
                 containsFloor(topFloors, p.getDestination())) {
+                //Top local ride
                 int rand = r.nextInt(topLocals.length);
                 Elevator el = topLocals[rand];
                 el.addToQueue(p, el.getQueue().size(), el.getQueue().size() + 1, CarPosition.NULL);
