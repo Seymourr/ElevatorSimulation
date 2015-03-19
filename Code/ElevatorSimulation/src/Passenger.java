@@ -15,6 +15,7 @@ public class Passenger {
 	private Stack<Integer> destinations = new Stack<Integer>();
     private int currentDestination = -1;
 	private int origin = -1;
+	private ElevatorSpecs spec;
     
     /** 
 	 * Constructor 
@@ -47,6 +48,7 @@ public class Passenger {
 		}
 		
 		currentDestination = destinations.pop();
+		this.spec = spec;
     }
 
     /**
@@ -79,5 +81,14 @@ public class Passenger {
 	 */
 	public int getOrigin() {
 		return origin;
+	}
+
+	/**
+	* Shift the position of the origin to a different one (above)
+	*/
+	public void shift() {
+		if(origin == spec.getLobbyFloor() || origin == spec.getSkylobbyfloor()) {
+			origin+=1;
+		}
 	}
 }

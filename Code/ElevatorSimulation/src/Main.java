@@ -5,6 +5,8 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.math.BigInteger;
 import java.util.LinkedList;
+import java.util.HashMap;
+
 
 /**
  *
@@ -266,16 +268,10 @@ public class Main {
 	 * Update the position of every elevator by calling its update function.
 	 */
 	private static void updateElevatorPosition(){
-		for(int i = 0; i < allElevators.get(0).size(); i++){
-			allElevators.get(0).get(i).updateElevator();
-		}
-		
-		for(int i = 0; i < allElevators.get(1).size(); i++){
-			allElevators.get(1).get(i).updateElevator();	
-		}
-		
-		for(int i = 0; i < allElevators.get(2).size(); i++){
-			allElevators.get(2).get(i).updateElevator();
+		for(int i = 0; i < allElevators.size(); i++) {
+			for(int j = 0; j < allElevators.get(i).size(); j++) {
+				allElevators.get(i).get(j).updateElevator();
+			}
 		}
 	}
 	
@@ -287,30 +283,17 @@ public class Main {
 	private static LinkedList<Passenger> updateElevatorOnOff(){
 	 LinkedList<Passenger> disembarked = new LinkedList<Passenger>();
 		
-		for(int i = 0; i < allElevators.get(0).size(); i++){
-			Passenger[] temp = allElevators.get(0).get(i).openDoors();
-			for(Passenger p : temp) {
-                p.nextDestination();
-                disembarked.add(p);
+	 for(int i = 0; i < allElevators.size(); i++) {
+	 	for(int j = 0; j < allElevators.get(i).size(); j++) {
+	 		 HashMap<CarPosition, Passenger[]> temp = allElevators.get(i).get(j).openDoors();
+			for(Passenger[] pList : temp.values()) {
+				for(Passenger k : pList) {
+					if(k.nextDestination() != -1) disembarked.add(k);
+				}
+                
             }
-		}
-
-		for(int i = 0; i < allElevators.get(1).size(); i++){
-			Passenger[] temp = allElevators.get(1).get(i).openDoors();
-			for(Passenger p : temp) {
-                p.nextDestination();
-                disembarked.add(p);
-            }
-		}
-
-		for(int i = 0; i < allElevators.get(2).size(); i++){
-			Passenger[] temp = allElevators.get(2).get(i).openDoors();
-			for(Passenger p : temp) {
-                p.nextDestination();
-                disembarked.add(p);
-            }
-		}
-
+	 	}
+	 }
 		return disembarked;
 	}
 	
