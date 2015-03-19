@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.util.HashMap;
 
 /**
  * Test class for Elevator.java
@@ -85,29 +86,56 @@ public class TestElevator {
     /* Open Doors */
     private static LinkedList<Passenger> openDoors() {
         LinkedList<Passenger> disembarked = new LinkedList<Passenger>();
-    
-        for(int j = 0; j < shuttles.length; j++) {
-            Passenger[] temp = shuttles[j].openDoors();
+        
+        //Open shuttle doors
+        for(int j = 0; j < shuttles.length; j++) {      
+            Passenger[] temp;
+            HashMap<CarPosition, Passenger[]> map = shuttles[j].openDoors();
+            if (map.containsKey(CarPosition.NULL)) {
+                temp = map.get(CarPosition.NULL);
+            } else {
+                temp = new Passenger[0];
+            }
+                   
+            //Update Passenger Destinations
             for(Passenger p : temp) {
                 p.nextDestination();
                 disembarked.add(p);
             }
         }
         
+        //Open bot local doors
         for(int j = 0; j < botLocals.length; j++) {
-            Passenger[] temp = botLocals[j].openDoors();
+            Passenger[] temp;
+            HashMap<CarPosition, Passenger[]> map = botLocals[j].openDoors();
+            if (map.containsKey(CarPosition.NULL)) {
+                temp = map.get(CarPosition.NULL);
+            } else {
+                temp = new Passenger[0];
+            }
+                    
+            //Update Passenger Destinations
             for(Passenger p : temp) {
                 p.nextDestination();
                 disembarked.add(p);
             }
         }
         
+        //Open top local doors
         for(int j = 0; j < topLocals.length; j++) {
-            Passenger[] temp = topLocals[j].openDoors();
+            Passenger[] temp;
+            HashMap<CarPosition, Passenger[]> map = topLocals[j].openDoors();
+            if (map.containsKey(CarPosition.NULL)) {
+                temp = map.get(CarPosition.NULL);
+            } else {
+                temp = new Passenger[0];
+            }
+            
+            //Update Passenger Destinations
             for(Passenger p : temp) {
                 p.nextDestination();
                 disembarked.add(p);
-            }
+            }            
         }
         
         return disembarked;

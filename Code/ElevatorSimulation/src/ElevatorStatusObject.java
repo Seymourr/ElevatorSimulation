@@ -8,20 +8,37 @@
  * Direction: -1 for down, 0 for idle, 1 for up
  * Destination: The current destination floor of the elevator,
  *  -1 if idle.
+ * Passengers: Total no of passengers (in all cars)
+ * upperCarPassengers: Passengers in upper car for double deckers, -1 for single deckers
+ * lowerCarpassengers: Passengers in lower car for double deckers, -1 for single deckers
  */
 public class ElevatorStatusObject {
     /* Fields */
-    public final float floor; //Current floor
+    public final float floor; //Current floor (upper floor for double decked)
     public final int direction; //Up or down
     public final int destination; //Headed to which floor
-    public final int passengers; //Passengers inside
+    public final int passengers; //Total Passengers inside
+    public final int upperCarPassengers;
+    public final int lowerCarpassengers;
 
-    /* Constructor */
+    /* Constructor for single deckers */
     public ElevatorStatusObject(float f, int dir, int dest, int cont) {
        floor = f;
        direction = dir;
        destination = dest;
        passengers = cont;
+       upperCarPassengers = -1;
+       lowerCarpassengers = -1;
+    }
+    
+    /* Constructor for double deckers */
+    public ElevatorStatusObject(float f, int dir, int dest, int upperPas, int lowerPass) {
+       floor = f;
+       direction = dir;
+       destination = dest;
+       upperCarPassengers = upperPas;
+       lowerCarpassengers = lowerPass;
+       passengers = upperPas + lowerPass;
     }
     
     /* Converts this ElevatorStatusObject to a nice little String */

@@ -1,6 +1,9 @@
 
 import java.util.LinkedList;
 import java.util.Arrays;
+import java.math.BigInteger;
+import java.math.BigDecimal;
+import java.util.HashMap;
 
 /**
  * This class represents a double decked elevator.
@@ -8,13 +11,18 @@ import java.util.Arrays;
 public class DDElevator implements ElevatorInterface{   
     /* Fields */
     private ElevatorSpecs specs;
-    private int[] floors;
+    public int[] floors;
     private LinkedList<ElevatorQueueObject> queue;
-    private int lowerCarPassengers;
-    private int upperCarPassengers;
+    private LinkedList<Passenger> lowerCarPassengers;
+    private LinkedList<Passenger> upperCarPassengers;
     private int waitingTime;
-    private float currentFloor; //Upper Car
+    private float currentUpperFloor;
     private final float distancePerFloor;
+    
+    private BigInteger totalWaitTime;
+    private BigInteger totalTravelTime;
+    private BigDecimal totalTravelDistance;
+    private BigInteger passengersServed;
     
     /**
      * Constructor 
@@ -25,27 +33,280 @@ public class DDElevator implements ElevatorInterface{
     public DDElevator(ElevatorSpecs spec, int[] floors, float currentFloor) {
         specs = spec;
         this.floors = floors;
-        lowerCarPassengers = 0;
-        upperCarPassengers = 0;
+        queue = new LinkedList<ElevatorQueueObject>();
+        lowerCarPassengers = new LinkedList<Passenger>();
+        upperCarPassengers = new LinkedList<Passenger>();
         queue = new LinkedList<ElevatorQueueObject>();
         waitingTime = 0;
-        this.currentFloor = currentFloor;
+        currentUpperFloor = currentFloor;
         distancePerFloor = (float)specs.getBuildingHeight() / (float)specs.getFloors();
+        
+        totalWaitTime = new BigInteger("0");
+        totalTravelTime = new BigInteger("0");
+        totalTravelDistance = new BigDecimal("0");
+        passengersServed = new BigInteger("0");
+    }
+    
+    /**
+      * Help method to openDoors that disembarking passengers from the specified
+      * car and returns a list of these.
+      */
+    private Passenger[] disembarkFromCar(CarPosition cp) {
+        //Specify values depending on car positions
+        LinkedList<Passenger> carPassengers;
+        float floor = 0;
+        if (cp == CarPosition.UPPER) {
+            floor = currentUpperFloor;
+            carPassengers = upperCarPassengers;
+        } else if (cp == CarPosition.LOWER) {
+            floor = currentUpperFloor - 1;
+            carPassengers = lowerCarPassengers;
+        } else {
+            throw new IllegalArgumentException("Only Upper or Lower allowed in disembark.");
+        }
+        
+        //Disembarking
+        LinkedList<Passenger> retPas = new LinkedList<Passenger>();
+        Passenger[] temp = new Passenger[carPassengers.size()];
+        for (int i = 0; i < carPassengers.size(); i++) {
+            temp[i] = carPassengers.get(i);
+        }
+        
+        //(Disembarking) Update queue, elevator and fill return list
+        for (int i = 0; i < temp.length; i++) {
+            if (temp[i].getDestination() == floor) {
+                carPassengers.remove(temp[i]); //Remove from elevator
+                retPas.add(temp[i]); //Add to return list
+                passengersServed = passengersServed.add(new BigInteger("1")); //Update service counter
+                
+                //Remove from queue
+                boolean removed = false;
+                for (int j = 0; j < queue.size(); j++) {
+                    ElevatorQueueObject q = queue.get(j);
+                    if (q.getPassenger() == temp[i] && q.getActionType() == ElevatorAction.DROPOFF) {
+                    	removed = true;
+                        queue.remove(q);
+                        break;
+                    }
+                }
+                if (!removed) { //Could not find queue object
+                    throw new RuntimeException("Could not find dismebarking passenger in queue.");
+                }
+            }
+        }
+        
+        //Update Elevator Contents
+        if (cp == CarPosition.UPPER) {
+            upperCarPassengers = carPassengers;
+        } else if (cp == CarPosition.LOWER) {
+            lowerCarPassengers = carPassengers;
+        }
+        
+        //Return disembarking passengers as an array
+        Passenger[] retArr = new Passenger[retPas.size()];
+        for (int i = 0; i < retPas.size(); i++) {
+            retArr[i] = retPas.get(i);
+        }
+        
+        return retArr;
     }
     
     /* See ElevatorInterface for details */
-    public Passenger[] openDoors() {
-        return new Passenger[0];
+    public HashMap<CarPosition, Passenger[]> openDoors() {
+        //Check if currently at a floor
+        int floor = Math.round(currentUpperFloor);
+        if (floor != currentUpperFloor) {
+            return new HashMap<CarPosition, Passenger[]>(0);
+        }
+        
+        //Disembarking
+        HashMap<CarPosition, Passenger[]> retMap = new HashMap<CarPosition, Passenger[]>(2);
+        retMap.put(CarPosition.UPPER, disembarkFromCar(CarPosition.UPPER));
+        retMap.put(CarPosition.LOWER, disembarkFromCar(CarPosition.LOWER));
+        
+        //Embarking
+        while (queue.size() > 0) {
+            ElevatorQueueObject q = queue.getFirst();
+            if (q.getActionType() == ElevatorAction.PICKUP) {
+                if (q.getPassenger().getOrigin() == floor &&
+                upperCarPassengers.size() < specs.getCarryCapacity() &&
+                q.getCarPosition() == CarPosition.UPPER) {
+                    //Passenger entering upper car
+                    upperCarPassengers.add(q.getPassenger());
+                    queue.removeFirst();
+                } else if (q.getPassenger().getOrigin() == floor - 1 &&
+                lowerCarPassengers.size() < specs.getCarryCapacity() &&
+                q.getCarPosition() == CarPosition.LOWER) {
+                    //Passenger entering lower car
+                    lowerCarPassengers.add(q.getPassenger());
+                    queue.removeFirst();
+                } else {
+                    break;
+                }
+            } else {
+                break;
+            }
+        }
+        
+        //Return disembarking passengers
+        return retMap;
     }
-
+    
     /* See ElevatorInterface for details */
     public boolean updateElevator() {
+        //If no people are waiting, do nothing
+        if (queue.isEmpty()){
+    		return true;
+    	}
+        
+        //Update total wait time
+        for (int i = 0; i < queue.size(); i++) {
+            if (queue.get(i).getActionType() == ElevatorAction.PICKUP) {
+               totalWaitTime = totalWaitTime.add(BigInteger.ONE);
+            }
+        }
+        
+        //Update total travel time
+        totalTravelTime = totalTravelTime.add(BigInteger.valueOf(lowerCarPassengers.size()));
+        totalTravelTime = totalTravelTime.add(BigInteger.valueOf(upperCarPassengers.size()));
+        
+        //Passengers boarding, no movement
         if (waitingTime > 0) {
             waitingTime -= 1;
             return true;
         }
         
+        ElevatorQueueObject q = queue.getFirst();
+        
+        //If the elevator is full, fetch the next passenger who can board succesfully
+        int index = 1;
+        while (q.getActionType() == ElevatorAction.PICKUP) {
+            if (q.getCarPosition() == CarPosition.UPPER &&
+            upperCarPassengers.size() == specs.getCarryCapacity()) {
+                q = queue.get(index);
+                index += 1;
+            } else if (q.getCarPosition() == CarPosition.LOWER &&
+            lowerCarPassengers.size() == specs.getCarryCapacity()) {
+                q = queue.get(index);
+                index += 1;
+            } else {
+                break;
+            }
+        }
+        
         //Fetch next destination
+        int dest = 0;
+        if (q.getActionType() == ElevatorAction.PICKUP) {
+            dest = q.getPassenger().getOrigin();
+        } else {
+            dest = q.getPassenger().getDestination();
+        }
+        
+        //Compensate destination if lower car
+        if (q.getCarPosition() == CarPosition.LOWER) {
+            dest += 1;
+        }
+        
+        //Check destination is valid
+        if (!containsFloor(floors, dest)) {
+            return false;
+        }
+        
+        //Update Elevator Position
+        float tempFloor = currentUpperFloor;
+        float newFloor = currentUpperFloor;
+ 
+        if (dest > currentUpperFloor) { //Going up
+            newFloor += (specs.getCarSpeed() / distancePerFloor);
+            if (dest <= newFloor) { //Reached destination
+                currentUpperFloor = dest;
+                //Set waiting time for embarking/disembarking
+                waitingTime = specs.getFloorDelay();
+            } else {
+                currentUpperFloor = newFloor;
+            }
+        } else if (dest < currentUpperFloor) { //Going down
+            newFloor -= (specs.getCarSpeed() / distancePerFloor);
+            if (dest >= newFloor) { //Reached destination?
+                currentUpperFloor = dest;
+                //Set waiting time for embarking/disembarking
+                waitingTime = specs.getFloorDelay();
+            } else {
+                currentUpperFloor = newFloor;
+            }
+        }
+        
+        //Update travel distance 
+        totalTravelDistance = totalTravelDistance.add(
+            BigDecimal.valueOf(Math.abs(tempFloor - currentUpperFloor) * distancePerFloor)
+        );
+        
+        //Everything okay
+        return true;
+    }
+
+    /* See ElevatorInterface for details */
+    public LinkedList<ElevatorQueueObject> getQueue() {
+        return queue;
+    }
+    
+    /**
+     * Checks that the given origin is within the floor range.
+     */
+    private boolean containsFloor(int[] temp, int origin) {
+    	for(int i = 0; i < temp.length; i++) {
+    		if (temp[i] == origin) {
+    			return true;
+    		}
+    	}
+    	return false;
+    }
+
+    /* See ElevatorInterface for details */
+    public boolean addToQueue(Passenger p, int index1, int index2, CarPosition c) {
+        if (!containsFloor(floors, p.getOrigin())) { 
+            return false;
+        }        
+        if (!containsFloor(floors, p.getDestination())) {
+            return false;
+        }
+        if (index2 <= index1) {
+            return false;
+        }
+        if (index1 < 0 || index1 > queue.size()) {
+            return false;
+        }
+        if (index2 < 0 || index2 > queue.size() + 1) {
+            return false;
+        }
+        if (c == CarPosition.NULL) {
+            return false;
+        }
+        
+        ElevatorQueueObject q1 = new ElevatorQueueObject(
+            p, ElevatorAction.PICKUP, c
+        );
+        ElevatorQueueObject q2 = new ElevatorQueueObject(
+            p, ElevatorAction.DROPOFF, c
+        );
+        
+        queue.add(index1, q1);
+        queue.add(index2, q2);
+        
+        return true;
+    }
+
+    /* See ElevatorInterface for details */
+    public ElevatorStatusObject getStatus() {
+        //Fetch destination
+    	if (queue.isEmpty()) {
+    		return new ElevatorStatusObject(
+                currentUpperFloor, 0, -1, upperCarPassengers.size(), lowerCarPassengers.size()
+            );
+    	}
+    	
+        //TODO Check in the same way as updateElevator()
+        
         ElevatorQueueObject q = queue.getFirst();
         int dest = 0;
         if (q.getActionType() == ElevatorAction.PICKUP) {
@@ -54,78 +315,27 @@ public class DDElevator implements ElevatorInterface{
             dest = q.getPassenger().getDestination();
         }
         
-        //Check destination is valid
-        if (!Arrays.asList(floors).contains(dest)) {
-            return false;
+        //Calculate direction
+        int dir = 0;
+        if (dest > currentUpperFloor) {
+            dir = 1;
+        } else if (dest < currentUpperFloor) {
+            dir = -1;
         }
         
-        //Compensate if the first call is for the lower car
-        float newFloor = currentFloor;
-        if (q.getCarPosition() == CarPosition.LOWER) {
-            newFloor += 1;
-        } else if (q.getCarPosition() == CarPosition.NULL) {
-            return false; //Invalid option for double deckers
-        }
-        
-        //Update Elevator Position
-        if (dest > currentFloor) { //Going up
-            newFloor += (specs.getCarSpeed() / distancePerFloor);
-            if (dest <= newFloor) { //Reached destination?
-                currentFloor = dest;
-                //Set waiting time for embarking/disembarking
-                waitingTime = specs.getFloorDelay();
-            } else {
-                currentFloor = newFloor;
-            }
-        } else if (dest < currentFloor) { //Going down
-            newFloor -= (specs.getCarSpeed() / distancePerFloor);
-            if (dest >= newFloor) { //Reached destination?
-                currentFloor = dest;
-                //Set waiting time for embarking/disembarking
-                waitingTime = specs.getFloorDelay();
-            } else {
-                currentFloor = newFloor;
-            }
-        }
-        
-        return true;
-    }
-
-    /* See ElevatorInterface for details */
-    public LinkedList<ElevatorQueueObject> getQueue() {
-        return queue;
-    }
-
-    /* See ElevatorInterface for details */
-    public boolean addToQueue(Passenger p, int index1, int index2, CarPosition c) {
-        if (!Arrays.asList(floors).contains(p.getOrigin())) {
-            return false;
-        }        
-        if (!Arrays.asList(floors).contains(p.getDestination())) {
-            return false;
-        }
-        
-        ElevatorQueueObject q1 = new ElevatorQueueObject(
-            p, ElevatorAction.PICKUP, CarPosition.NULL
+        return new ElevatorStatusObject(
+            currentUpperFloor, dir, dest, upperCarPassengers.size(), lowerCarPassengers.size()
         );
-        ElevatorQueueObject q2 = new ElevatorQueueObject(
-            p, ElevatorAction.DROPOFF, CarPosition.NULL
-        );
-        
-        queue.add(index1, q1);
-        queue.add(index2 + 1, q2);
-        
-        return true;
-    }
-
-    /* See ElevatorInterface for details */
-    public ElevatorStatusObject getStatus() {
-        //TODO
-        return null;
     }
     
     /* See ElevatorInterface for details */
     public ElevatorServiceStatus getRecords() {
-        return null;
+        return new ElevatorServiceStatus(totalWaitTime, totalTravelTime, 
+            totalTravelDistance.toBigInteger(), passengersServed);
+    }
+    
+    /* See ElevatorInterface for details */
+    public ElevatorType ofType() {
+        return ElevatorType.DOUBLE;
     }
 }

@@ -3,6 +3,7 @@ import java.util.LinkedList;
 import java.util.Arrays;
 import java.math.BigInteger;
 import java.math.BigDecimal;
+import java.util.HashMap;
 
 /**
  * This class represents an single decked elevator.
@@ -41,11 +42,11 @@ public class Elevator implements ElevatorInterface {
     }
     
     /* See ElevatorInterface for details */
-    public Passenger[] openDoors() {
+    public HashMap<CarPosition, Passenger[]> openDoors() {
         //Check if currently at a floor
         int floor = Math.round(currentFloor);
         if (floor != currentFloor) {
-            return new Passenger[0];
+            return new HashMap<CarPosition, Passenger[]>(0);
         }
         
         //Disembarking
@@ -93,25 +94,17 @@ public class Elevator implements ElevatorInterface {
             }
         }
         
-        //Return disembarking passengers as an array
+        //Format disembarking passengers as an array
         Passenger[] retArr = new Passenger[retPas.size()];
         for (int i = 0; i < retPas.size(); i++) {
             retArr[i] = retPas.get(i);
         }
         
-        return retArr;
-    }
-    
-    /**
-     * Checks if the elevator currently contains the given passenger
-     */
-    private boolean containsPassenger(Passenger p) {
-        for(int i = 0; i < currentPassengers.size(); i++) {
-            if (currentPassengers.get(i) == p) {
-                return true;
-            }
-        }
-        return false;
+        //Return disembarking passengers as a HashMap
+        HashMap<CarPosition, Passenger[]> retMap = new HashMap<CarPosition, Passenger[]>(1);
+        retMap.put(CarPosition.NULL, retArr);
+        
+        return retMap;
     }
 
     /* See ElevatorInterface for details */
@@ -142,8 +135,7 @@ public class Elevator implements ElevatorInterface {
         //If the elevator is full, fetch the next passenger DROPOFF
         int index = 1;
         while (currentPassengers.size() == specs.getCarryCapacity() 
-            && q.getActionType() == ElevatorAction.PICKUP
-            && containsPassenger(q.getPassenger())) {
+            && q.getActionType() == ElevatorAction.PICKUP) {
             q = queue.get(index);
             index += 1;
         }
@@ -210,26 +202,22 @@ public class Elevator implements ElevatorInterface {
     	}
     	return false;
     }
+    
     /* See ElevatorInterface for details */
     public boolean addToQueue(Passenger p, int index1, int index2, CarPosition c) {
         if (!containsFloor(floors, p.getOrigin())) { 
-        	System.out.println("1!!");
             return false;
         }        
         if (!containsFloor(floors, p.getDestination())) {
-        	System.out.println("2!!");
             return false;
         }
         if (index2 <= index1) {
-        	System.out.println("3!!");
             return false;
         }
         if (index1 < 0 || index1 > queue.size()) {
-        	System.out.println("4!!");
             return false;
         }
         if (index2 < 0 || index2 > queue.size() + 1) {
-        	System.out.println("5!!");
             return false;
         }
         
@@ -242,16 +230,19 @@ public class Elevator implements ElevatorInterface {
         
         queue.add(index1, q1);
         queue.add(index2, q2);
+        
         return true;
     }
     
     /* See ElevatorInterface for details */
     public ElevatorStatusObject getStatus() {
         //Fetch destination
-    	if(queue.isEmpty()) {
+    	if (queue.isEmpty()) {
     		return new ElevatorStatusObject(currentFloor, 0, -1, currentPassengers.size());
     	}
     	
+        //TODO Check in the same way as updateElevator()
+        
         ElevatorQueueObject q = queue.getFirst();
         int dest = 0;
         if (q.getActionType() == ElevatorAction.PICKUP) {
@@ -275,5 +266,10 @@ public class Elevator implements ElevatorInterface {
     public ElevatorServiceStatus getRecords() {
         return new ElevatorServiceStatus(totalWaitTime, totalTravelTime, 
             totalTravelDistance.toBigInteger(), passengersServed);
+    }
+    
+    /* See ElevatorInterface for details */
+    public ElevatorType ofType() {
+        return ElevatorType.SINGLE;
     }
 }

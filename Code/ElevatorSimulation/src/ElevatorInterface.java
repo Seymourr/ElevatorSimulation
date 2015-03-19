@@ -1,5 +1,6 @@
 
 import java.util.LinkedList;
+import java.util.HashMap;
 
 /**
  * Interface for the elevator implementing classes.
@@ -10,9 +11,9 @@ public interface ElevatorInterface {
      * of the elevator. All passengers inside the elevator will disembark
      * if the stop is at their destination floor. However, only passengers
      * who are at the beginning of the queue will embark the elevator.
-     * Returns a list of the passengers who disembarks.
+     * Returns a list of the passengers who disembarks at each CarPosition.
      */
-    public Passenger[] openDoors();
+    public HashMap<CarPosition, Passenger[]> openDoors();
 
     /**
      * Update elevator with one second of travel time.
@@ -50,4 +51,10 @@ public interface ElevatorInterface {
      * for the elevator. See documentation for ElevatorServiceStatus for details.
      */
     public ElevatorServiceStatus getRecords();
+    
+    /**
+     * Returns ElevatorType.SINGLE or ElevatorType.DOUBLE depending on the type
+     * of elevator this object is.
+     */
+    public ElevatorType ofType();
 }
