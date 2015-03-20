@@ -6,14 +6,14 @@ public abstract class Algorithm {
 
 	
 	ElevatorSpecs specs;	
-	public abstract ArrayList<ArrayList<Elevator>> manageCalls(ArrayList<ArrayList<Elevator>> elevators, LinkedList<Passenger> calls);
+	public abstract ArrayList<ArrayList<ElevatorInterface>> manageCalls(ArrayList<ArrayList<ElevatorInterface>> elevators, LinkedList<Passenger> calls);
 
 	/**
 	* Attempts to pick an optimal shuttle for the given passenger. The optimal shuttle is the idle one at 
 	* the same floor as the passenger. If no optimal shuttle is found, the passenger is assinged to a random
 	* shuttle.
 	*/
-	public ArrayList<Elevator> assignShuttleElevator(ArrayList<Elevator> elevators, Passenger p, CarPosition pos) {
+	public ArrayList<ElevatorInterface> assignShuttleElevator(ArrayList<ElevatorInterface> elevators, Passenger p, CarPosition pos) {
 		int chosenElevator = -1;
 		for(int i = 0; i < elevators.size(); i++) {
 			if(elevators.get(i).getStatus().direction == 0 && elevators.get(i).getStatus().passengers < specs.getCarryCapacity()) {

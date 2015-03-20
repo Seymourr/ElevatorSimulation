@@ -11,7 +11,7 @@ import java.util.HashMap;
 public class Elevator implements ElevatorInterface {
     /* Fields */
     private ElevatorSpecs specs;
-    public int[] floors; //EDIT TEMPORARY
+    private int[] floors;
     private LinkedList<ElevatorQueueObject> queue;
     private LinkedList<Passenger> currentPassengers;
     private int waitingTime;
@@ -271,5 +271,10 @@ public class Elevator implements ElevatorInterface {
     /* See ElevatorInterface for details */
     public ElevatorType ofType() {
         return ElevatorType.SINGLE;
+    }
+    
+    /* See ElevatorInterface for details */
+    public int[] getFloors() {
+        return floors;
     }
 }

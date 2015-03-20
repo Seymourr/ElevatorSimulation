@@ -57,4 +57,9 @@ public interface ElevatorInterface {
      * of elevator this object is.
      */
     public ElevatorType ofType();
+    
+    /**
+     * Returns a list of floors this elevator operates on.
+     */
+    public int[] getFloors();
 }

@@ -14,7 +14,7 @@
  	/**
  	* Goes through the list of calls and assigns elevators to passangers based on those calls.
  	*/
- 	public ArrayList<ArrayList<Elevator>> manageCalls(ArrayList<ArrayList<Elevator>> allElevators, LinkedList<Passenger> calls)
+ 	public ArrayList<ArrayList<ElevatorInterface>> manageCalls(ArrayList<ArrayList<ElevatorInterface>> allElevators, LinkedList<Passenger> calls)
  	{
  		while(!calls.isEmpty()) {
  			Passenger p = calls.removeFirst();
@@ -40,8 +40,8 @@
  	/**
  	* Returns a random index of elevators.
  	*/
-	private int getRandomElevator(ArrayList<Elevator> elevators, Passenger p) {
-		ArrayList<Elevator> temp = new ArrayList<Elevator>();
+	private int getRandomElevator(ArrayList<ElevatorInterface> elevators, Passenger p) {
+		ArrayList<ElevatorInterface> temp = new ArrayList<ElevatorInterface>();
 		ArrayList<Integer> tempNumber = new ArrayList<Integer>();
 		for(int i = 0; i < elevators.size(); i++) {
 			if(elevatorContainsFloor(elevators.get(i), p.getOrigin(), p.getDestination())) {
@@ -63,7 +63,7 @@
 	/**
 	* Assigns calls to local elevators or double decked elevators (depending on the elevator type).
 	*/
-	private ArrayList<Elevator> assignLocalWithSingleAutomatic(ArrayList<Elevator> elevators, Passenger p) {
+	private ArrayList<ElevatorInterface> assignLocalWithSingleAutomatic(ArrayList<ElevatorInterface> elevators, Passenger p) {
 		if(elevators.get(0).ofType() == ElevatorType.SINGLE) {
 			int elevatorIndex = getRandomElevator(elevators, p);
 			elevators.get(elevatorIndex).addToQueue(p, elevators.get(elevatorIndex).getQueue().size(), elevators.get(elevatorIndex).getQueue().size() + 1, CarPosition.NULL);
@@ -71,7 +71,7 @@
 			int elevatorIndex = getRandomElevator(elevators, p);
 			CarPosition pos = CarPosition.NULL;
 
-			if(p.getDestination() == elevators.get(elevatorIndex).floors[elevators.get(elevatorIndex).floors.length - 1]) {
+			if(p.getDestination() == elevators.get(elevatorIndex).getFloors()[elevators.get(elevatorIndex).getFloors().length - 1]) {
 				pos = CarPosition.UPPER;
 				if(p.getOrigin() == specs.getLobbyFloor() || p.getOrigin() == specs.getSkylobbyfloor()) {
 					p.shift();
@@ -98,17 +98,17 @@
  	 * @param destination
  	 * @return True, if within range, false otherwise
  	 */
- 	private boolean containsFloor(ArrayList<Elevator> elevators, int origin, int destination) {
+ 	private boolean containsFloor(ArrayList<ElevatorInterface> elevators, int origin, int destination) {
  		boolean inOrigin = false;
  		boolean goingToDestination = false;
 
  		for(int i = 0; i < elevators.size(); i++) {
- 			for(int j = 0; j < elevators.get(i).floors.length; j++) {
- 				if(elevators.get(i).floors[j] == origin) {
+ 			for(int j = 0; j < elevators.get(i).getFloors().length; j++) {
+ 				if(elevators.get(i).getFloors()[j] == origin) {
  					inOrigin = true;
  				}
 
- 				if(elevators.get(i).floors[j] == destination) {
+ 				if(elevators.get(i).getFloors()[j] == destination) {
  					goingToDestination = true;
  				}
 
@@ -125,15 +125,15 @@
 	* Confirms whether the given elevator is a possible elevator to take, that is
 	* it can take the passanger from its origin to its destination.
 	*/
-	private boolean elevatorContainsFloor(Elevator e, int origin, int destination) {
+	private boolean elevatorContainsFloor(ElevatorInterface e, int origin, int destination) {
 		boolean inOrigin = false;
 		boolean goingToDestination = false;
-		for(int i = 0; i < e.floors.length; i++) {
-			if(e.floors[i] == origin) {
+		for(int i = 0; i < e.getFloors().length; i++) {
+			if(e.getFloors()[i] == origin) {
 				inOrigin = true;
 			}
 
-			if(e.floors[i] == destination) {
+			if(e.getFloors()[i] == destination) {
 				goingToDestination = true;
 			}
 		}

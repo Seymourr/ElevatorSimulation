@@ -3,30 +3,28 @@ import java.util.ArrayList;
 
 /**
  * Objects of this class contains elevator specifications that will be used in the simulation.
+ * Note that if a double decked elevator is used the skyLobbyFloor will represent the lower
+ * of the two lobby floors in used, the same goes for lobbyfloor.
  */
 public class ElevatorSpecs {
 	/* Fields */
-	private int simulationDays; 
-	private int periodTime;
-	private int lowTraffic;
-	private int mediumTraffic;
-	private int heavyTraffic;
-	private int floors;
-	private int skylobbyfloor;
-	private int distanceBetweenFloors;
-	private int shafts;
-	private int buildingHeight;
-	private int carryCapacity;
-	private int carSpeed;
-	private int floorDelay; //Passenger boarding time
-	private ElevatorType local;
-	private ElevatorType shuttle;
-	private int numberOfShuttles;
-	
-	private int lobbyFloor;
-	
-	//TODO Number of shuttles
-	//TODO Research low, medium, heavy traffic params
+	private final int simulationDays; 
+	private final int periodTime;
+	private final int lowTraffic;
+	private final int mediumTraffic;
+	private final int heavyTraffic;
+	private final int floors;
+	private final int skylobbyfloor;
+	private final int distanceBetweenFloors;
+	private final int shafts;
+	private final int buildingHeight;
+	private final int carryCapacity;
+	private final int carSpeed;
+	private final int floorDelay; //Passenger boarding time
+	private final ElevatorType local;
+	private final ElevatorType shuttle;
+	private final int numberOfShuttles;
+	private final int lobbyFloor;
 	
 	/**
 	 * Creates an object which puts data from the input ArrayList
@@ -40,7 +38,6 @@ public class ElevatorSpecs {
 	 */
 	public ElevatorSpecs(ArrayList<String> indata) {
 		lobbyFloor = 0;
-
 		this.simulationDays = Integer.parseInt(indata.get(0));
 		this.periodTime = Integer.parseInt(indata.get(1));
 		this.lowTraffic = Integer.parseInt(indata.get(2));
@@ -54,16 +51,14 @@ public class ElevatorSpecs {
 		this.carryCapacity = Integer.parseInt(indata.get(10));
 		this.carSpeed = Integer.parseInt(indata.get(11));
 		this.floorDelay = Integer.parseInt(indata.get(12));
-		
-		if(indata.get(13).equals("single"))
-		{
+        
+		if(indata.get(13).equals("single")) {
 			local = ElevatorType.SINGLE;
 		} else {
 			local = ElevatorType.DOUBLE;
 		}
-		
-		if(indata.get(14).equals("single"))
-		{
+        
+		if(indata.get(14).equals("single")) {
 			shuttle = ElevatorType.SINGLE;
 		} else {
 			shuttle = ElevatorType.DOUBLE;
@@ -136,12 +131,9 @@ public class ElevatorSpecs {
 		return local;
 	}
 
-
-
 	public ElevatorType getShuttle() {
 		return shuttle;
 	}
-
 		
 	public int getNumberOfShuttles() {
 		return numberOfShuttles;
