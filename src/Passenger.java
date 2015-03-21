@@ -24,6 +24,9 @@ public class Passenger {
 	 * and getDestination methods.
      */
     public Passenger(Call c, ElevatorSpecs spec) {
+        
+        //TODO Calculate route depending on the type of elevators in usage
+        
         int goal = c.getDestination();
         origin = c.getOriginFloor();
         int skylobby = spec.getSkylobbyfloor();

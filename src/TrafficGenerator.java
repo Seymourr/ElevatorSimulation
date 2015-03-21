@@ -12,10 +12,12 @@ import java.util.Random;
 public class TrafficGenerator {
 	/* Fields */
 	private ElevatorSpecs specs;
+    private Random r;
 	
 	/* Constructor */
 	public TrafficGenerator(ElevatorSpecs specs) {
 		this.specs = specs;
+        r = new Random();
 	}
 	
 	//Call amount is one of the three traffic weights(1000, 5000, 10000) or a random number (5 % or so so
@@ -24,17 +26,33 @@ public class TrafficGenerator {
 	 * Returns a random number between low (inclusive) and high (exclusive)
 	 */
 	private int getRandomNumber(int low, int high) {
-		Random r = new Random();
 		int number = r.nextInt(high-low) + low; 
+		return number;
+	}
+    
+	/*
+	 * Returns a random floor between low(inclusive) and high(exclusive). 
+	 * The skylobby floors is not an allowed floor to be returned.
+     * This method is for double decked shuttles.
+	 */
+	private int getDoubleRandomFloor(int low, int high) {
+		int number = r.nextInt(high-low) + low;
+		while(number == specs.getSkylobbyfloor() || number == specs.getSkylobbyfloor() + 1) {
+			number = r.nextInt(high-low) + low;
+		}
 		return number;
 	}
 	
 	/*
 	 * Returns a random floor between low(inclusive) and high(exclusive). 
 	 * The skylobby floor is not an allowed floor to be returned.
+     * This method takes into account if the shuttle is of single decked or double decked type.
 	 */
 	private int getRandomFloor(int low, int high) {
-		Random r = new Random();
+        if (specs.getShuttle() == ElevatorType.DOUBLE) {
+            return getDoubleRandomFloor(low + 1, high);
+        }
+
 		int number = r.nextInt(high-low) + low;
 		while(number == specs.getSkylobbyfloor()) {
 			number = r.nextInt(high-low) + low;
@@ -99,7 +117,7 @@ public class TrafficGenerator {
 					int destination = getRandomFloor(0, specs.getFloors());
 					int origin = getRandomFloor(0, specs.getFloors());
 					while(destination == origin) {
-						destination = getRandomFloor(1, specs.getFloors());
+						destination = getRandomFloor(0, specs.getFloors());
 					}
 					Call c = new Call(getRandomNumber(0, specs.getPeriodTime()), origin, destination);
 					newCalls.add(c);
