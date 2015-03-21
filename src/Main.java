@@ -55,7 +55,7 @@ public class Main {
 	 * Method to test the traffic generator
 	 */
 	private static void testTrafficGen() {
-		ArrayList<Call> traffic = trafficGen.getTraffic(TrafficType.LUNCH, 1000);
+		ArrayList<Call> traffic = trafficGen.getTraffic(TrafficType.REGULAR, 50);
 		for (int i = 0; i < traffic.size(); i++) {
 			Call tempcall = traffic.get(i);
 			System.out.print("Calltime: " + tempcall.getCallTime());
@@ -95,13 +95,13 @@ public class Main {
 		trafficGen = new TrafficGenerator(specs);
 		
 		//Test the traffic generator
-        //testTrafficGen();
+        testTrafficGen();
     
         //Create the elevators
-		createElevators();
+		//createElevators();
         
         //Perform the simulation
-		simulateDay(new SingleAutomatic(specs), 1000); 
+		//simulateDay(new SingleAutomatic(specs), 1000); 
 	}
 
 	/**
