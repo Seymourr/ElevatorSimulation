@@ -11,7 +11,7 @@ import java.util.HashMap;
 public class DDElevator implements ElevatorInterface{   
     /* Fields */
     private ElevatorSpecs specs;
-    private int[] floors;
+    private int[] floors; 
     private LinkedList<ElevatorQueueObject> queue;
     private LinkedList<Passenger> lowerCarPassengers;
     private LinkedList<Passenger> upperCarPassengers;

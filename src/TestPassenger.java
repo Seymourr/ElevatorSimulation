@@ -30,7 +30,7 @@ public class TestPassenger {
 		Call c4 = new Call(25, 4, 8);
 		Call c5 = new Call(25, 0, 3);
 		Call c6 = new Call(25, 8, 7);
-		
+		Call c7 = new Call(25, 3, 0);		
 		ElevatorSpecs specs;
 		try {
 			specs = getSpecs();
@@ -38,7 +38,7 @@ public class TestPassenger {
 			specs = null;
 		}
 		
-		Call[] calls = {c1, c2, c3, c4, c5, c6};
+		Call[] calls = {c1, c2, c3, c4, c5, c6, c7};
 		
 		for(Call c : calls) {
 			Passenger p = new Passenger(c, specs);

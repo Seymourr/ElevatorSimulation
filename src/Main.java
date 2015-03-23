@@ -95,13 +95,13 @@ public class Main {
 		trafficGen = new TrafficGenerator(specs);
 		
 		//Test the traffic generator
-        testTrafficGen();
+       // testTrafficGen();
     
         //Create the elevators
-		//createElevators();
+		createElevators();
         
         //Perform the simulation
-		//simulateDay(new SingleAutomatic(specs), 1000); 
+		simulateDay(new SingleAutomatic(specs), 100); 
 	}
 
 	/**
@@ -212,6 +212,7 @@ public class Main {
 		LinkedList<Call> traffic = new LinkedList<Call>(trafficGen.getTraffic(t, trafficAmount));
         //	testTraffic(traffic); //Debugging
 		
+
 		for(int second_i = 0; second_i < specs.getPeriodTime(); second_i++) {
 			//Update position of elevators
 			updateElevatorPosition();
@@ -331,7 +332,11 @@ public class Main {
 	 		 HashMap<CarPosition, Passenger[]> temp = allElevators.get(i).get(j).openDoors();
 			for(Passenger[] pList : temp.values()) {
 				for(Passenger k : pList) {
-					if(k.nextDestination() != -1) disembarked.add(k);
+					int dest = k.nextDestination();
+					if(dest != -1) 
+						{
+							disembarked.add(k);
+						} 
 				}
                 
             }
