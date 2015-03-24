@@ -11,6 +11,6 @@
 12  //Car carry capacity
 4   //Car speed (Average)
 10  //Floor delay
-single //local elevator
+double //local elevator
 double //shuttle elevator
 1   //Number of shuttles
