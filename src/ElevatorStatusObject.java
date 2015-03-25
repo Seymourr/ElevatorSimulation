@@ -5,7 +5,7 @@
  *
  * Floor: Indicates which floor the elevator currently is at
  *  or ex 5.4 if it is between floors 5 and 6.
- * Direction: -1 for down, 0 for idle, 1 for up
+ * Direction: -1 for down, 0 for idle, 1 for up. 0 is only given if the queue is empty.
  * Destination: The current destination floor of the elevator,
  *  -1 if idle.
  * Passengers: Total no of passengers (in all cars)
