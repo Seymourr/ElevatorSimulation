@@ -19,7 +19,7 @@ public class ElevatorStatusObject {
     public final int destination; //Headed to which floor
     public final int passengers; //Total Passengers inside
     public final int upperCarPassengers;
-    public final int lowerCarpassengers;
+    public final int lowerCarPassengers;
 
     /* Constructor for single deckers */
     public ElevatorStatusObject(float f, int dir, int dest, int cont) {
@@ -28,7 +28,7 @@ public class ElevatorStatusObject {
        destination = dest;
        passengers = cont;
        upperCarPassengers = -1;
-       lowerCarpassengers = -1;
+       lowerCarPassengers = -1;
     }
     
     /* Constructor for double deckers */
@@ -37,7 +37,7 @@ public class ElevatorStatusObject {
        direction = dir;
        destination = dest;
        upperCarPassengers = upperPas;
-       lowerCarpassengers = lowerPass;
+       lowerCarPassengers = lowerPass;
        passengers = upperPas + lowerPass;
     }
     

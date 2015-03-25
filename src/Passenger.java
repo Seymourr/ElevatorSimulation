@@ -154,6 +154,8 @@ public class Passenger {
 	public void shift() {
 		if(origin == spec.getLobbyFloor() || origin == spec.getSkylobbyfloor()) {
 			origin+=1;
-		}
+		} else if(origin == spec.getLobbyFloor() + 1 || origin == spec.getSkylobbyfloor() + 1) {
+            origin-=1;
+        }
 	}
 }

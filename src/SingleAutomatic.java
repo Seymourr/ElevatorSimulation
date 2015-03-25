@@ -43,7 +43,6 @@
 	protected int getElevator(ArrayList<ElevatorInterface> elevators, Passenger p) {
 		int emptyCheck = getRandomEmptyElevator(elevators, p);
 		if(emptyCheck != -1) return emptyCheck;
-		
 		//No empty elevator was found. Pick a random one 
 		return getRandomElevator(elevators, p);
 	}
@@ -52,25 +51,12 @@
 	* Assigns calls to local elevators or double decked elevators (depending on the elevator type).
 	*/
 	private ArrayList<ElevatorInterface> assignLocalWithSingleAutomatic(ArrayList<ElevatorInterface> elevators, Passenger p) {
-		if(elevators.get(0).ofType() == ElevatorType.SINGLE) {
+		if(specs.getLocal() == ElevatorType.SINGLE) {
 			int elevatorIndex = getElevator(elevators, p);
 			elevators.get(elevatorIndex).addToQueue(p, elevators.get(elevatorIndex).getQueue().size(), elevators.get(elevatorIndex).getQueue().size() + 1, CarPosition.NULL);
-		} else if(elevators.get(0).ofType() == ElevatorType.DOUBLE) {
+		} else if(specs.getLocal() == ElevatorType.DOUBLE) {
 			int elevatorIndex = getElevator(elevators, p);
-			CarPosition pos = CarPosition.NULL;
-
-			if(p.getDestination() == elevators.get(elevatorIndex).getFloors()[elevators.get(elevatorIndex).getFloors().length - 1]) {
-				pos = CarPosition.UPPER;
-				if(p.getOrigin() == specs.getLobbyFloor() || p.getOrigin() == specs.getSkylobbyfloor()) {
-					p.shift();
-				}
-			} else {
-				if(p.getOrigin() < p.getDestination()) {
-					pos = CarPosition.UPPER;
-				} else {
-					pos = CarPosition.LOWER;
-				}
-			}
+			CarPosition pos = getCarPos(elevators.get(elevatorIndex), p);
 			elevators.get(elevatorIndex).addToQueue(p, elevators.get(elevatorIndex).getQueue().size(), elevators.get(elevatorIndex).getQueue().size() + 1, pos);
 		} else {
 			System.out.println("Something went wrong with assigning elevators, ABORTING SIMULATION");

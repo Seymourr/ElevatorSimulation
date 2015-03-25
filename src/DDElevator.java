@@ -289,7 +289,9 @@ public class DDElevator implements ElevatorInterface{
         ElevatorQueueObject q2 = new ElevatorQueueObject(
             p, ElevatorAction.DROPOFF, c
         );
-        
+        if(queue.size() == 0) {
+            
+        }
         queue.add(index1, q1);
         queue.add(index2, q2);
         
