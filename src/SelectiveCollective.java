@@ -153,8 +153,8 @@ public class SelectiveCollective extends Algorithm {
 							break;
 						}
 					}
+				}
 			}
-
 			//Is all calls in the queue done prior to passengers destination without a reverse?
 			if(dropPosition == -1) {
 				dropPosition = elevator.getQueue().size(); 
@@ -162,8 +162,8 @@ public class SelectiveCollective extends Algorithm {
 					dropPosition += 1;
 				}
 			}
-			}
 		}
+
 		if(pickUpPosition == -1 ||dropPosition == -1) {
 			System.out.println("ERROR IN SAME, FIX");
 			System.exit(0);

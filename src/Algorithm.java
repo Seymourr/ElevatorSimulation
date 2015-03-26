@@ -198,7 +198,6 @@ public abstract class Algorithm {
 
 		Random r = new Random();
 		if(!temp.isEmpty()){
-			//TODO KOMMENTAR (Ta närmsta?)
 			int elevatorIndex = 0;
 			for(int i = 0; i < temp.size(); i++) {
 				if(Math.abs(temp.get(i).getStatus().floor - p.getOrigin()) < Math.abs(temp.get(elevatorIndex).getStatus().floor - p.getOrigin())) {

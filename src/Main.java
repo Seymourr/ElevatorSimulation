@@ -98,13 +98,174 @@ public class Main {
        // testTrafficGen();
     
         //Create the elevators
-		createElevators();
-        
+ //       if(specs.zoningUsed()) {
+  //      	createZonedElevators();
+  //      	printZoning();
+   //     } else {
+			createElevators();
+	//	}
+   //     
         //Perform the simulation
-		simulateDay(new SelectiveCollective(specs), 500); 
+	simulateDay(new SelectiveCollective(specs), 500); 
 	//	simulateDay(new SingleAutomatic(specs), 500);
 
 	}
+
+	private static void printZoning() {
+		for(int i = 0; i < allElevators.size(); i++) {
+			System.out.println("***************************************");
+			System.out.println("Now printing new set of elevators");
+			System.out.println("***************************************");
+			for(int j = 0; j < allElevators.get(i).size(); j++) {
+				System.out.print("Served floors: ");
+				for(int k = 0; k < allElevators.get(i).get(j).getFloors().length; k++) {
+					System.out.print(allElevators.get(i).get(j).getFloors()[k] + " , ");
+				}
+				System.out.println();
+			}
+		}
+	}
+	/**
+	* Creates bot and top local elevators as well as shuttle elevators much like the method createElevators, with the
+	* exception that floors are evenly distributed to local elevators. Assumed there are at least 50 floors, with reasonable number of shafts.
+	*/
+	private static void createZonedElevators() {
+		  //Initiate the lists
+        localElevatorsBottom = new ArrayList<ElevatorInterface>();
+        localElevatorsTop = new ArrayList<ElevatorInterface>();
+        shuttleElevators = new ArrayList<ElevatorInterface>();
+
+        int botFloors = specs.getSkylobbyfloor();
+        int topFloors = specs.getFloors() - specs.getSkylobbyfloor();
+
+        localElevatorsBottom = getZonedElevators(botFloors, specs.getLobbyFloor(), specs.getSkylobbyfloor());
+        localElevatorsTop = getZonedElevators(topFloors, specs.getSkylobbyfloor(), specs.getSkylobbyfloor());
+
+        //Create shuttles
+        int[] shuttleFloors;
+        
+        //Calculate shuttle floor ranges
+        if (specs.getShuttle() == ElevatorType.SINGLE) {
+            shuttleFloors = new int[2];
+            shuttleFloors[0] = specs.getLobbyFloor();
+            shuttleFloors[1] = specs.getSkylobbyfloor();
+        } else { //Double decked shuttle and thus two lobby floors
+            shuttleFloors = new int[4];
+            shuttleFloors[0] = specs.getLobbyFloor();
+            shuttleFloors[1] = shuttleFloors[0] + 1;
+            shuttleFloors[2] = specs.getSkylobbyfloor();
+            shuttleFloors[3] = shuttleFloors[2] + 1;
+        }
+
+        //Fill the shuttle lists with elevators depending on type
+        int numberOfShuttles = specs.getNumberOfShuttles();
+        if (specs.getShuttle() == ElevatorType.SINGLE) {
+            for(int i = 0; i < numberOfShuttles; i++){
+                shuttleElevators.add(new Elevator(specs, shuttleFloors, 0));
+            }
+        } else {
+            for(int i = 0; i < numberOfShuttles; i++){
+                shuttleElevators.add(new DDElevator(specs, shuttleFloors, 0));
+            }
+        } 
+
+		allElevators = new ArrayList<ArrayList<ElevatorInterface>>();
+		allElevators.add(localElevatorsBottom);
+		allElevators.add(shuttleElevators);
+		allElevators.add(localElevatorsTop);
+
+   }
+
+    private static ArrayList<ElevatorInterface> getZonedElevators(int amntFloors, int lobby, int limit) {
+
+    	ArrayList<ElevatorInterface> elevators = new ArrayList<ElevatorInterface>();
+    	int minzone = 1;
+        if(specs.getShuttle() == ElevatorType.DOUBLE) {
+        	minzone = 2;
+        }
+
+        int zonesize = minzone;
+        int zones = amntFloors / zonesize;
+        int eles = specs.getShafts() - specs.getNumberOfShuttles();
+        while(eles/zones < 1) {
+        	//zoneize needs to get bigger
+        	zonesize += minzone;
+        	zones = amntFloors/zonesize;
+        }
+
+        int elevatorsPerZone = eles / zones;
+
+        //Create elevators
+        int remainingElevators = eles;
+        int i = 0;
+        for(i = minzone; i < amntFloors; i+=zonesize) {
+        	for(int j = 0; j < elevatorsPerZone; j++) {
+        		ArrayList<Integer> temp = new ArrayList<Integer>();
+        		temp.add(lobby);
+        		if(specs.getShuttle() == ElevatorType.DOUBLE) {
+        			temp.add(lobby + 1);
+        		}
+        		for(int k = i; k < i + zonesize; k++) {
+        			if(k >= limit) {
+        				break;
+        			}
+        			temp.add(k + lobby);
+        		}
+        		if(temp.size() == 2) {
+        			System.out.println("Error first loop");
+        		}
+        		int[] floors = new int[temp.size()];
+        			for(int k = 0; k < temp.size(); k++) {
+        				floors[k] = temp.get(k);
+        			}
+
+        		if(specs.getLocal() == ElevatorType.SINGLE) {
+        			
+        			elevators.add(new Elevator(specs, floors, floors[0]));
+        		} else {
+        			elevators.add(new DDElevator(specs, floors, floors[0]));
+        		}
+        		remainingElevators -= 1;
+        	}
+        }
+        i = i - zonesize;
+
+        for(int k = i; k > 0; k-= zonesize) {
+        	if(remainingElevators == 0) {
+        		break;
+        	}
+        	ArrayList<Integer> temp = new ArrayList<Integer>();
+        		temp.add(lobby);
+        		if(specs.getShuttle() == ElevatorType.DOUBLE) {
+        			temp.add(lobby + 1);
+        		}
+        		for(int j = k; j < k + zonesize; j++) {
+        			if(j >= limit) {
+        				break;
+        			}
+        			temp.add(j + lobby);
+        		}
+        		if(temp.size() == 2) {
+        			System.out.println("Error sec loop");
+        		}
+        		int[] floors = new int[temp.size()];
+        			for(int l = 0; l < temp.size(); l++) {
+        				floors[l] = temp.get(l);
+        			}
+
+        		if(specs.getLocal() == ElevatorType.SINGLE) {
+        			
+        			elevators.add(new Elevator(specs, floors, floors[0]));
+        		} else {
+        			elevators.add(new DDElevator(specs, floors, floors[0]));
+        		}
+        		remainingElevators -= 1;
+        }
+
+        return elevators;
+    }
+        
+
 
 	/**
 	 * Creates bot and top local elevators, as well as shuttle elevators, and put their respective collection

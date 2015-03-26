@@ -28,7 +28,8 @@
  				//Top ride
  				allElevators.set(2, assignLocalWithSingleAutomatic(allElevators.get(2), p));
  			} else {
- 				System.out.println("ERROR IN MANAGECALL, SIMULATION ABORTED");
+ 				System.out.println("ERROR IN MANAGECALL: " + p.getOrigin() + " , " + p.getDestination());
+ 				System.out.println("SIMULATION ABORTED");
  				System.exit(0);
  			}
  		}
