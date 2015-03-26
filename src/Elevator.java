@@ -80,14 +80,15 @@ public class Elevator implements ElevatorInterface {
         //(Disembarking) Update queue, elevator and fill return list
         for (int i = 0; i < temp.length; i++) {
             if (temp[i].getDestination() == currentFloor) {
-                currentPassengers.remove(temp[i]); //Remove from elevator
+                if (!currentPassengers.remove(temp[i])) { //Remove from elevator
+                    throw new RuntimeException("Could not find dismebarking passenger in elevator.");
+                }
                 retPas.add(temp[i]); //Add to return list
                 passengersServed = passengersServed.add(new BigInteger("1")); //Update service counter
                 
                 boolean removed = false;
                 for (int j = 0; j < queue.size(); j++) {
                     ElevatorQueueObject q = queue.get(j);
-
                     if (q.getPassenger() == temp[i] && q.getActionType() == ElevatorAction.DROPOFF) {
                     	removed = true;
                         queue.remove(q); //Remove from queue
@@ -262,9 +263,16 @@ public class Elevator implements ElevatorInterface {
     		return new ElevatorStatusObject(currentFloor, 0, -1, currentPassengers.size());
     	}
     	
-        //TODO Check in the same way as updateElevator()
-        
+        //Fetch next call
         ElevatorQueueObject q = queue.getFirst();
+        int index = 1;
+        while (currentPassengers.size() == specs.getCarryCapacity() 
+            && q.getActionType() == ElevatorAction.PICKUP) {
+            q = queue.get(index);
+            index += 1;
+        }
+        
+        //Fetch destination
         int dest = 0;
         if (q.getActionType() == ElevatorAction.PICKUP) {
             dest = q.getPassenger().getOrigin();
