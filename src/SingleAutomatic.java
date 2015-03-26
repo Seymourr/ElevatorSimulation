@@ -41,9 +41,6 @@
  	* Returns a index of a elevator, attempting to provide a empty one. If no such is found, a random one is returned. 
  	*/
 	protected int getElevator(ArrayList<ElevatorInterface> elevators, Passenger p) {
-		int emptyCheck = getRandomEmptyElevator(elevators, p);
-		if(emptyCheck != -1) return emptyCheck;
-		//No empty elevator was found. Pick a random one 
 		return getRandomElevator(elevators, p);
 	}
 

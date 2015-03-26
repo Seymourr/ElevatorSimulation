@@ -242,24 +242,5 @@ public abstract class Algorithm {
 		
 	}
 
-	protected int getRandomEmptyElevator(ArrayList<ElevatorInterface> elevators, Passenger p) {
-		int elevatorIndex = -1;
-		ArrayList<ElevatorInterface> temp = new ArrayList<ElevatorInterface>();
-		ArrayList<Integer> temp2 = new ArrayList<Integer>();
-		for(int i = 0; i < elevators.size(); i++) {
-			if(elevatorContainsFloor(elevators.get(i), p.getOrigin(), p.getDestination())) {
-				if(elevators.get(i).getStatus().direction == 0) {
-					temp.add(elevators.get(i));
-					temp2.add(i);
-				}
-			}
-		}
-		if(temp.isEmpty()) {
-			return -1;
-		}
-		Random r = new Random();
-		int number = r.nextInt(temp.size());
-		return temp2.get(number);
-	}
 }
 

@@ -101,8 +101,8 @@ public class Main {
 		createElevators();
         
         //Perform the simulation
-		simulateDay(new SelectiveCollective(specs), 4000); 
-		//simulateDay(new SingleAutomatic(specs), 500);
+		//simulateDay(new SelectiveCollective(specs), 4000); 
+		simulateDay(new SingleAutomatic(specs), 500);
 
 	}
 
