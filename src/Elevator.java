@@ -157,7 +157,8 @@ public class Elevator implements ElevatorInterface {
         //If the elevator is full, fetch the next passenger DROPOFF
         int index = 1;
         while (currentPassengers.size() == specs.getCarryCapacity() 
-            && q.getActionType() == ElevatorAction.PICKUP) {
+            && (q.getActionType() == ElevatorAction.PICKUP ||
+            !currentPassengers.contains(q.getPassenger()))) {
             q = queue.get(index);
             index += 1;
         }
@@ -267,7 +268,8 @@ public class Elevator implements ElevatorInterface {
         ElevatorQueueObject q = queue.getFirst();
         int index = 1;
         while (currentPassengers.size() == specs.getCarryCapacity() 
-            && q.getActionType() == ElevatorAction.PICKUP) {
+            && (q.getActionType() == ElevatorAction.PICKUP ||
+            !currentPassengers.contains(q.getPassenger()))) {
             q = queue.get(index);
             index += 1;
         }
