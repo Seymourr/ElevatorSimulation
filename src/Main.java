@@ -101,7 +101,9 @@ public class Main {
 		createElevators();
         
         //Perform the simulation
-		simulateDay(new SingleAutomatic(specs), 100); 
+		simulateDay(new SelectiveCollective(specs), 5000); 
+		 //simulateDay(new SingleAutomatic(specs), 5000);
+
 	}
 
 	/**
@@ -118,16 +120,18 @@ public class Main {
         shuttleElevators = new ArrayList<ElevatorInterface>();
         
         //Calculate local floor ranges
-        int[] bottomfloors = new int[specs.getSkylobbyfloor()];
-        for(int i = 0; i < specs.getSkylobbyfloor(); i++){
-            bottomfloors[i] = i;
-        }
-        
-        int[] topfloors = new int[(specs.getFloors() - bottomfloors.length)];
-        for (int i = 0; i < topfloors.length; i++) {
-            topfloors[i] = skylobby + i;
-        }
-        
+    
+       
+     
+       	int[] bottomfloors = new int[specs.getSkylobbyfloor()];
+       	for(int i = 0; i < specs.getSkylobbyfloor(); i++){
+       	   	bottomfloors[i] = i;
+       		}
+      	int[] topfloors = new int[(specs.getFloors() - bottomfloors.length)];
+      	for (int i = 0; i < topfloors.length; i++) {
+        	topfloors[i] = skylobby + i;
+       	}
+       	
         int[] shuttleFloors;
         
         //Calculate shuttle floor ranges
@@ -190,14 +194,19 @@ public class Main {
 	 */
 	public static void simulateDay(Algorithm alg, int trafficAmount){
 		simulatePeriod(alg, TrafficType.UPPEAK, trafficAmount);
-	//	simulatePeriod(alg, TrafficType.REGULAR, trafficAmount);
-	//	simulatePeriod(alg, TrafficType.LUNCH, trafficAmount);
-	//	simulatePeriod(alg, TrafficType.REGULAR, trafficAmount);
-	//	simulatePeriod(alg, TrafficType.DOWNPEAK, trafficAmount);
+		System.out.println("Period complete");
+		simulatePeriod(alg, TrafficType.REGULAR, trafficAmount);
+			System.out.println("Period complete");
+		simulatePeriod(alg, TrafficType.LUNCH, trafficAmount);
+			System.out.println("Period complete");
+		simulatePeriod(alg, TrafficType.REGULAR, trafficAmount);
+			System.out.println("Period complete");
+		simulatePeriod(alg, TrafficType.DOWNPEAK, trafficAmount);
+			System.out.println("Period complete");
 		System.out.println("Now going into rest calls");
 		handleRestCalls(alg); // Extra time needed to empty system
 		System.out.println("Simulation finished, system empty");
-		printDayResults(new BigInteger("" + trafficAmount)); 
+		printDayResults(new BigInteger("" + (trafficAmount*5))); //Maybe consider dividing by amount of calls instead?
 		//TODO: Something to manage time from this day (UPDATE: NOT FINISHED?)
 	}
     
@@ -210,16 +219,16 @@ public class Main {
 	 */
 	public static void simulatePeriod(Algorithm alg, TrafficType t, int trafficAmount) {
 		LinkedList<Call> traffic = new LinkedList<Call>(trafficGen.getTraffic(t, trafficAmount));
-        //	testTraffic(traffic); //Debugging
+        	//testTraffic(traffic); //Debugging
 		
 
 		for(int second_i = 0; second_i < specs.getPeriodTime(); second_i++) {
-			//Update position of elevators
-			updateElevatorPosition();
-			
 			//People get off elevators
 			LinkedList<Passenger> calls = updateElevatorOnOff();
 			
+			//Update position of elevators
+			updateElevatorPosition();
+
             //New calls at this second?
 			while(!traffic.isEmpty() && traffic.getFirst().getCallTime() == second_i) {
                 calls.add(new Passenger(traffic.removeFirst(), specs));

@@ -25,6 +25,7 @@ public class ElevatorSpecs {
 	private final ElevatorType shuttle;
 	private final int numberOfShuttles;
 	private final int lobbyFloor;
+	private final boolean zoning;
 	
 	/**
 	 * Creates an object which puts data from the input ArrayList
@@ -65,6 +66,11 @@ public class ElevatorSpecs {
 		}
 		
 		this.numberOfShuttles = Integer.parseInt(indata.get(15));
+		if(indata.get(16).equals("true")) {
+			zoning = true;
+		} else {
+			zoning = false;
+		}
 		
 		//no consideration to error in reading
 	}
@@ -137,5 +143,9 @@ public class ElevatorSpecs {
 		
 	public int getNumberOfShuttles() {
 		return numberOfShuttles;
+	}
+
+	public boolean zoningUsed() {
+		return zoning;
 	}
 }
