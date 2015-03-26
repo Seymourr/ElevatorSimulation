@@ -61,11 +61,7 @@ public class Passenger {
      * be switched to the other lobby or skylobby floor with a double decked
      * trip (since there are two of these when the shuttle is double decked).
      */
-    private void reviseDoubleDeckedTrip() {
-        if (spec.getShuttle() != ElevatorType.DOUBLE) {
-            return;
-        }
-        
+    private void reviseDoubleDeckedTrip() {  
         if (currentDestination == -1 || origin == -1) {
             return;
         }
@@ -73,42 +69,54 @@ public class Passenger {
         if (currentDestination == spec.getLobbyFloor()) {
             if (origin == spec.getSkylobbyfloor() + 1) {
                 //Shuttle ride from upper car
-                currentDestination = spec.getLobbyFloor() + 1;
+                if (spec.getShuttle() == ElevatorType.DOUBLE) {
+                    currentDestination = spec.getLobbyFloor() + 1;
+                }
             } else if (origin < spec.getSkylobbyfloor()) {
                 //Local ride in bot locals downwards
                 if ((origin - spec.getLobbyFloor()) % 2 == 1) {
                     //Upper floor is best
-                    currentDestination = spec.getLobbyFloor() + 1;
+                    if (spec.getLocal() == ElevatorType.DOUBLE) {
+                        currentDestination = spec.getLobbyFloor() + 1;
+                    }
                 } 
             }
         } else if (currentDestination == spec.getSkylobbyfloor()) {
             if (origin == spec.getLobbyFloor() + 1) {
                 //Shuttle ride from upper car
-                currentDestination = spec.getSkylobbyfloor() + 1;
+                if (spec.getShuttle() == ElevatorType.DOUBLE) {
+                    currentDestination = spec.getSkylobbyfloor() + 1;
+                }
             } else if (origin > spec.getSkylobbyfloor()) {
                 //Local ride in top locals downwards
                 if ((origin - spec.getSkylobbyfloor()) % 2 == 1) {
                     //Upper floor is best
-                    currentDestination = spec.getSkylobbyfloor() + 1;
+                    if (spec.getLocal() == ElevatorType.DOUBLE) {
+                        currentDestination = spec.getSkylobbyfloor() + 1;
+                    }
                 } 
             }
         } else if (origin == spec.getLobbyFloor() || origin == spec.getLobbyFloor() + 1) {
             //Local ride in bot locals upwards
-            if ((currentDestination - spec.getLobbyFloor()) % 2 == 1) {
-                //Upper floor is best
-                origin = spec.getLobbyFloor() + 1;
-            } else {
-                //Lower floor is best
-                origin = spec.getLobbyFloor();
+            if (spec.getLocal() == ElevatorType.DOUBLE) {
+                if ((currentDestination - spec.getLobbyFloor()) % 2 == 1) {
+                    //Upper floor is best
+                    origin = spec.getLobbyFloor() + 1;
+                } else {
+                    //Lower floor is best
+                    origin = spec.getLobbyFloor();
+                }
             }
         } else if (origin == spec.getSkylobbyfloor() || origin == spec.getSkylobbyfloor() + 1) {
             //Local ride in top locals upwards
-            if ((currentDestination - spec.getSkylobbyfloor()) % 2 == 1) {
-                //Upper floor is best
-                origin = spec.getSkylobbyfloor() + 1;
-            } else {
-                //Lower floor is best
-                origin = spec.getSkylobbyfloor();
+            if (spec.getLocal() == ElevatorType.DOUBLE) { 
+                if ((currentDestination - spec.getSkylobbyfloor()) % 2 == 1) {
+                    //Upper floor is best
+                    origin = spec.getSkylobbyfloor() + 1;
+                } else {
+                    //Lower floor is best
+                    origin = spec.getSkylobbyfloor();
+                }
             }
         }
     }
