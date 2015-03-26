@@ -154,7 +154,7 @@ public class Elevator implements ElevatorInterface {
         
         ElevatorQueueObject q = queue.getFirst();
         
-        //If the elevator is full, fetch the next passenger DROPOFF
+        //If the elevator is full, fetch the next passenger who can disembark successfully
         int index = 1;
         while (currentPassengers.size() == specs.getCarryCapacity() 
             && (q.getActionType() == ElevatorAction.PICKUP ||

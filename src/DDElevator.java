@@ -135,12 +135,6 @@ public class DDElevator implements ElevatorInterface{
     
     /* See ElevatorInterface for details */
     public HashMap<CarPosition, Passenger[]> openDoors() {
-        //Check if currently at a floor
-        int floor = Math.round(currentUpperFloor);
-        if (floor != currentUpperFloor) {
-            return new HashMap<CarPosition, Passenger[]>(0);
-        }
-        
         //Disembarking
         HashMap<CarPosition, Passenger[]> retMap = new HashMap<CarPosition, Passenger[]>(2);
         retMap.put(CarPosition.UPPER, disembarkFromCar(CarPosition.UPPER));
@@ -150,13 +144,13 @@ public class DDElevator implements ElevatorInterface{
         while (queue.size() > 0) {
             ElevatorQueueObject q = queue.getFirst();
             if (q.getActionType() == ElevatorAction.PICKUP) {
-                if (q.getPassenger().getOrigin() == floor &&
+                if (q.getPassenger().getOrigin() == currentUpperFloor &&
                 upperCarPassengers.size() < specs.getCarryCapacity() &&
                 q.getCarPosition() == CarPosition.UPPER) {
                     //Passenger entering upper car
                     upperCarPassengers.add(q.getPassenger());
                     queue.removeFirst();
-                } else if (q.getPassenger().getOrigin() == floor - 1 &&
+                } else if (q.getPassenger().getOrigin() == currentUpperFloor - 1 &&
                 lowerCarPassengers.size() < specs.getCarryCapacity() &&
                 q.getCarPosition() == CarPosition.LOWER) {
                     //Passenger entering lower car
@@ -198,22 +192,33 @@ public class DDElevator implements ElevatorInterface{
             return true;
         }
         
+        //If the elevator is full, fetch the next passenger who can disembark successfully
         ElevatorQueueObject q = queue.getFirst();
-        
-        //If the elevator is full, fetch the next passenger who can board succesfully
         int index = 1;
-        while (q.getActionType() == ElevatorAction.PICKUP) {
-            if (q.getCarPosition() == CarPosition.UPPER &&
-            upperCarPassengers.size() == specs.getCarryCapacity()) {
-                q = queue.get(index);
-                index += 1;
-            } else if (q.getCarPosition() == CarPosition.LOWER &&
-            lowerCarPassengers.size() == specs.getCarryCapacity()) {
-                q = queue.get(index);
-                index += 1;
+        while (true) {
+            if (q.getCarPosition() == CarPosition.UPPER) {
+                if (upperCarPassengers.size() == specs.getCarryCapacity() 
+                    && (q.getActionType() == ElevatorAction.PICKUP ||
+                    !upperCarPassengers.contains(q.getPassenger()))) {
+                    q = queue.get(index);
+                    index += 1;
+                } else {
+                    break;
+                }
+            } else if (q.getCarPosition() == CarPosition.LOWER) {
+                if (lowerCarPassengers.size() == specs.getCarryCapacity() 
+                    && (q.getActionType() == ElevatorAction.PICKUP ||
+                    !lowerCarPassengers.contains(q.getPassenger()))) {
+                    q = queue.get(index);
+                    index += 1;
+                } else {
+                    break;
+                }
             } else {
-                break;
+                throw new RuntimeException("CarPosition.NULL in double decked.");
             }
+            q = queue.get(index);
+            index += 1;
         }
         
         //Fetch next destination
@@ -329,10 +334,36 @@ public class DDElevator implements ElevatorInterface{
             );
     	}
     	
-        //TODO Check in the same way as updateElevator()
+        //Fetch the next destination
+        ElevatorQueueObject q = queue.getFirst();
+        int index = 1;
+        while (true) {
+            if (q.getCarPosition() == CarPosition.UPPER) {
+                if (upperCarPassengers.size() == specs.getCarryCapacity() 
+                    && (q.getActionType() == ElevatorAction.PICKUP ||
+                    !upperCarPassengers.contains(q.getPassenger()))) {
+                    q = queue.get(index);
+                    index += 1;
+                } else {
+                    break;
+                }
+            } else if (q.getCarPosition() == CarPosition.LOWER) {
+                if (lowerCarPassengers.size() == specs.getCarryCapacity() 
+                    && (q.getActionType() == ElevatorAction.PICKUP ||
+                    !lowerCarPassengers.contains(q.getPassenger()))) {
+                    q = queue.get(index);
+                    index += 1;
+                } else {
+                    break;
+                }
+            } else {
+                throw new RuntimeException("CarPosition.NULL in double decked.");
+            }
+            q = queue.get(index);
+            index += 1;
+        }
         
         //Fetch current destination
-        ElevatorQueueObject q = queue.getFirst();
         int dest = 0;
         if (q.getActionType() == ElevatorAction.PICKUP) {
             dest = q.getPassenger().getOrigin();
