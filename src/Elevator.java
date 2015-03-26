@@ -24,6 +24,27 @@ public class Elevator implements ElevatorInterface {
 
     /**
      * Constructor 
+     * Used for cloning
+     */
+    private Elevator(ElevatorSpecs s, int[] f, LinkedList<ElevatorQueueObject> q, 
+        LinkedList<Passenger> c, int w, float cf, BigInteger twt, BigInteger ttt,
+        BigDecimal ttd, BigInteger ps) 
+    {
+        specs = s;
+        floors = f;
+        queue = q;
+        currentPassengers = c;
+        waitingTime = w;
+        currentFloor = cf;
+        distancePerFloor = (float)specs.getBuildingHeight() / (float)specs.getFloors();
+        totalWaitTime = twt;
+        totalTravelTime = ttt;
+        totalTravelDistance = ttd;
+        passengersServed = ps;
+    }
+    
+    /**
+     * Constructor 
      * @param spec The specifications for this elevator.
      * @param floors The set of floors to operate on.
      */
@@ -276,5 +297,11 @@ public class Elevator implements ElevatorInterface {
     /* See ElevatorInterface for details */
     public int[] getFloors() {
         return floors;
+    }
+    
+    /* See ElevatorInterface for details */
+    public ElevatorInterface clone() {
+        return new Elevator(specs, floors, queue, currentPassengers, waitingTime, 
+        currentFloor, BigInteger.ZERO, BigInteger.ZERO, BigDecimal.ZERO, BigInteger.ZERO);
     }
 }

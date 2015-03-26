@@ -6,6 +6,13 @@ import java.util.HashMap;
  * Interface for the elevator implementing classes.
  */
 public interface ElevatorInterface {
+    /**
+     * Returns a clone of this ElevatorInterface object.
+     * NOTE: The clone has its service record variables reset to 0, i.e.
+     * like it was just created.
+     */
+    public ElevatorInterface clone();
+    
     /** 
      * Allows passengers to embark and disembark on the current floor
      * of the elevator. All passengers inside the elevator will disembark

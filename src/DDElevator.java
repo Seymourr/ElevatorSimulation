@@ -26,6 +26,28 @@ public class DDElevator implements ElevatorInterface{
     
     /**
      * Constructor 
+     * Used for cloning
+     */
+    private DDElevator(ElevatorSpecs s, int[] f, LinkedList<ElevatorQueueObject> q, 
+        LinkedList<Passenger> lc, LinkedList<Passenger> uc, int w, float cf, BigInteger twt, 
+        BigInteger ttt, BigDecimal ttd, BigInteger ps) 
+    {
+        specs = s;
+        floors = f;
+        queue = q;
+        lowerCarPassengers = lc;
+        upperCarPassengers = uc;
+        waitingTime = w;
+        currentUpperFloor = cf;
+        distancePerFloor = (float)specs.getBuildingHeight() / (float)specs.getFloors();
+        totalWaitTime = twt;
+        totalTravelTime = ttt;
+        totalTravelDistance = ttd;
+        passengersServed = ps;
+    }
+    
+    /**
+     * Constructor 
      * @param spec The specifications for this elevator.
      * @param floors The set of floors to operate on.
      * $param currentFloor The current position of the upper car.
@@ -350,5 +372,11 @@ public class DDElevator implements ElevatorInterface{
     /* See ElevatorInterface for details */
     public int[] getFloors() {
         return floors;
+    }
+    
+    /* See ElevatorInterface for details */
+    public ElevatorInterface clone() {
+        return new DDElevator(specs, floors, queue, lowerCarPassengers, upperCarPassengers, waitingTime, 
+        currentUpperFloor, BigInteger.ZERO, BigInteger.ZERO, BigDecimal.ZERO, BigInteger.ZERO);
     }
 }

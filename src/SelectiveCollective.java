@@ -72,7 +72,7 @@ public class SelectiveCollective extends Algorithm {
 			return elevators;
 	}
 
-	protected ElevatorInterface pickUpOnTheWay(ElevatorInterface elevator, Passenger p, int passDir, CarPosition pos) {
+	public ElevatorInterface pickUpOnTheWay(ElevatorInterface elevator, Passenger p, int passDir, CarPosition pos) {
 		int pickUpPosition = -1;
 		int dropPosition = -1;
 
@@ -172,7 +172,7 @@ public class SelectiveCollective extends Algorithm {
 		return elevator;
 	}
 
-protected ElevatorInterface pickUpOnReverse(ElevatorInterface elevator, Passenger p, int passDir, CarPosition pos) {
+public ElevatorInterface pickUpOnReverse(ElevatorInterface elevator, Passenger p, int passDir, CarPosition pos) {
 	int pickUpPosition = -1;
 	int dropPosition = -1;
 

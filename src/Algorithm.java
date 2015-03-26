@@ -71,7 +71,13 @@ public abstract class Algorithm {
 
 
 	protected CarPosition getCarPos(ElevatorInterface elevator, Passenger p) {
-		CarPosition pos = CarPosition.NULL;
+        CarPosition pos = CarPosition.NULL;
+        
+        //If single decked always return NULL
+        if (elevator.ofType() == ElevatorType.SINGLE) {
+            return pos;
+        }
+		
 		if(p.getDestination() == elevator.getFloors()[elevator.getFloors().length - 1] || p.getOrigin() == elevator.getFloors()[elevator.getFloors().length-1]) {
 			pos = CarPosition.UPPER;
 		} else {
