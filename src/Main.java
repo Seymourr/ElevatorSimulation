@@ -23,7 +23,7 @@ public class Main {
 	private static ElevatorSpecs specs;
 	private static int travellingTime;
 	private static int waitingTime;
-	
+	private static int numberOfCalls;
 	/**
 	 * Read all specifications for this simulation from file, and returns an object carrying all these
 	 * in a proper manor. 
@@ -101,8 +101,8 @@ public class Main {
 		createElevators();
         
         //Perform the simulation
-		simulateDay(new SelectiveCollective(specs), 5000); 
-		 //simulateDay(new SingleAutomatic(specs), 5000);
+		simulateDay(new SelectiveCollective(specs), 4000); 
+		//simulateDay(new SingleAutomatic(specs), 500);
 
 	}
 
@@ -168,12 +168,12 @@ public class Main {
         if (specs.getLocal() == ElevatorType.SINGLE) {
             for (int i = 0; i < noLocals; i++) {
                 localElevatorsBottom.add(new Elevator(specs, bottomfloors, 0));
-                localElevatorsTop.add(new Elevator(specs, topfloors, 0));
+                localElevatorsTop.add(new Elevator(specs, topfloors, topfloors[0]));
             }
         } else if (specs.getLocal() == ElevatorType.DOUBLE) {
             for (int i = 0; i < noLocals; i++) {
                 localElevatorsBottom.add(new DDElevator(specs, bottomfloors, 0));
-                localElevatorsTop.add(new DDElevator(specs, topfloors, 0));
+                localElevatorsTop.add(new DDElevator(specs, topfloors, topfloors[0]));
             }
         } else {
             System.out.println("Elevator local type not specified correctly.");
@@ -193,18 +193,31 @@ public class Main {
 	 * @param trafficAmount
 	 */
 	public static void simulateDay(Algorithm alg, int trafficAmount){
+
 		simulatePeriod(alg, TrafficType.UPPEAK, trafficAmount);
 		System.out.println("Period complete");
+		printCallAmount();
+
 		simulatePeriod(alg, TrafficType.REGULAR, trafficAmount);
-			System.out.println("Period complete");
+		System.out.println("Period complete");
+		printCallAmount();
+
 		simulatePeriod(alg, TrafficType.LUNCH, trafficAmount);
-			System.out.println("Period complete");
+		System.out.println("Period complete");
+		printCallAmount();
+
 		simulatePeriod(alg, TrafficType.REGULAR, trafficAmount);
-			System.out.println("Period complete");
+		System.out.println("Period complete");
+		printCallAmount();
+
 		simulatePeriod(alg, TrafficType.DOWNPEAK, trafficAmount);
-			System.out.println("Period complete");
+		System.out.println("Period complete");
+		printCallAmount();
+
 		System.out.println("Now going into rest calls");
+		printCallAmount();
 		handleRestCalls(alg); // Extra time needed to empty system
+
 		System.out.println("Simulation finished, system empty");
 		printDayResults(new BigInteger("" + (trafficAmount*5))); //Maybe consider dividing by amount of calls instead?
 		//TODO: Something to manage time from this day (UPDATE: NOT FINISHED?)
@@ -219,13 +232,13 @@ public class Main {
 	 */
 	public static void simulatePeriod(Algorithm alg, TrafficType t, int trafficAmount) {
 		LinkedList<Call> traffic = new LinkedList<Call>(trafficGen.getTraffic(t, trafficAmount));
-        	//testTraffic(traffic); //Debugging
+        //	testTraffic(traffic); //Debugging
 		
-
+		numberOfCalls += traffic.size();
 		for(int second_i = 0; second_i < specs.getPeriodTime(); second_i++) {
 			//People get off elevators
 			LinkedList<Passenger> calls = updateElevatorOnOff();
-			
+			numberOfCalls += calls.size();
 			//Update position of elevators
 			updateElevatorPosition();
 
@@ -236,9 +249,25 @@ public class Main {
 			
 			//Manage new calls (algorithm call)
 			allElevators = alg.manageCalls(allElevators, calls);
+		//	debugPrint();
 		}
 	}
 	
+
+	private static void debugPrint() {
+		if(systemEmpty()) {
+			return;
+		}
+		for(int i = 0; i < allElevators.size(); i++) {
+			for(int j = 0; j < allElevators.get(i).size(); j++) {
+				if(allElevators.get(i).get(j).getStatus().direction == 0 && allElevators.get(i).get(j).getStatus().passengers == 0) {
+					continue;
+				}
+				System.out.println(allElevators.get(i).get(j).getQueue().getFirst().getCarPosition());
+				System.out.println(allElevators.get(i).get(j).getStatus().getStringRepresentation());
+			}
+		}
+	}
 	/**
 	 * Print out the total waiting and average time of the system, including the average passenger case.
 	 * @param passengerAmount
@@ -276,17 +305,29 @@ public class Main {
 		System.out.println("Total traveling time: " + totalTravelingTime.toString() + " virtual seconds");
 		System.out.println("Average Total waiting time: " + totalWaitingTime.divide(passengerAmount).toString() + " virtual seconds");
 		System.out.println("Average Total traveling time: " + totalTravelingTime.divide(passengerAmount).toString() + " virtual seconds");
+		System.out.println("Average Total waiting time (With calls): " + totalWaitingTime.divide(new BigInteger(numberOfCalls + "")).toString() + " virtual seconds");
 	}
 	
 	/**
 	 * Further simulates remaining passengers traveling. Extra time is added to the total time.
 	 */
 	public static void handleRestCalls(Algorithm alg){
+		
 		while(!systemEmpty()){
-			updateElevatorPosition();
 			LinkedList<Passenger> calls = updateElevatorOnOff();
+			updateElevatorPosition();
 			allElevators = alg.manageCalls(allElevators, calls);
 		}
+	}
+
+	private static void printCallAmount() {
+		int temp = 0;
+		for(int i = 0; i < allElevators.size(); i++) {
+			for(int j = 0; j < allElevators.get(i).size(); j++) {
+				temp += allElevators.get(i).get(j).getQueue().size();
+			}
+		}
+		System.out.println(temp);
 	}
 
 	/**

@@ -4,14 +4,14 @@
 5000 //Medium traffic passenger amount
 10000 //Heavy traffic passenger amount
 100 //Number of floors
-46  //Skylobby floor (Must be in even floor)
-5   //Distance between floors
+50 //Skylobby floor (Must be in even floor)
+10   //Distance between floors
 45 //Number of shafts
 500 //Building height
-12  //Car carry capacity
-4   //Car speed (Average)
+15  //Car carry capacity
+5   //Car speed (Average)
 10  //Floor delay
-single //local elevator
-single //shuttle elevator
-8   //Number of shuttles
+double //local elevator
+double //shuttle elevator
+10   //Number of shuttles
 false //Is equally distributed zoning used? (Not implemented yet)

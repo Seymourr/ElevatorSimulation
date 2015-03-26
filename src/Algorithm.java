@@ -18,7 +18,7 @@ public abstract class Algorithm {
 	public ArrayList<ElevatorInterface> assignShuttleElevator(ArrayList<ElevatorInterface> elevators, Passenger p) {
 		int chosenElevator = -1;
 		for(int i = 0; i < elevators.size(); i++) {
-			if(elevators.get(i).getStatus().direction == 0 && elevators.get(i).getStatus().passengers < specs.getCarryCapacity()) {
+			if(elevators.get(i).getStatus().passengers < specs.getCarryCapacity()) {
 				if(elevators.get(i).getStatus().floor == p.getOrigin() || elevators.get(i).getStatus().floor - 1 == p.getOrigin()) {
 					chosenElevator = i;
 					break;
@@ -181,20 +181,65 @@ public abstract class Algorithm {
 	}
 
 	/**
-	* Returns a random elevator position in a list of elevators
+	* Returns a semi-random elevator position in a list of elevators
 	*/
 	protected int getRandomElevator(ArrayList<ElevatorInterface> elevators, Passenger p) {
 		ArrayList<ElevatorInterface> temp = new ArrayList<ElevatorInterface>();
 		ArrayList<Integer> temp2 = new ArrayList<Integer>();
+
+		for(int i = 0; i < elevators.size(); i++) {
+			if(elevatorContainsFloor(elevators.get(i), p.getOrigin(), p.getDestination())) {
+				if(elevators.get(i).getStatus().direction == 0 && elevators.get(i).getStatus().passengers < specs.getCarryCapacity()) {
+					temp.add(elevators.get(i));
+					temp2.add(i);
+				}
+			}
+		}
+
+		Random r = new Random();
+		if(!temp.isEmpty()){
+			//TODO KOMMENTAR (Ta närmsta?)
+			int elevatorIndex = 0;
+			for(int i = 0; i < temp.size(); i++) {
+				if(Math.abs(temp.get(i).getStatus().floor - p.getOrigin()) < Math.abs(temp.get(elevatorIndex).getStatus().floor - p.getOrigin())) {
+					elevatorIndex = i;
+				}
+			}
+			return elevatorIndex;	
+		}
+
+		//No empty or idle elevators exist. Attempt to get the closest one, which is not full.
+
+		for(int i = 0; i < elevators.size(); i++) {
+			if(elevatorContainsFloor(elevators.get(i), p.getOrigin(), p.getDestination())) {
+				if(elevators.get(i).getStatus().passengers < specs.getCarryCapacity()) {
+					temp.add(elevators.get(i));
+					temp2.add(i);
+				}
+			}
+		}
+		
+		if(!temp.isEmpty()) {
+			int elevatorIndex = 0;
+			for(int i = 0; i < temp.size(); i++) {
+				if(Math.abs(temp.get(i).getStatus().floor - p.getOrigin()) < Math.abs(temp.get(elevatorIndex).getStatus().floor - p.getOrigin())) {
+					elevatorIndex = i;
+				}
+			}
+			return elevatorIndex;	
+		}
+
+		//If we come here, all elevators are full.
+
 		for(int i = 0; i < elevators.size(); i++) {
 			if(elevatorContainsFloor(elevators.get(i), p.getOrigin(), p.getDestination())) {
 				temp.add(elevators.get(i));
 				temp2.add(i);
 			}
 		}
-		Random r = new Random();
 		int number = r.nextInt(temp.size());
 		return temp2.get(number);
+		
 	}
 
 	protected int getRandomEmptyElevator(ArrayList<ElevatorInterface> elevators, Passenger p) {
