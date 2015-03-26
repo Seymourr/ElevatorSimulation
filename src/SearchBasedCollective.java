@@ -37,6 +37,15 @@ public class SearchBasedCollective extends Algorithm {
     /* Returns an index of a suitable elevator for the given passenger */
 	protected int getElevator(ArrayList<ElevatorInterface> elevators, Passenger p) {
         //TODO
+        
+        //Order by distance to current
+        
+        //Go through list, if no has space and wrong direction, remove it
+        
+        //Calculate waiting and travel times based on the queue
+        
+        //Chose min of above
+        
         return 0;
     }
     
