@@ -65,10 +65,10 @@ public class Elevator implements ElevatorInterface {
     /* See ElevatorInterface for details */
     public HashMap<CarPosition, Passenger[]> openDoors() {
         //Check if currently at a floor
-        int floor = Math.round(currentFloor);
-        if (floor != currentFloor) {
-            return new HashMap<CarPosition, Passenger[]>(0);
-        }
+  //     float floot = currentFloor;
+  //      if (floor != currentFloor) {
+    //        return new HashMap<CarPosition, Passenger[]>(0);
+   //     }
         
         //Disembarking
         LinkedList<Passenger> retPas = new LinkedList<Passenger>();
@@ -104,7 +104,7 @@ public class Elevator implements ElevatorInterface {
         while (currentPassengers.size() < specs.getCarryCapacity() && queue.size() > 0) {
             ElevatorQueueObject q = queue.getFirst();
             if (q.getActionType() == ElevatorAction.PICKUP) {
-                if(q.getPassenger().getOrigin() == floor) {
+                if(q.getPassenger().getOrigin() == currentFloor) {
                     currentPassengers.add(q.getPassenger());
                     queue.removeFirst();
                 } else {

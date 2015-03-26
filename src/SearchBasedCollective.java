@@ -54,7 +54,7 @@ public class SearchBasedCollective extends Algorithm {
     
     /* Run the elevators until it is empty */
     private ElevatorInterface emptyElevator(ElevatorInterface e) {
-        while (e.getStatus().direction != 0) {
+        while (!e.getQueue().isEmpty()) {
             e.openDoors();
             e.updateElevator();
         }

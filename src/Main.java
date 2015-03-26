@@ -106,8 +106,22 @@ public class Main {
 	//	}
    //     
         //Perform the simulation
-	simulateDay(new SelectiveCollective(specs), 500); 
-	//	simulateDay(new SingleAutomatic(specs), 500);
+		int trafficAmount = specs.getHeavyTraffic();;
+		System.out.println("Now starting simulation with " + trafficAmount + " passengers per period");
+		for(int i = 0; i < specs.getSimulationDays(); i++) {
+			simulateDay(new SingleAutomatic(specs), trafficAmount); 
+			System.out.println("Day " + i + " complete");
+		}
+		printResults(new BigInteger("" + (specs.getSimulationDays() * trafficAmount *5)));
+	
+//		for(int i = 0; i < specs.getSimulationDays(); i++) {}
+//		simulatePeriod(alg, TrafficType.DOWNPEAK, trafficAmount);
+//		printCallAmount();
+
+//		System.out.println("Now going into rest calls");
+//		printCallAmount();
+	//	handleRestCalls(alg); // Extra time needed to empty system
+	//	simulateDay(new SingleAutomatic(specs), 1000);
 
 	}
 
@@ -354,33 +368,26 @@ public class Main {
 	 * @param trafficAmount
 	 */
 	public static void simulateDay(Algorithm alg, int trafficAmount){
-
+		System.out.println("Entered day");
 		simulatePeriod(alg, TrafficType.UPPEAK, trafficAmount);
-		System.out.println("Period complete");
+		printCallAmount();
+		simulatePeriod(alg, TrafficType.REGULAR, trafficAmount/3);
 		printCallAmount();
 
-		simulatePeriod(alg, TrafficType.REGULAR, trafficAmount);
-		System.out.println("Period complete");
+		simulatePeriod(alg, TrafficType.LUNCH, trafficAmount/2);
 		printCallAmount();
 
-		simulatePeriod(alg, TrafficType.LUNCH, trafficAmount);
-		System.out.println("Period complete");
-		printCallAmount();
-
-		simulatePeriod(alg, TrafficType.REGULAR, trafficAmount);
-		System.out.println("Period complete");
+		simulatePeriod(alg, TrafficType.REGULAR, trafficAmount/3);
 		printCallAmount();
 
 		simulatePeriod(alg, TrafficType.DOWNPEAK, trafficAmount);
-		System.out.println("Period complete");
 		printCallAmount();
 
 		System.out.println("Now going into rest calls");
-		printCallAmount();
 		handleRestCalls(alg); // Extra time needed to empty system
 
 		System.out.println("Simulation finished, system empty");
-		printDayResults(new BigInteger("" + (trafficAmount*5))); //Maybe consider dividing by amount of calls instead?
+		 //Maybe consider dividing by amount of calls instead?
 		//TODO: Something to manage time from this day (UPDATE: NOT FINISHED?)
 	}
     
@@ -433,30 +440,30 @@ public class Main {
 	 * Print out the total waiting and average time of the system, including the average passenger case.
 	 * @param passengerAmount
 	 */
-	private static void printDayResults(BigInteger passengerAmount){
+	private static void printResults(BigInteger passengerAmount){
 		BigInteger totalWaitingTime = new BigInteger("0");
 		BigInteger totalTravelingTime = new BigInteger("0");
         
-        System.out.println("************** LOCAL BOT ************");
+      //  System.out.println("************** LOCAL BOT ************");
         
 		for(int i = 0; i < localElevatorsBottom.size(); i++){
-            System.out.println(localElevatorsBottom.get(i).getRecords().getStringRepresentation()); // DEBUG UTSKRIFTER HÄR
+       //     System.out.println(localElevatorsBottom.get(i).getRecords().getStringRepresentation()); // DEBUG UTSKRIFTER HÄR
 			totalWaitingTime = totalWaitingTime.add(localElevatorsBottom.get(i).getRecords().waitingTime);
 			totalTravelingTime = totalTravelingTime.add(localElevatorsBottom.get(i).getRecords().travelingTime);
 		}
         
-        System.out.println("************** LOCAL TOP ************");
+     //   System.out.println("************** LOCAL TOP ************");
 		
 		for(int i = 0; i < localElevatorsTop.size(); i++){
-            System.out.println(localElevatorsTop.get(i).getRecords().getStringRepresentation()); // DEBUG UTSKRIFTER HÄR
+     //       System.out.println(localElevatorsTop.get(i).getRecords().getStringRepresentation()); // DEBUG UTSKRIFTER HÄR
 			totalWaitingTime = totalWaitingTime.add(localElevatorsTop.get(i).getRecords().waitingTime);
 			totalTravelingTime = totalTravelingTime.add(localElevatorsTop.get(i).getRecords().travelingTime);
 		}
         
-        System.out.println("************** SHUTTLES ************");
+     //   System.out.println("************** SHUTTLES ************");
 		
 		for(int i = 0; i < shuttleElevators.size(); i++){
-            System.out.println(shuttleElevators.get(i).getRecords().getStringRepresentation()); // DEBUG UTSKRIFTER HÄR
+      //      System.out.println(shuttleElevators.get(i).getRecords().getStringRepresentation()); // DEBUG UTSKRIFTER HÄR
 			totalWaitingTime = totalWaitingTime.add(shuttleElevators.get(i).getRecords().waitingTime);
 			totalTravelingTime = totalTravelingTime.add(shuttleElevators.get(i).getRecords().travelingTime);
 		}
@@ -473,15 +480,38 @@ public class Main {
 	 * Further simulates remaining passengers traveling. Extra time is added to the total time.
 	 */
 	public static void handleRestCalls(Algorithm alg){
-		
+		int cnt = 1;
+		int previous = 0;
 		while(!systemEmpty()){
 			LinkedList<Passenger> calls = updateElevatorOnOff();
 			updateElevatorPosition();
 			allElevators = alg.manageCalls(allElevators, calls);
+			int current = printCallAmount();
+			if(previous == current) {
+				cnt +=1;
+			} else {
+				cnt = 1;
+			}
+			previous = current;
+			if(cnt == 2000) {
+			for(int i = 0; i < allElevators.size(); i++) {
+				for(int j = 0; j < allElevators.get(i).size(); j++) {
+					if(!allElevators.get(i).get(j).getQueue().isEmpty()) {
+						System.out.println("Elevator type: " + i);
+						System.out.println("Queue size: " + allElevators.get(i).get(j).getQueue().size());
+						System.out.println(allElevators.get(i).get(j).getQueue().get(0).getActionType());
+						System.out.println(allElevators.get(i).get(j).getStatus().getStringRepresentation());
+
+					}
+				}	
+			}
+				
+				System.exit(0);
+			}
 		}
 	}
 
-	private static void printCallAmount() {
+	private static int printCallAmount() {
 		int temp = 0;
 		for(int i = 0; i < allElevators.size(); i++) {
 			for(int j = 0; j < allElevators.get(i).size(); j++) {
@@ -489,6 +519,7 @@ public class Main {
 			}
 		}
 		System.out.println(temp);
+		return temp;
 	}
 
 	/**
@@ -525,7 +556,10 @@ public class Main {
 	private static void updateElevatorPosition(){
 		for(int i = 0; i < allElevators.size(); i++) {
 			for(int j = 0; j < allElevators.get(i).size(); j++) {
-				allElevators.get(i).get(j).updateElevator();
+				if(!allElevators.get(i).get(j).updateElevator()){
+					System.out.println("Something went wrong with updating the elevator ");
+					System.exit(0);
+				}
 			}
 		}
 	}

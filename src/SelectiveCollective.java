@@ -65,7 +65,12 @@ public class SelectiveCollective extends Algorithm {
 		} else if(elevators.get(elevatorIndex).getStatus().direction == 0) { //Empty, idle elevator
 			int from = elevators.get(elevatorIndex).getQueue().size();
 			int to = from + 1;
-			elevators.get(elevatorIndex).addToQueue(p, from, to, pos);
+			if(!elevators.get(elevatorIndex).addToQueue(p, from, to, pos)) {
+			System.out.println("Error picking up passenger going from " + p.getOrigin() + " to " +p.getDestination());
+			System.out.println("Pickupposition: " + from + " Dropposition: " + to + " Pos in elevator: " + pos);
+			System.out.println(elevators.get(elevatorIndex).getStatus().getStringRepresentation());
+			System.out.println("Queue size: " + elevators.get(elevatorIndex).getQueue().size());
+		}
 		} else {
 			elevators.set(elevatorIndex, pickUpOnReverse(elevators.get(elevatorIndex), p, passengerDirection, pos)); //Elevator going in opposite direction
 		}
@@ -168,7 +173,12 @@ public class SelectiveCollective extends Algorithm {
 			System.out.println("ERROR IN SAME, FIX");
 			System.exit(0);
 		}
-		elevator.addToQueue(p, pickUpPosition, dropPosition, pos);
+		if(!elevator.addToQueue(p, pickUpPosition, dropPosition, pos)) {
+			System.out.println("Error picking up passenger going from " + p.getOrigin() + " to " +p.getDestination());
+			System.out.println("Pickupposition: " + pickUpPosition + " Dropposition: " + dropPosition + " Pos in elevator: " + pos);
+			System.out.println(elevator.getStatus().getStringRepresentation());
+			System.out.println("Queue size: " + elevator.getQueue().size());
+		}
 		return elevator;
 	}
 
@@ -245,7 +255,12 @@ public ElevatorInterface pickUpOnReverse(ElevatorInterface elevator, Passenger p
 			//No reverse, just add to end 
 			pickUpPosition = elevator.getQueue().size();
 			dropPosition = pickUpPosition +1;
-			elevator.addToQueue(p, pickUpPosition, dropPosition, pos);
+			if(!elevator.addToQueue(p, pickUpPosition, dropPosition, pos)) {
+			System.out.println("Error picking up passenger going from " + p.getOrigin() + " to " +p.getDestination());
+			System.out.println("Pickupposition: " + pickUpPosition + " Dropposition: " + dropPosition + " Pos in elevator: " + pos);
+			System.out.println(elevator.getStatus().getStringRepresentation());
+			System.out.println("Queue size: " + elevator.getQueue().size());
+		}
 			return elevator;
 		}
 
@@ -354,7 +369,12 @@ public ElevatorInterface pickUpOnReverse(ElevatorInterface elevator, Passenger p
 			System.out.println("ERROR IN REVERSE, FIX");
 			System.exit(0);
 		}
-		elevator.addToQueue(p, pickUpPosition, dropPosition, pos);
+		if(!elevator.addToQueue(p, pickUpPosition, dropPosition, pos)) {
+			System.out.println("Error picking up passenger going from " + p.getOrigin() + " to " +p.getDestination());
+			System.out.println("Pickupposition: " + pickUpPosition + " Dropposition: " + dropPosition + " Pos in elevator: " + pos);
+			System.out.println(elevator.getStatus().getStringRepresentation());
+			System.out.println("Queue size: " + elevator.getQueue().size());
+		}
 		return elevator;
 	}
 
