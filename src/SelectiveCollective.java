@@ -38,9 +38,6 @@ public class SelectiveCollective extends Algorithm {
  	* Returns a index of a elevator
  	*/
 	protected int getElevator(ArrayList<ElevatorInterface> elevators, Passenger p) {
-		int emptyCheck = getRandomEmptyElevator(elevators, p);
-		if(emptyCheck != -1) return emptyCheck;
-		//No empty elevator was found. Pick a random one 
 		return getRandomElevator(elevators, p);
 	}
 
