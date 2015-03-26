@@ -9,50 +9,93 @@ import java.util.LinkedList;
  * strategy.
  */
 public class SearchBasedCollective extends Algorithm {
-    /* Class representing parameters for addToQueue for an elevator */
-    private class QueueDetails {
-        /* Fields */
-        public final int i1;
-        public final int i2;
-        public final CarPosition c;
-        public final Passenger p;
-        
-        /* Constructor */
-        public QueueDetails(int i1, int i2, CarPosition c, Passenger p) {
-            this.i1 = i1;
-            this.i2 = i2;
-            this.c = c;
-            this.p = p;
-        }
-    }
-    
     /* Fields */
     private ElevatorSpecs specs;
+    private SelectiveCollective sc;
     
     /* Constructor */
     public SearchBasedCollective(ElevatorSpecs spec) {
         specs = spec;
+        sc = new SelectiveCollective(spec);
+    }
+    
+    /* Adds the passenger to the elevator using SelectiveCollective, returns the elevator again */
+    private ElevatorInterface addToElevator(ElevatorInterface e, Passenger p) {
+        //Calculate passenger direction
+        int pDir = 1;
+		if (p.getOrigin() > p.getDestination()) {
+			pDir = -1;
+		}
+        
+        //Calculate car position to use
+        CarPosition c = getCarPos(e, p);
+        
+        //Fetch elevator direction
+        int eDir = e.getStatus().direction;
+        
+        //Fetch elevator position
+        float ePos = e.getStatus().floor;
+        
+        //Do the assignment
+        if (p.getOrigin() >= ePos && eDir == 1) {
+            //Elevator going up, passenger on the way
+            return sc.pickUpOnTheWay(e, p, pDir, c);
+        } else if (p.getOrigin() <= ePos && eDir == -1) {
+            //Elevator going down, passenger on the way
+            return sc.pickUpOnTheWay(e, p, pDir, c);
+        } else if (eDir == 0) {
+            //Elevator idle
+            return sc.pickUpOnTheWay(e, p, pDir, c);
+        } else {
+            //Surely not on the way
+            return sc.pickUpOnReverse(e, p, pDir, c);
+        }
+    }
+    
+    /* Run the elevators until it is empty */
+    private ElevatorInterface emptyElevator(ElevatorInterface e) {
+        while (e.getStatus().direction != 0) {
+            e.openDoors();
+            e.updateElevator();
+        }
+        return e;
     }
     
     /* Returns an index of a suitable elevator for the given passenger */
 	protected int getElevator(ArrayList<ElevatorInterface> elevators, Passenger p) {
-        //TODO
+        int bestIndex = 0;
+        int bestTime = 0;
         
-        //Order by distance to current
+        for (int i = 0; i < elevators.size(); i++) {
+            //Check elevator is valid
+            if (!elevatorContainsFloor(elevators.get(i), p.getOrigin(), p.getDestination())) {
+                continue;
+            }
+            
+            //Clone the elevators list
+            ElevatorInterface e1 = elevators.get(i).clone();
+            ElevatorInterface tmp = e1.clone();
+            
+            //Assign the new passenger using Selective Collective
+            ElevatorInterface e2 = addToElevator(tmp, p);
+            
+            //Lets the two elevators run until empty
+            e1 = emptyElevator(e1);
+            e2 = emptyElevator(e2);
+            
+            //Calculate total wait + travel time for both elevators
+            int e1time = e1.getRecords().waitingTime.add(e1.getRecords().travelingTime).intValue();
+            int e2time = e2.getRecords().waitingTime.add(e2.getRecords().travelingTime).intValue();
+            int totTime = e2time - e1time;
+            
+            //Check if better than previous best
+            if (totTime < bestTime) {
+                bestTime = totTime;
+                bestIndex = i;
+            }
+        }
         
-        //Go through list, if no has space and wrong direction, remove it
-        
-        //Calculate waiting and travel times based on the queue
-        
-        //Chose min of above
-        
-        return 0;
-    }
-    
-    /* Returns a QueueDetails object with values for when the passenger should be picked up */
-    private QueueDetails getAddQueueParameters(ElevatorInterface elevator, Passenger p) {
-        //TODO
-        return null;
+        return bestIndex;
     }
     
     /* Assigns all new calls in the call list to an elevator */
@@ -84,11 +127,11 @@ public class SearchBasedCollective extends Algorithm {
             //Fetch a suitable elevator in the elevators list
             int elIndex = getElevator(elevators, p);
             
-            //Fetch a suitable spot in this elevator to add the new passenger
-            QueueDetails qd = getAddQueueParameters(elevators.get(elIndex), p);
-            
             //Assign the passenger to an elevator
-            allElevators.get(rideType).get(elIndex).addToQueue(p, qd.i1, qd.i2, qd.c);  
+            ElevatorInterface e = addToElevator(elevators.get(elIndex), p);
+            
+            //Update allElevators
+            allElevators.get(rideType).set(elIndex, e);
         }
         return allElevators;
     }
