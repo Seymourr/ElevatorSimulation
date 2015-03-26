@@ -309,12 +309,18 @@ public class DDElevator implements ElevatorInterface{
     	
         //TODO Check in the same way as updateElevator()
         
+        //Fetch current destination
         ElevatorQueueObject q = queue.getFirst();
         int dest = 0;
         if (q.getActionType() == ElevatorAction.PICKUP) {
             dest = q.getPassenger().getOrigin();
         } else {
             dest = q.getPassenger().getDestination();
+        }
+        
+        //Compensate if lower car
+        if (q.getCarPosition() == CarPosition.LOWER) {
+            dest += 1;
         }
         
         //Calculate direction
