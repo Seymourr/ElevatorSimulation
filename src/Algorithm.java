@@ -1,20 +1,98 @@
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Random;
 
 public abstract class Algorithm {
-
-	
 	ElevatorSpecs specs;	
 	public abstract ArrayList<ArrayList<ElevatorInterface>> manageCalls(ArrayList<ArrayList<ElevatorInterface>> elevators, LinkedList<Passenger> calls);
 	protected abstract int getElevator(ArrayList<ElevatorInterface> elevators, Passenger p);
 
-
+    /**
+     * Help function to getZonedElevators
+     * Return true if the given floor is a lobby floor.
+     */
+    private boolean isLobbyFloor(ElevatorInterface e, int floor) {
+        //If the actual lobby or skylobby floor ok
+        if (floor == specs.getLobbyFloor() || floor == specs.getSkylobbyfloor()) {
+            return true;
+        }
+        
+        floor -= 1;
+        
+        //If double decked floor + 1 is also ok
+        if (e.ofType() == ElevatorType.DOUBLE) {
+            if (floor == specs.getLobbyFloor() || floor == specs.getSkylobbyfloor()) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Help function to getZonedElevators
+     * Return true if the given floor is within the specified elevator's
+     * zone.
+     */
+    private boolean checkContainsZonedFloor(ElevatorInterface e, int floor) {
+        for (int i : e.getZonedFloors()) {
+            if (i == floor) {
+                return true;
+            }
+        }
+        return false;
+    }
+     
+    /**
+     * Returns a list of the elevators in the given list of elevators that
+     * can be used to serve the given passenger when zoning is used.
+     */
+    protected ArrayList<ElevatorInterface> getZonedElevators (
+            ArrayList<ElevatorInterface> eles, Passenger p) {
+        //If zoning is not used all elevators can be used
+        if (!specs.zoningUsed()) {
+            return eles;
+        }
+        
+        //Create the return list
+        ArrayList<ElevatorInterface> retEles = new ArrayList<ElevatorInterface>();
+        
+        //Iterate through the elevators and check which are in the correct zone
+        for (int i = 0; i < eles.size(); i++) {
+            ElevatorInterface el = eles.get(i);
+            
+            //Check elevator operates over the required floors
+            if (!elevatorContainsFloor(el, p.getOrigin(), p.getDestination())) {
+                continue;
+            }
+            
+            //Check passenger ride is within the zone
+            if (checkContainsZonedFloor(el, p.getOrigin())) {
+                if (checkContainsZonedFloor(el, p.getDestination())) {
+                    //Origin and destination both within range
+                    retEles.add(el);
+                } else if (isLobbyFloor(el, p.getDestination())) {
+                    //Interfloor ride with origin in range
+                    retEles.add(el); 
+                }
+            }
+        }
+        
+        //Throw exception if empty list
+        if (retEles.isEmpty()) {
+            throw new RuntimeException("Empty list in getZonedElevators");
+        }
+        
+        return retEles;
+    }
+    
 	/**
-	* Attempts to pick an optimal shuttle for the given passenger. The optimal shuttle is the idle one at 
-	* the same floor as the passenger. If no optimal shuttle is found, the passenger is assinged to a random
-	* shuttle.
-	*/
+	 * Attempts to pick an optimal shuttle for the given passenger. The optimal shuttle is the idle one at 
+	 * the same floor as the passenger. If no optimal shuttle is found, the passenger is assinged 
+     * to a random
+	 * shuttle.
+	 */
 	public ArrayList<ElevatorInterface> assignShuttleElevator(ArrayList<ElevatorInterface> elevators, Passenger p) {
 		int chosenElevator = -1;
 		for(int i = 0; i < elevators.size(); i++) {
