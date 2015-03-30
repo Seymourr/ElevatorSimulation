@@ -29,9 +29,8 @@ public class DDElevator implements ElevatorInterface{
      * Used for cloning
      */
     private DDElevator(ElevatorSpecs s, int[] f, LinkedList<ElevatorQueueObject> q, 
-        LinkedList<Passenger> lc, LinkedList<Passenger> uc, int w, float cf, BigInteger twt, 
-        BigInteger ttt, BigDecimal ttd, BigInteger ps) 
-    {
+		    LinkedList<Passenger> lc, LinkedList<Passenger> uc, int w, float cf, BigInteger twt, 
+		    BigInteger ttt, BigDecimal ttd, BigInteger ps) {
         specs = s;
         floors = f;
         queue = q;

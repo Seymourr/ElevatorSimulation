@@ -2,7 +2,7 @@
 7200 //Amount of minutes in a traffic period
 500 //Low traffic passenger amount
 1500 //Medium traffic passenger amount
-2500 //Heavy traffic passenger amount
+2200 //Heavy traffic passenger amount
 100 //Number of floors
 50 //Skylobby floor (Must be in even floor)
 10   //Distance between floors

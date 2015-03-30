@@ -4,6 +4,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.math.BigInteger;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.LinkedList;
 import java.util.HashMap;
 
@@ -106,13 +108,14 @@ public class Main {
 	//	}
    //     
         //Perform the simulation
-		int trafficAmount = specs.getHeavyTraffic();;
+		int trafficAmount = specs.getHeavyTraffic();
+		int cnt = 0;
 		System.out.println("Now starting simulation with " + trafficAmount + " passengers per period");
 		for(int i = 0; i < specs.getSimulationDays(); i++) {
-			simulateDay(new SingleAutomatic(specs), trafficAmount); 
+			cnt += simulateDay(new SearchBasedCollective(specs), trafficAmount); 
 			System.out.println("Day " + i + " complete");
 		}
-		printResults(new BigInteger("" + (specs.getSimulationDays() * trafficAmount *5)));
+		printResults(new BigInteger("" + cnt));
 	
 //		for(int i = 0; i < specs.getSimulationDays(); i++) {}
 //		simulatePeriod(alg, TrafficType.DOWNPEAK, trafficAmount);
@@ -367,28 +370,30 @@ public class Main {
 	 * @param alg
 	 * @param trafficAmount
 	 */
-	public static void simulateDay(Algorithm alg, int trafficAmount){
+	public static int simulateDay(Algorithm alg, int trafficAmount){
+		int cnt = 0;
 		System.out.println("Entered day");
 		simulatePeriod(alg, TrafficType.UPPEAK, trafficAmount);
 		printCallAmount();
+		cnt += trafficAmount;
 		simulatePeriod(alg, TrafficType.REGULAR, trafficAmount/3);
 		printCallAmount();
-
+		cnt += trafficAmount/3;
 		simulatePeriod(alg, TrafficType.LUNCH, trafficAmount/2);
 		printCallAmount();
-
+		cnt += trafficAmount/2;
 		simulatePeriod(alg, TrafficType.REGULAR, trafficAmount/3);
 		printCallAmount();
-
+		cnt += trafficAmount/3;
 		simulatePeriod(alg, TrafficType.DOWNPEAK, trafficAmount);
 		printCallAmount();
+		cnt += trafficAmount;
 
 		System.out.println("Now going into rest calls");
 		handleRestCalls(alg); // Extra time needed to empty system
 
 		System.out.println("Simulation finished, system empty");
-		 //Maybe consider dividing by amount of calls instead?
-		//TODO: Something to manage time from this day (UPDATE: NOT FINISHED?)
+		return cnt;
 	}
     
     	
@@ -471,9 +476,10 @@ public class Main {
 		System.out.println("***RESULTS ARE THE FOLLOWING***");
 		System.out.println("Total waiting time: " + totalWaitingTime.toString() + " virtual seconds");
 		System.out.println("Total traveling time: " + totalTravelingTime.toString() + " virtual seconds");
-		System.out.println("Average Total waiting time: " + totalWaitingTime.divide(passengerAmount).toString() + " virtual seconds");
-		System.out.println("Average Total traveling time: " + totalTravelingTime.divide(passengerAmount).toString() + " virtual seconds");
-		System.out.println("Average Total waiting time (With calls): " + totalWaitingTime.divide(new BigInteger(numberOfCalls + "")).toString() + " virtual seconds");
+		System.out.println("Average waiting time: " + (new BigDecimal(totalWaitingTime)).divide(new BigDecimal(passengerAmount), 2, RoundingMode.HALF_UP).toString() + " virtual seconds");
+		System.out.println("Average squared waiting time: " + ((new BigDecimal(totalWaitingTime)).pow(2)).divide((new BigDecimal(passengerAmount)).pow(2), 2, RoundingMode.HALF_UP).toString() + " virtual seconds");
+		System.out.println("Average traveling time: " + (new BigDecimal(totalTravelingTime)).divide(new BigDecimal(passengerAmount), 2, RoundingMode.HALF_UP).toString() + " virtual seconds");
+		System.out.println("Average squared traveling time: " +  ((new BigDecimal(totalTravelingTime)).pow(2)).divide((new BigDecimal(passengerAmount)).pow(2), 2, RoundingMode.HALF_UP).toString() + " virtual seconds");
 	}
 	
 	/**
