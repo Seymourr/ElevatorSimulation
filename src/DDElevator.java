@@ -29,7 +29,7 @@ public class DDElevator implements ElevatorInterface{
      * Constructor 
      * Used for cloning
      */
-    private DDElevator(ElevatorSpecs s, int[] f, LinkedList<ElevatorQueueObject> q, 
+    private DDElevator(ElevatorSpecs s, int[] f, int[] z, LinkedList<ElevatorQueueObject> q, 
 		    LinkedList<Passenger> lc, LinkedList<Passenger> uc, int w, float cf, BigInteger twt, 
 		    BigInteger ttt, BigDecimal ttd, BigInteger ps) {
         specs = s;
@@ -44,6 +44,7 @@ public class DDElevator implements ElevatorInterface{
         totalTravelTime = ttt;
         totalTravelDistance = ttd;
         passengersServed = ps;
+        zonedFloors = z;
     }
     
     /**
@@ -435,7 +436,7 @@ public class DDElevator implements ElevatorInterface{
     
     /* See ElevatorInterface for details */
     public ElevatorInterface clone() {
-        return new DDElevator(specs, floors, queue, lowerCarPassengers, upperCarPassengers, waitingTime, 
+        return new DDElevator(specs, floors, zonedFloors, queue, lowerCarPassengers, upperCarPassengers, waitingTime, 
         currentUpperFloor, BigInteger.ZERO, BigInteger.ZERO, BigDecimal.ZERO, BigInteger.ZERO);
     }
     
