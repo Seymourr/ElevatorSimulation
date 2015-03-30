@@ -12,24 +12,24 @@ public class Elevator implements ElevatorInterface {
     /* Fields */
     private ElevatorSpecs specs;
     private int[] floors;
+    private int[] zonedFloors;
     private LinkedList<ElevatorQueueObject> queue;
     private LinkedList<Passenger> currentPassengers;
     private int waitingTime;
     private float currentFloor;
     private final float distancePerFloor;
+    
     private BigInteger totalWaitTime;
     private BigInteger totalTravelTime;
     private BigDecimal totalTravelDistance;
     private BigInteger passengersServed;
 
     /**
-     * Constructor 
-     * Used for cloning
+     * Private constructor, used for cloning
      */
     private Elevator(ElevatorSpecs s, int[] f, LinkedList<ElevatorQueueObject> q, 
-        LinkedList<Passenger> c, int w, float cf, BigInteger twt, BigInteger ttt,
-        BigDecimal ttd, BigInteger ps) 
-    {
+            LinkedList<Passenger> c, int w, float cf, BigInteger twt, BigInteger ttt,
+            BigDecimal ttd, BigInteger ps) {
         specs = s;
         floors = f;
         queue = q;
@@ -44,9 +44,34 @@ public class Elevator implements ElevatorInterface {
     }
     
     /**
-     * Constructor 
+     * Constructor used for zoning
+     *
      * @param spec The specifications for this elevator.
      * @param floors The set of floors to operate on.
+     * @param zonedFloors The set of floors used in zoning.
+     * @param currentFloor The current floor.
+     */
+    public Elevator(ElevatorSpecs spec, int[] floors, int zonedFloors[], float currentFloor) {
+        specs = spec;
+        this.floors = floors;
+        currentPassengers = new LinkedList<Passenger>();
+        queue = new LinkedList<ElevatorQueueObject>();
+        waitingTime = 0;
+        this.currentFloor = currentFloor;
+        distancePerFloor = (float)specs.getBuildingHeight() / (float)specs.getFloors();
+        totalWaitTime = new BigInteger("0");
+        totalTravelTime = new BigInteger("0");
+        totalTravelDistance = new BigDecimal("0");
+        passengersServed = new BigInteger("0");  
+        this.zonedFloors = zonedFloors;
+    }
+    
+    /**
+     * Constructor used without zoning
+     *
+     * @param spec The specifications for this elevator.
+     * @param floors The set of floors to operate on.
+     * @param currentFloor The current floor.
      */
     public Elevator(ElevatorSpecs spec, int[] floors, float currentFloor) {
         specs = spec;
@@ -59,17 +84,12 @@ public class Elevator implements ElevatorInterface {
         totalWaitTime = new BigInteger("0");
         totalTravelTime = new BigInteger("0");
         totalTravelDistance = new BigDecimal("0");
-        passengersServed = new BigInteger("0");   
+        passengersServed = new BigInteger("0"); 
+        zonedFloors = floors;       
     }
     
     /* See ElevatorInterface for details */
-    public HashMap<CarPosition, Passenger[]> openDoors() {
-        //Check if currently at a floor
-  //     float floot = currentFloor;
-  //      if (floor != currentFloor) {
-    //        return new HashMap<CarPosition, Passenger[]>(0);
-   //     }
-        
+    public HashMap<CarPosition, Passenger[]> openDoors() {        
         //Disembarking
         LinkedList<Passenger> retPas = new LinkedList<Passenger>();
         Passenger[] temp = new Passenger[currentPassengers.size()];
@@ -313,5 +333,10 @@ public class Elevator implements ElevatorInterface {
     public ElevatorInterface clone() {
         return new Elevator(specs, floors, queue, currentPassengers, waitingTime, 
         currentFloor, BigInteger.ZERO, BigInteger.ZERO, BigDecimal.ZERO, BigInteger.ZERO);
+    }
+    
+    /* See ElevatorInterface for details */
+    public int[] getZonedFloors() {
+        return zonedFloors;
     }
 }

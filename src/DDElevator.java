@@ -12,6 +12,7 @@ public class DDElevator implements ElevatorInterface{
     /* Fields */
     private ElevatorSpecs specs;
     private int[] floors; 
+    private int[] zonedFloors;
     private LinkedList<ElevatorQueueObject> queue;
     private LinkedList<Passenger> lowerCarPassengers;
     private LinkedList<Passenger> upperCarPassengers;
@@ -46,7 +47,34 @@ public class DDElevator implements ElevatorInterface{
     }
     
     /**
-     * Constructor 
+     * Constructor used for zoning
+     *
+     * @param spec The specifications for this elevator.
+     * @param floors The set of floors to operate on.
+     * @param zonedFloors The set of floors used for zoning.
+     * $param currentFloor The current position of the upper car.
+     */
+    public DDElevator(ElevatorSpecs spec, int[] floors, int zonedFloors[], float currentFloor) {
+        specs = spec;
+        this.floors = floors;
+        queue = new LinkedList<ElevatorQueueObject>();
+        lowerCarPassengers = new LinkedList<Passenger>();
+        upperCarPassengers = new LinkedList<Passenger>();
+        queue = new LinkedList<ElevatorQueueObject>();
+        waitingTime = 0;
+        currentUpperFloor = currentFloor;
+        distancePerFloor = (float)specs.getBuildingHeight() / (float)specs.getFloors();
+        this.zonedFloors = zonedFloors;
+        
+        totalWaitTime = new BigInteger("0");
+        totalTravelTime = new BigInteger("0");
+        totalTravelDistance = new BigDecimal("0");
+        passengersServed = new BigInteger("0");
+    }
+    
+    /**
+     * Constructor used without zoning
+     *
      * @param spec The specifications for this elevator.
      * @param floors The set of floors to operate on.
      * $param currentFloor The current position of the upper car.
@@ -61,6 +89,7 @@ public class DDElevator implements ElevatorInterface{
         waitingTime = 0;
         currentUpperFloor = currentFloor;
         distancePerFloor = (float)specs.getBuildingHeight() / (float)specs.getFloors();
+        zonedFloors = floors;
         
         totalWaitTime = new BigInteger("0");
         totalTravelTime = new BigInteger("0");
@@ -408,5 +437,10 @@ public class DDElevator implements ElevatorInterface{
     public ElevatorInterface clone() {
         return new DDElevator(specs, floors, queue, lowerCarPassengers, upperCarPassengers, waitingTime, 
         currentUpperFloor, BigInteger.ZERO, BigInteger.ZERO, BigDecimal.ZERO, BigInteger.ZERO);
+    }
+    
+    /* See ElevatorInterface for details */
+    public int[] getZonedFloors() {
+        return zonedFloors;
     }
 }

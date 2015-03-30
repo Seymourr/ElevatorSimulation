@@ -3,7 +3,10 @@ import java.util.LinkedList;
 import java.util.HashMap;
 
 /**
- * Interface for the elevator implementing classes.
+ * Interface for the elevator implementing classes. The set of zoning floors
+ * potentially used by the elevator implementing this interface are inteded 
+ * as storage assistance for the algorithm only. No check for the validity
+ * for these are performed.
  */
 public interface ElevatorInterface {
     /**
@@ -69,4 +72,11 @@ public interface ElevatorInterface {
      * Returns a list of floors this elevator operates on.
      */
     public int[] getFloors();
+    
+    /**
+     * Returns a list of floors this elevator is zoned for.
+     * This will return the same floors as getFloors() if
+     * zoning is not used.
+     */
+    public int[] getZonedFloors();
 }
