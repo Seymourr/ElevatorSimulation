@@ -64,7 +64,7 @@ public class SearchBasedCollective extends Algorithm {
     /* Returns an index of a suitable elevator for the given passenger */
 	protected int getElevator(ArrayList<ElevatorInterface> elevators, Passenger p) {
         int bestIndex = 0;
-        int bestTime = 0;
+        int bestTime = Integer.MAX_VALUE;
         
         for (int i = 0; i < elevators.size(); i++) {
             //Check elevator is valid
@@ -74,7 +74,7 @@ public class SearchBasedCollective extends Algorithm {
             
             //Clone the elevators list
             ElevatorInterface e1 = elevators.get(i).clone();
-            ElevatorInterface tmp = e1.clone();
+            ElevatorInterface tmp = elevators.get(i).clone();
             
             //Assign the new passenger using Selective Collective
             ElevatorInterface e2 = addToElevator(tmp, p);
@@ -100,7 +100,7 @@ public class SearchBasedCollective extends Algorithm {
     
     /* Assigns all new calls in the call list to an elevator */
     public ArrayList<ArrayList<ElevatorInterface>> manageCalls(
-        ArrayList<ArrayList<ElevatorInterface>> allElevators, LinkedList<Passenger> calls) {
+            ArrayList<ArrayList<ElevatorInterface>> allElevators, LinkedList<Passenger> calls) {
         //Iterate through all new calls
         while(calls.peekFirst() != null) {
             Passenger p = calls.removeFirst();
