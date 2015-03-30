@@ -49,7 +49,7 @@ public abstract class Algorithm {
      * can be used to serve the given passenger when zoning is used.
      */
     protected ArrayList<ElevatorInterface> getZonedElevators (
-            ArrayList<ElevatorInterface> eles, Passenger p) {
+    ArrayList<ElevatorInterface> eles, Passenger p) {
         //If zoning is not used all elevators can be used
         if (!specs.zoningUsed()) {
             return eles;

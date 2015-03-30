@@ -27,7 +27,7 @@ public class Elevator implements ElevatorInterface {
     /**
      * Private constructor, used for cloning
      */
-    private Elevator(ElevatorSpecs s, int[] f, LinkedList<ElevatorQueueObject> q, 
+    private Elevator(ElevatorSpecs s, int[] f, int[] z, LinkedList<ElevatorQueueObject> q, 
             LinkedList<Passenger> c, int w, float cf, BigInteger twt, BigInteger ttt,
             BigDecimal ttd, BigInteger ps) {
         specs = s;
@@ -41,6 +41,7 @@ public class Elevator implements ElevatorInterface {
         totalTravelTime = ttt;
         totalTravelDistance = ttd;
         passengersServed = ps;
+        zonedFloors = z;
     }
     
     /**
@@ -336,7 +337,7 @@ public class Elevator implements ElevatorInterface {
     
     /* See ElevatorInterface for details */
     public ElevatorInterface clone() {
-        return new Elevator(specs, floors, queue, currentPassengers, waitingTime, 
+        return new Elevator(specs, floors, zonedFloors, queue, currentPassengers, waitingTime, 
         currentFloor, BigInteger.ZERO, BigInteger.ZERO, BigDecimal.ZERO, BigInteger.ZERO);
     }
     
