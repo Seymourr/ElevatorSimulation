@@ -100,21 +100,21 @@ public class Main {
        // testTrafficGen();
     
         //Create the elevators
- //       if(specs.zoningUsed()) {
-  //      	createZonedElevators();
-  //      	printZoning();
-   //     } else {
+ 	      if(specs.zoningUsed()) {
+        	createZonedElevators();
+        	printZoning();
+       } else {
 			createElevators();
-	//	}
-   //     
+		}
+       
         //Perform the simulation
-		int trafficAmount = specs.getHeavyTraffic();
+		int trafficAmount = 10; //specs.getHeavyTraffic();
 		int cnt = 0;
 		System.out.println("Now starting simulation with " + trafficAmount + " passengers per period");
-		for(int i = 0; i < specs.getSimulationDays(); i++) {
-			cnt += simulateDay(new SearchBasedCollective(specs), trafficAmount); 
-			System.out.println("Day " + i + " complete");
-		}
+//		for(int i = 0; i < specs.getSimulationDays(); i++) {
+			cnt += simulateDay(new SingleAutomatic(specs), trafficAmount); 
+//			System.out.println("Day " + i + " complete");
+//		}
 		printResults(new BigInteger("" + cnt));
 	
 //		for(int i = 0; i < specs.getSimulationDays(); i++) {}
@@ -135,8 +135,8 @@ public class Main {
 			System.out.println("***************************************");
 			for(int j = 0; j < allElevators.get(i).size(); j++) {
 				System.out.print("Served floors: ");
-				for(int k = 0; k < allElevators.get(i).get(j).getFloors().length; k++) {
-					System.out.print(allElevators.get(i).get(j).getFloors()[k] + " , ");
+				for(int k = 0; k < allElevators.get(i).get(j).getZonedFloors().length; k++) {
+					System.out.print(allElevators.get(i).get(j).getZonedFloors()[k] + " , ");
 				}
 				System.out.println();
 			}
@@ -155,8 +155,16 @@ public class Main {
         int botFloors = specs.getSkylobbyfloor();
         int topFloors = specs.getFloors() - specs.getSkylobbyfloor();
 
-        localElevatorsBottom = getZonedElevators(botFloors, specs.getLobbyFloor(), specs.getSkylobbyfloor());
-        localElevatorsTop = getZonedElevators(topFloors, specs.getSkylobbyfloor(), specs.getSkylobbyfloor());
+        int[] bF = new int[specs.getSkylobbyfloor()];
+        for(int i = 0; i < bF.length; i++) {
+        	bF[i] = i;
+        }
+         int[] tF = new int[specs.getFloors() - specs.getSkylobbyfloor()];
+        for(int i = 0; i < tF.length; i++) {
+        	tF[i] = i + specs.getSkylobbyfloor();
+        }
+        localElevatorsBottom = getZonedElevators(botFloors, specs.getLobbyFloor(), specs.getSkylobbyfloor(), bF);
+        localElevatorsTop = getZonedElevators(topFloors, specs.getSkylobbyfloor(), specs.getSkylobbyfloor(), tF);
 
         //Create shuttles
         int[] shuttleFloors;
@@ -193,7 +201,7 @@ public class Main {
 
    }
 
-    private static ArrayList<ElevatorInterface> getZonedElevators(int amntFloors, int lobby, int limit) {
+    private static ArrayList<ElevatorInterface> getZonedElevators(int amntFloors, int lobby, int limit, int[] standardFloors) {
 
     	ArrayList<ElevatorInterface> elevators = new ArrayList<ElevatorInterface>();
     	int minzone = 1;
@@ -238,9 +246,9 @@ public class Main {
 
         		if(specs.getLocal() == ElevatorType.SINGLE) {
         			
-        			elevators.add(new Elevator(specs, floors, floors[0]));
+        			elevators.add(new Elevator(specs, standardFloors, floors, floors[0]));
         		} else {
-        			elevators.add(new DDElevator(specs, floors, floors[0]));
+        			elevators.add(new DDElevator(specs, standardFloors, floors, floors[0]));
         		}
         		remainingElevators -= 1;
         	}
@@ -272,9 +280,9 @@ public class Main {
 
         		if(specs.getLocal() == ElevatorType.SINGLE) {
         			
-        			elevators.add(new Elevator(specs, floors, floors[0]));
+        			elevators.add(new Elevator(specs, standardFloors, floors, floors[0]));
         		} else {
-        			elevators.add(new DDElevator(specs, floors, floors[0]));
+        			elevators.add(new DDElevator(specs, standardFloors, floors, floors[0]));
         		}
         		remainingElevators -= 1;
         }
@@ -373,12 +381,14 @@ public class Main {
 	public static int simulateDay(Algorithm alg, int trafficAmount){
 		int cnt = 0;
 		System.out.println("Entered day");
-		simulatePeriod(alg, TrafficType.UPPEAK, trafficAmount);
-		printCallAmount();
-		cnt += trafficAmount;
+		//simulatePeriod(alg, TrafficType.UPPEAK, trafficAmount);
+	//	printCallAmount();
+	//	cnt += trafficAmount;
+		
 		simulatePeriod(alg, TrafficType.REGULAR, trafficAmount/3);
 		printCallAmount();
 		cnt += trafficAmount/3;
+		/*
 		simulatePeriod(alg, TrafficType.LUNCH, trafficAmount/2);
 		printCallAmount();
 		cnt += trafficAmount/2;
@@ -388,7 +398,7 @@ public class Main {
 		simulatePeriod(alg, TrafficType.DOWNPEAK, trafficAmount);
 		printCallAmount();
 		cnt += trafficAmount;
-
+		*/
 		System.out.println("Now going into rest calls");
 		handleRestCalls(alg); // Extra time needed to empty system
 
@@ -405,7 +415,7 @@ public class Main {
 	 */
 	public static void simulatePeriod(Algorithm alg, TrafficType t, int trafficAmount) {
 		LinkedList<Call> traffic = new LinkedList<Call>(trafficGen.getTraffic(t, trafficAmount));
-        //	testTraffic(traffic); //Debugging
+        	testTraffic(traffic); //Debugging
 		
 		numberOfCalls += traffic.size();
 		for(int second_i = 0; second_i < specs.getPeriodTime(); second_i++) {
@@ -449,26 +459,26 @@ public class Main {
 		BigInteger totalWaitingTime = new BigInteger("0");
 		BigInteger totalTravelingTime = new BigInteger("0");
         
-      //  System.out.println("************** LOCAL BOT ************");
+        System.out.println("************** LOCAL BOT ************");
         
 		for(int i = 0; i < localElevatorsBottom.size(); i++){
-       //     System.out.println(localElevatorsBottom.get(i).getRecords().getStringRepresentation()); // DEBUG UTSKRIFTER HÄR
+            System.out.println(localElevatorsBottom.get(i).getRecords().getStringRepresentation()); // DEBUG UTSKRIFTER HÄR
 			totalWaitingTime = totalWaitingTime.add(localElevatorsBottom.get(i).getRecords().waitingTime);
 			totalTravelingTime = totalTravelingTime.add(localElevatorsBottom.get(i).getRecords().travelingTime);
 		}
         
-     //   System.out.println("************** LOCAL TOP ************");
+        System.out.println("************** LOCAL TOP ************");
 		
 		for(int i = 0; i < localElevatorsTop.size(); i++){
-     //       System.out.println(localElevatorsTop.get(i).getRecords().getStringRepresentation()); // DEBUG UTSKRIFTER HÄR
+           System.out.println(localElevatorsTop.get(i).getRecords().getStringRepresentation()); // DEBUG UTSKRIFTER HÄR
 			totalWaitingTime = totalWaitingTime.add(localElevatorsTop.get(i).getRecords().waitingTime);
 			totalTravelingTime = totalTravelingTime.add(localElevatorsTop.get(i).getRecords().travelingTime);
 		}
         
-     //   System.out.println("************** SHUTTLES ************");
+        System.out.println("************** SHUTTLES ************");
 		
 		for(int i = 0; i < shuttleElevators.size(); i++){
-      //      System.out.println(shuttleElevators.get(i).getRecords().getStringRepresentation()); // DEBUG UTSKRIFTER HÄR
+            System.out.println(shuttleElevators.get(i).getRecords().getStringRepresentation()); // DEBUG UTSKRIFTER HÄR
 			totalWaitingTime = totalWaitingTime.add(shuttleElevators.get(i).getRecords().waitingTime);
 			totalTravelingTime = totalTravelingTime.add(shuttleElevators.get(i).getRecords().travelingTime);
 		}
@@ -492,7 +502,7 @@ public class Main {
 			LinkedList<Passenger> calls = updateElevatorOnOff();
 			updateElevatorPosition();
 			allElevators = alg.manageCalls(allElevators, calls);
-			int current = printCallAmount();
+		/*	int current = printCallAmount();
 			if(previous == current) {
 				cnt +=1;
 			} else {
@@ -514,6 +524,7 @@ public class Main {
 				
 				System.exit(0);
 			}
+			*/
 		}
 	}
 

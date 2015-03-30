@@ -53,8 +53,8 @@ public abstract class Algorithm {
         //If zoning is not used all elevators can be used
         if (!specs.zoningUsed()) {
             return eles;
-        }
-        
+        } 
+        System.out.println("Continuing");
         //Create the return list
         ArrayList<ElevatorInterface> retEles = new ArrayList<ElevatorInterface>();
         
@@ -94,32 +94,12 @@ public abstract class Algorithm {
 	 * shuttle.
 	 */
 	public ArrayList<ElevatorInterface> assignShuttleElevator(ArrayList<ElevatorInterface> elevators, Passenger p) {
-		int chosenElevator = -1;
-		for(int i = 0; i < elevators.size(); i++) {
-			if(elevators.get(i).getStatus().passengers < specs.getCarryCapacity()) {
-				if(elevators.get(i).getStatus().floor == p.getOrigin() || elevators.get(i).getStatus().floor - 1 == p.getOrigin()) {
-					chosenElevator = i;
-					break;
-				}
-			}
-		}
-
+		int index = getElevator(getZonedElevators(elevators, p), p);
 		int from = 0;
-
-		if(chosenElevator == -1) {
-			//No optimal elevator was found, assign a random one
-			Random r = new Random();
-			chosenElevator = r.nextInt(elevators.size());
-			from = elevators.get(chosenElevator).getQueue().size();
-			for(int i = 0; i < elevators.get(chosenElevator).getQueue().size(); i++) {
-				if(elevators.get(chosenElevator).getQueue().get(i).getPassenger().getOrigin() == p.getOrigin() && elevators.get(chosenElevator).getQueue().get(i).getActionType() == ElevatorAction.PICKUP) {
-					from = i;
-					break;
-				}
-			}
-		
-		} 
-		int to = elevators.get(chosenElevator).getQueue().size() + 1;
+		if(elevators.get(index).getStatus().floor != p.getOrigin()) {
+			from = elevators.get(index).getQueue().size();
+		}
+		int to = elevators.get(index).getQueue().size() + 1;
 
 		CarPosition pos = CarPosition.NULL;
 		if(specs.getShuttle() == ElevatorType.DOUBLE) {
@@ -131,9 +111,8 @@ public abstract class Algorithm {
 		}
 		
 		}
-		elevators.get(chosenElevator).addToQueue(p, from, to, pos);
+		elevators.get(index).addToQueue(p, from, to, pos);
 		return elevators;
-		
 	}
 
 

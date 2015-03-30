@@ -248,10 +248,15 @@ public class Elevator implements ElevatorInterface {
     
     /* See ElevatorInterface for details */
     public boolean addToQueue(Passenger p, int index1, int index2, CarPosition c) {
-        if (!containsFloor(floors, p.getOrigin())) { 
+        if (!containsFloor(floors, p.getOrigin())) {
+            System.out.println("1!"); 
             return false;
         }        
         if (!containsFloor(floors, p.getDestination())) {
+            System.out.println("2!");
+            for(int i = 0; i < floors.length; i++) {
+                System.out.print(" " + floors[i]);
+            }
             return false;
         }
         if (index2 <= index1) {
