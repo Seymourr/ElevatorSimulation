@@ -39,17 +39,19 @@ public class SearchBasedCollective extends Algorithm {
         //Do the assignment
         if (p.getOrigin() >= ePos && eDir == 1) {
             //Elevator going up, passenger on the way
-            return sc.pickUpOnTheWay(e, p, pDir, c);
+            e =  sc.pickUpOnTheWay(e, p, pDir, c);
         } else if (p.getOrigin() <= ePos && eDir == -1) {
             //Elevator going down, passenger on the way
-            return sc.pickUpOnTheWay(e, p, pDir, c);
+             e =   sc.pickUpOnTheWay(e, p, pDir, c);
         } else if (eDir == 0) {
             //Elevator idle
-            return sc.pickUpOnTheWay(e, p, pDir, c);
+             e =   sc.pickUpOnTheWay(e, p, pDir, c);
         } else {
             //Surely not on the way
-            return sc.pickUpOnReverse(e, p, pDir, c);
+             e =   sc.pickUpOnReverse(e, p, pDir, c);
         }
+
+        return e;
     }
     
     /* Run the elevators until it is empty */
@@ -64,7 +66,7 @@ public class SearchBasedCollective extends Algorithm {
     /* Returns an index of a suitable elevator for the given passenger */
 	protected int getElevator(ArrayList<ElevatorInterface> elevators, Passenger p) {
         int bestIndex = 0;
-        int bestTime = Integer.MAX_VALUE;
+        int bestTime = 5000; //Integer.MAX_VALUE;
         
         for (int i = 0; i < elevators.size(); i++) {
             //Check elevator is valid
@@ -92,7 +94,8 @@ public class SearchBasedCollective extends Algorithm {
             if (totTime < bestTime) {
                 bestTime = totTime;
                 bestIndex = i;
-            }
+            } 
+         
         }
         
         return bestIndex;
@@ -102,7 +105,7 @@ public class SearchBasedCollective extends Algorithm {
     public ArrayList<ArrayList<ElevatorInterface>> manageCalls(
             ArrayList<ArrayList<ElevatorInterface>> allElevators, LinkedList<Passenger> calls) {
         //Iterate through all new calls
-        while(calls.peekFirst() != null) {
+        while(!calls.isEmpty()) {
             Passenger p = calls.removeFirst();
             
             //Check which type of ride this call belongs to
@@ -129,7 +132,8 @@ public class SearchBasedCollective extends Algorithm {
             
             //Assign the passenger to an elevator
             ElevatorInterface e = addToElevator(elevators.get(elIndex), p);
-            
+
+
             //Update allElevators
             allElevators.get(rideType).set(elIndex, e);
         }

@@ -9,9 +9,9 @@
 70 //Number of shafts was 70
 400 //Building height
 15  //Car carry capacity
-40   //Car speed (Average)
+20   //Car speed (Average)
 5  //Floor delay
 single //local elevator
 single //shuttle elevator
 10   //Number of shuttles was 10
-true //Is equally distributed zoning used? (Not implemented yet)
+false //Is equally distributed zoning used? (Not implemented yet)

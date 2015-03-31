@@ -54,7 +54,6 @@ public abstract class Algorithm {
         if (!specs.zoningUsed()) {
             return eles;
         } 
-        System.out.println("Continuing");
         //Create the return list
         ArrayList<ElevatorInterface> retEles = new ArrayList<ElevatorInterface>();
         
@@ -233,19 +232,31 @@ public abstract class Algorithm {
 		}
 
 		//Get closest elevator
-		index = bestElevators.get(0);
+		index = 0;
+		ArrayList<Integer> temp = new ArrayList<Integer>();
 		for(int i = 0; i < bestElevators.size(); i++) {
 			if(Math.abs(zonedElevators.get(bestElevators.get(i)).getStatus().floor - p.getOrigin()) < Math.abs(zonedElevators.get(bestElevators.get(index)).getStatus().floor - p.getOrigin())) {
 				index = i;
 			}
 		}
 
-		for(int i = 0; i < elevatorsOriginal.size(); i++) {
-			if(similarElevator(zonedElevators.get(bestElevators.get(index)).getZonedFloors(), elevatorsOriginal.get(i).getZonedFloors())) {
-			index = i;
-			break;
+
+		for(int i = 0; i < bestElevators.size(); i++) {
+			if(Math.abs(zonedElevators.get(bestElevators.get(i)).getStatus().floor - p.getOrigin()) == Math.abs(zonedElevators.get(bestElevators.get(index)).getStatus().floor - p.getOrigin())) {
+				temp.add(bestElevators.get(i));
 			}
 		}
+
+		index = r.nextInt(temp.size());
+		if(specs.zoningUsed()) {
+			for(int i = 0; i < elevatorsOriginal.size(); i++) {
+				if(similarElevator(zonedElevators.get(temp.get(index)).getZonedFloors(), elevatorsOriginal.get(i).getZonedFloors())) {
+				index = i;
+				break;
+				}
+			}
+		}
+		
 		return index;
 
 	}

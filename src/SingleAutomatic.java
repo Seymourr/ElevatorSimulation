@@ -49,16 +49,10 @@
 	* Assigns calls to local elevators or double decked elevators (depending on the elevator type).
 	*/
 	private ArrayList<ElevatorInterface> assignLocalWithSingleAutomatic(ArrayList<ElevatorInterface> elevators, Passenger p) {
-		System.out.println("From: " + p.getOrigin() + " To: " + p.getDestination());
 
 		if(specs.getLocal() == ElevatorType.SINGLE) {
 			int elevatorIndex = getElevator(elevators,p);
-			System.out.println("The chosen elevator has following floors:");
-
-			for(int i = 0; i < elevators.get(elevatorIndex).getZonedFloors().length; i++) {
-				System.out.print(" " + elevators.get(elevatorIndex).getZonedFloors()[i]);
-			}
-			System.out.println();
+		
 			boolean b = elevators.get(elevatorIndex).addToQueue(p, elevators.get(elevatorIndex).getQueue().size(), elevators.get(elevatorIndex).getQueue().size() + 1, CarPosition.NULL);
 			if(!b) {
 				System.out.println("Error, addToQueue returned false");
