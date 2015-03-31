@@ -69,6 +69,7 @@ public abstract class Algorithm {
             
             //Check passenger ride is within the zone
             if (checkContainsZonedFloor(el, p.getOrigin())) {
+            	/*
                 if (checkContainsZonedFloor(el, p.getDestination())) {
                     //Origin and destination both within range
                     retEles.add(el);
@@ -76,6 +77,8 @@ public abstract class Algorithm {
                     //Interfloor ride with origin in range
                     retEles.add(el); 
                 }
+                */
+                retEles.add(el); 
             }
         }
         
@@ -94,7 +97,7 @@ public abstract class Algorithm {
 	 * shuttle.
 	 */
 	public ArrayList<ElevatorInterface> assignShuttleElevator(ArrayList<ElevatorInterface> elevators, Passenger p) {
-		int index = getElevator(getZonedElevators(elevators, p), p);
+		int index = getElevator(elevators, p);
 		int from = 0;
 		if(elevators.get(index).getStatus().floor != p.getOrigin()) {
 			from = elevators.get(index).getQueue().size();
@@ -146,64 +149,6 @@ public abstract class Algorithm {
 		}
 		return pos;
 	}
-/*
-		if(elevator.getStatus().floor == p.getOrigin()) {
-				if(elevator.getStatus().upperCarPassengers < specs.getCarryCapacity()) {
-					pos = CarPosition.UPPER;
-				} else if(elevator.getStatus().lowerCarPassengers < specs.getCarryCapacity()) {
-					pos = CarPosition.LOWER;
-					p.shift();
-				} else {
-					pos = CarPosition.UPPER; //No space in elevator, just assign it to upper
-				}
-		} else if(elevator.getStatus().floor - 1 == p.getOrigin()){
-				if(elevator.getStatus().lowerCarPassengers < specs.getCarryCapacity()) {
-					pos = CarPosition.LOWER;
-				} else if(elevator.getStatus().upperCarPassengers < specs.getCarryCapacity()) {
-					pos = CarPosition.UPPER;
-					p.shift();
-				} else {
-					pos = CarPosition.LOWER; //No space in elevator, just assign it to lower
-				}
-		} else {
-			//Not parked at close proximity, decide up or down for incoming elevator
-			int pickingUpAtOtherFloor = 0;
-			int pickingUpAtPassengerFloor = 0;
-			for(int i = 0; i < elevator.getQueue().size(); i++) {
-				if(elevator.getQueue().get(i).getPassenger().getOrigin() == p.getOrigin() && elevator.getQueue().get(i).getActionType() == ElevatorAction.PICKUP) {
-					pickingUpAtPassengerFloor +=1;
-				} else if((elevator.getQueue().get(i).getPassenger().getOrigin() == p.getOrigin() + 1 || elevator.getQueue().get(i).getPassenger().getOrigin() == p.getOrigin() - 1) && elevator.getQueue().get(i).getActionType() == ElevatorAction.PICKUP){
-					pickingUpAtOtherFloor +=1;
-				}
-			}
-
-			if(pickingUpAtPassengerFloor < specs.getCarryCapacity()) {
-				if(p.getOrigin() == specs.getSkylobbyfloor() || p.getOrigin() == specs.getLobbyFloor()) {
-					pos = CarPosition.LOWER;
-				} else {
-					pos = CarPosition.UPPER;
-				}
-			} else if(pickingUpAtOtherFloor < specs.getCarryCapacity()) {
-				if(p.getOrigin() == specs.getSkylobbyfloor() || p.getOrigin() == specs.getLobbyFloor()) {
-					pos = CarPosition.UPPER;
-				} else {
-					pos = CarPosition.LOWER;
-				}
-			} else {
-				//Not even incoming elevator can afford, assign it to closest cart
-				if(p.getOrigin() == specs.getSkylobbyfloor() || p.getOrigin() == specs.getLobbyFloor()) {
-					pos = CarPosition.LOWER;
-				} else {
-					pos = CarPosition.UPPER;
-				}
-			}
-
-		}
-		return pos;
-
-	}
-*/
-
 
 
 	/**
@@ -246,63 +191,71 @@ public abstract class Algorithm {
 	/**
 	* Returns a semi-random elevator position in a list of elevators
 	*/
-	protected int getRandomElevator(ArrayList<ElevatorInterface> elevators, Passenger p) {
-		ArrayList<ElevatorInterface> temp = new ArrayList<ElevatorInterface>();
-		ArrayList<Integer> temp2 = new ArrayList<Integer>();
-
-		for(int i = 0; i < elevators.size(); i++) {
-			if(elevatorContainsFloor(elevators.get(i), p.getOrigin(), p.getDestination())) {
-				if(elevators.get(i).getStatus().direction == 0 && elevators.get(i).getStatus().passengers < specs.getCarryCapacity()) {
-					temp.add(elevators.get(i));
-					temp2.add(i);
-				}
-			}
-		}
-
+	protected int getRandomElevator(ArrayList<ElevatorInterface> elevatorsOriginal, ArrayList<ElevatorInterface> zonedElevators, Passenger p) {
+		ArrayList<Integer> legitElevators = new ArrayList<Integer>();
+		int index = -1;
 		Random r = new Random();
-		if(!temp.isEmpty()){
-			int elevatorIndex = 0;
-			for(int i = 0; i < temp.size(); i++) {
-				if(Math.abs(temp.get(i).getStatus().floor - p.getOrigin()) < Math.abs(temp.get(elevatorIndex).getStatus().floor - p.getOrigin())) {
-					elevatorIndex = i;
+
+		for(int i = 0; i < zonedElevators.size(); i++) {
+			if(elevatorContainsFloor(zonedElevators.get(i), p.getOrigin(), p.getDestination())) {
+				legitElevators.add(i);
+			}
+		}
+
+		if(legitElevators.isEmpty()) {
+			throw new RuntimeException("No eligable elevator found in getRandomElevator");
+		}
+
+		ArrayList<Integer> bestElevators = new ArrayList<Integer>();
+		for(int i = 0; i < legitElevators.size(); i++) {
+			if(zonedElevators.get(legitElevators.get(i)).getStatus().direction == 0 && zonedElevators.get(legitElevators.get(i)).getStatus().passengers < specs.getCarryCapacity()){
+				bestElevators.add(legitElevators.get(i));
+			}
+		}
+
+		if(bestElevators.isEmpty()) {
+			for(int i = 0; i < legitElevators.size(); i++) {
+				if(zonedElevators.get(legitElevators.get(i)).getStatus().passengers < specs.getCarryCapacity()) {
+					bestElevators.add(legitElevators.get(i));
 				}
 			}
-			return elevatorIndex;	
 		}
 
-		//No empty or idle elevators exist. Attempt to get the closest one, which is not full.
-
-		for(int i = 0; i < elevators.size(); i++) {
-			if(elevatorContainsFloor(elevators.get(i), p.getOrigin(), p.getDestination())) {
-				if(elevators.get(i).getStatus().passengers < specs.getCarryCapacity()) {
-					temp.add(elevators.get(i));
-					temp2.add(i);
+		if(bestElevators.isEmpty()) {
+			//All elevators are full, return a random one
+			int tempIndex = 0;
+			tempIndex = r.nextInt(legitElevators.size());
+			for(int i = 0; i < elevatorsOriginal.size(); i++) {
+				if(similarElevator(zonedElevators.get(legitElevators.get(tempIndex)).getZonedFloors(), elevatorsOriginal.get(i).getZonedFloors())) {
+					return i;
 				}
 			}
 		}
-		
-		if(!temp.isEmpty()) {
-			int elevatorIndex = 0;
-			for(int i = 0; i < temp.size(); i++) {
-				if(Math.abs(temp.get(i).getStatus().floor - p.getOrigin()) < Math.abs(temp.get(elevatorIndex).getStatus().floor - p.getOrigin())) {
-					elevatorIndex = i;
-				}
-			}
-			return elevatorIndex;	
-		}
 
-		//If we come here, all elevators are full.
-
-		for(int i = 0; i < elevators.size(); i++) {
-			if(elevatorContainsFloor(elevators.get(i), p.getOrigin(), p.getDestination())) {
-				temp.add(elevators.get(i));
-				temp2.add(i);
+		//Get closest elevator
+		index = bestElevators.get(0);
+		for(int i = 0; i < bestElevators.size(); i++) {
+			if(Math.abs(zonedElevators.get(bestElevators.get(i)).getStatus().floor - p.getOrigin()) < Math.abs(zonedElevators.get(bestElevators.get(index)).getStatus().floor - p.getOrigin())) {
+				index = i;
 			}
 		}
-		int number = r.nextInt(temp.size());
-		return temp2.get(number);
-		
+
+		for(int i = 0; i < elevatorsOriginal.size(); i++) {
+			if(similarElevator(zonedElevators.get(bestElevators.get(index)).getZonedFloors(), elevatorsOriginal.get(i).getZonedFloors())) {
+			index = i;
+			break;
+			}
+		}
+		return index;
+
 	}
-
+		
+	private boolean similarElevator(int[] a, int[] b) {
+		if(a.length != b.length) return false;
+		for(int i = 0; i < a.length; i++) {
+			if(a[i] != b[i]) return false;
+		}
+		return true;
+	}
 }
 

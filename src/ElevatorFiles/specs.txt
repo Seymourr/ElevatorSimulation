@@ -6,12 +6,12 @@
 100 //Number of floors
 50 //Skylobby floor (Must be in even floor)
 10   //Distance between floors
-4 //Number of shafts was 70
+70 //Number of shafts was 70
 400 //Building height
 15  //Car carry capacity
 40   //Car speed (Average)
 5  //Floor delay
 single //local elevator
 single //shuttle elevator
-1   //Number of shuttles was 10
+10   //Number of shuttles was 10
 true //Is equally distributed zoning used? (Not implemented yet)

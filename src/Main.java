@@ -381,14 +381,14 @@ public class Main {
 	public static int simulateDay(Algorithm alg, int trafficAmount){
 		int cnt = 0;
 		System.out.println("Entered day");
-		//simulatePeriod(alg, TrafficType.UPPEAK, trafficAmount);
+	//	simulatePeriod(alg, TrafficType.UPPEAK, trafficAmount);
 	//	printCallAmount();
 	//	cnt += trafficAmount;
-		
+	
 		simulatePeriod(alg, TrafficType.REGULAR, trafficAmount/3);
 		printCallAmount();
 		cnt += trafficAmount/3;
-		/*
+	/*		
 		simulatePeriod(alg, TrafficType.LUNCH, trafficAmount/2);
 		printCallAmount();
 		cnt += trafficAmount/2;
@@ -462,7 +462,9 @@ public class Main {
         System.out.println("************** LOCAL BOT ************");
         
 		for(int i = 0; i < localElevatorsBottom.size(); i++){
+			if(localElevatorsBottom.get(i).getRecords().ridesServed.intValue() > 0){
             System.out.println(localElevatorsBottom.get(i).getRecords().getStringRepresentation()); // DEBUG UTSKRIFTER HÄR
+            }
 			totalWaitingTime = totalWaitingTime.add(localElevatorsBottom.get(i).getRecords().waitingTime);
 			totalTravelingTime = totalTravelingTime.add(localElevatorsBottom.get(i).getRecords().travelingTime);
 		}
@@ -470,7 +472,9 @@ public class Main {
         System.out.println("************** LOCAL TOP ************");
 		
 		for(int i = 0; i < localElevatorsTop.size(); i++){
+				if(localElevatorsTop.get(i).getRecords().ridesServed.intValue()  > 0){
            System.out.println(localElevatorsTop.get(i).getRecords().getStringRepresentation()); // DEBUG UTSKRIFTER HÄR
+       }
 			totalWaitingTime = totalWaitingTime.add(localElevatorsTop.get(i).getRecords().waitingTime);
 			totalTravelingTime = totalTravelingTime.add(localElevatorsTop.get(i).getRecords().travelingTime);
 		}
@@ -478,7 +482,9 @@ public class Main {
         System.out.println("************** SHUTTLES ************");
 		
 		for(int i = 0; i < shuttleElevators.size(); i++){
+			if(shuttleElevators.get(i).getRecords().ridesServed.intValue()  > 0){
             System.out.println(shuttleElevators.get(i).getRecords().getStringRepresentation()); // DEBUG UTSKRIFTER HÄR
+        }	
 			totalWaitingTime = totalWaitingTime.add(shuttleElevators.get(i).getRecords().waitingTime);
 			totalTravelingTime = totalTravelingTime.add(shuttleElevators.get(i).getRecords().travelingTime);
 		}
