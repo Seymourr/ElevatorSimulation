@@ -2,6 +2,7 @@
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Random;
+import java.util.Stack;
 
 public abstract class Algorithm {
 	ElevatorSpecs specs;	
@@ -48,12 +49,16 @@ public abstract class Algorithm {
      * Returns a list of the indexes of the elevators in the given list of elevators that
      * can be used to serve the given passenger when zoning is used.
      */
-    protected ArrayList<Integer> getZonedElevators (
-    ArrayList<ElevatorInterface> eles, Passenger p) {
-        //If zoning is not used all elevators can be used
+    protected int[] getZonedElevators (ArrayList<ElevatorInterface> eles, Passenger p) {
+        //If zoning is not used all elevators can be used, return a list of all indexes
         if (!specs.zoningUsed()) {
-            return eles;
+            int[] retArr = new int[eles.size()];
+            for (int i = 0; i < eles.size(); i++) {
+                retArr[i] = i;
+            }
+            return retArr;
         } 
+        
         //Create the return list
         ArrayList<Integer> retEles = new ArrayList<Integer>();
         
@@ -83,7 +88,13 @@ public abstract class Algorithm {
             throw new RuntimeException("Empty list in getZonedElevators");
         }
         
-        return retEles;
+        //Convert ArrayList to array
+        int[] retArr = new int[retEles.size()];
+        for (int i = 0; i < retEles.size(); i++) {
+            retArr[i] = retEles.get(i);
+        }
+        
+        return retArr;
     }
     
 	/**
@@ -187,7 +198,7 @@ public abstract class Algorithm {
 	/**
 	* Returns a random elevator position in a list of elevators
 	*/
-	protected int getRandomElevator(ArrayList<ElevatorInterface> elevators, ArrayList<Integer> zonedIndexes, 
+	protected int getRandomElevator(ArrayList<ElevatorInterface> elevators, int[] zonedIndexes, 
     Passenger p) {
 		int index = -1;
 		Random r = new Random();
@@ -215,16 +226,16 @@ public abstract class Algorithm {
 
         //If we get here, all elevators are full, just return a random elevator
 		if (potentialElevatorIndexes.isEmpty()) {
-			int indexOfElevatorIndex = r.nextInt(zonedIndexes.size());
-			return zonedIndexes(indexOfElevatorIndex);
+			int indexOfElevatorIndex = r.nextInt(zonedIndexes.length);
+			return zonedIndexes[indexOfElevatorIndex];
 		}
 
 		//Of the potential elevators fetched, find the closest one
-		int bestDistance = Integer.MAX_INT;
+		float bestDistance = Integer.MAX_VALUE;
         int bestIndex = 0;
 		for(Integer i : potentialElevatorIndexes) {
             ElevatorStatusObject esq = elevators.get(i).getStatus();
-            int distance = Math.abs(esq.floor - p.getOrigin());
+            float distance = Math.abs(esq.floor - (float)p.getOrigin());
 			if (distance < bestDistance) {
 				bestDistance = distance;
                 bestIndex = i;

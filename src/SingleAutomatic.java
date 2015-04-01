@@ -42,7 +42,8 @@
  	* Returns a index of a elevator, attempting to provide a empty one. If no such is found, a random one is returned. 
  	*/
 	protected int getElevator(ArrayList<ElevatorInterface> elevators, Passenger p) {
-		return getRandomElevator(elevators, getZonedElevators(elevators, p), p);
+        int[] zonedIndexes = getZonedElevators(elevators, p);
+		return getRandomElevator(elevators, zonedIndexes, p);
 	}
 
 	/**
