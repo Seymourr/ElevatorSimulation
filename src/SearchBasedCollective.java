@@ -152,9 +152,6 @@ public class SearchBasedCollective extends Algorithm {
             //Fetch a suitable elevator in the elevators list
             int elIndex = getElevator(elevators, p);
             
-            //DEBUG UTSKRIFT
-            System.out.print("Chosen index: " + elIndex + ", ");
-            
             //Assign the passenger to an elevator
             ElevatorInterface e = addToElevator(elevators.get(elIndex), p);
 

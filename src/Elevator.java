@@ -347,4 +347,22 @@ public class Elevator implements ElevatorInterface {
         totalTravelDistance = BigDecimal.ZERO;
         passengersServed = BigInteger.ZERO;
     }
+    
+    /* See ElevatorInterface for details */
+    public Elevator duplicate() {
+        //Duplicate queue
+        LinkedList<ElevatorQueueObject> newQueue = new LinkedList<ElevatorQueueObject>();
+        for (int i = 0; i < queue.size(); i++) {
+            newQueue.add(i, queue.get(i));
+        }
+    
+        //Duplicate currentPassengers
+        LinkedList<Passenger> lcp = new LinkedList<Passenger>();
+        for (int i = 0; i < currentPassengers.size(); i++) {
+            lcp.add(i, currentPassengers.get(i));
+        }
+        
+        return new Elevator(specs, floors, zonedFloors, newQueue, lcp, waitingTime, 
+        currentFloor, BigInteger.ZERO, BigInteger.ZERO, BigDecimal.ZERO, BigInteger.ZERO);
+    }
 }

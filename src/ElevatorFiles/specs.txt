@@ -14,4 +14,4 @@
 double //local elevator
 double //shuttle elevator
 10   //Number of shuttles was 10
-true //Is equally distributed zoning used? (Not implemented yet)
+false //Is equally distributed zoning used? (Not implemented yet)

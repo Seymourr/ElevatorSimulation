@@ -110,7 +110,7 @@ public class Main {
 		}
        
         //Perform the simulation
-		int trafficAmount = 500; //specs.getHeavyTraffic();
+		int trafficAmount = 2000; //specs.getHeavyTraffic();
 		int cnt = 0;
 		System.out.println("Now starting simulation with " + trafficAmount + " passengers per period");
 		for(int i = 0; i < specs.getSimulationDays(); i++) {
@@ -474,7 +474,7 @@ public class Main {
         
 		for(int i = 0; i < localElevatorsBottom.size(); i++){
 			if(localElevatorsBottom.get(i).getRecords().ridesServed.intValue() > 0){
-            //System.out.println(localElevatorsBottom.get(i).getRecords().getStringRepresentation()); // DEBUG UTSKRIFTER HÄR
+            System.out.println(localElevatorsBottom.get(i).getRecords().getStringRepresentation()); // DEBUG UTSKRIFTER HÄR
             }
 			totalWaitingTime = totalWaitingTime.add(localElevatorsBottom.get(i).getRecords().waitingTime);
 			totalTravelingTime = totalTravelingTime.add(localElevatorsBottom.get(i).getRecords().travelingTime);
@@ -485,7 +485,7 @@ public class Main {
 		
 		for(int i = 0; i < localElevatorsTop.size(); i++){
 				if(localElevatorsTop.get(i).getRecords().ridesServed.intValue()  > 0){
-           //System.out.println(localElevatorsTop.get(i).getRecords().getStringRepresentation()); // DEBUG UTSKRIFTER HÄR
+           System.out.println(localElevatorsTop.get(i).getRecords().getStringRepresentation()); // DEBUG UTSKRIFTER HÄR
        }
 			totalWaitingTime = totalWaitingTime.add(localElevatorsTop.get(i).getRecords().waitingTime);
 			totalTravelingTime = totalTravelingTime.add(localElevatorsTop.get(i).getRecords().travelingTime);
@@ -496,7 +496,7 @@ public class Main {
 		
 		for(int i = 0; i < shuttleElevators.size(); i++){
 			if(shuttleElevators.get(i).getRecords().ridesServed.intValue()  > 0){
-            //System.out.println(shuttleElevators.get(i).getRecords().getStringRepresentation()); // DEBUG UTSKRIFTER HÄR
+            System.out.println(shuttleElevators.get(i).getRecords().getStringRepresentation()); // DEBUG UTSKRIFTER HÄR
         }	
 			totalWaitingTime = totalWaitingTime.add(shuttleElevators.get(i).getRecords().waitingTime);
 			totalTravelingTime = totalTravelingTime.add(shuttleElevators.get(i).getRecords().travelingTime);
