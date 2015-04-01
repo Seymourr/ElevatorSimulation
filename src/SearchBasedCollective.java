@@ -66,36 +66,52 @@ public class SearchBasedCollective extends Algorithm {
     /* Returns an index of a suitable elevator for the given passenger */
 	protected int getElevator(ArrayList<ElevatorInterface> elevators, Passenger p) {
         int bestIndex = 0;
-        int bestTime = 5000; //Integer.MAX_VALUE;
+        int bestTime = Integer.MAX_VALUE;
         
         for (int i = 0; i < elevators.size(); i++) {
             //Check elevator is valid
             if (!elevatorContainsFloor(elevators.get(i), p.getOrigin(), p.getDestination())) {
                 continue;
             }
+
+            //Reset elevator service status
+            ElevatorInterface e1 = elevators.get(i);
+            e1.resetSerivceStatus();
+
+            //Run elevator until empty
+            emptyElevator(e1);
             
-            //Clone the elevators list
-            ElevatorInterface e1 = elevators.get(i).clone();
-            ElevatorInterface tmp = elevators.get(i).clone();
+            //TODO Need to clone before emptying
             
-            //Assign the new passenger using Selective Collective
-            ElevatorInterface e2 = addToElevator(tmp, p);
-            
-            //Lets the two elevators run until empty
-            e1 = emptyElevator(e1);
-            e2 = emptyElevator(e2);
-            
-            //Calculate total wait + travel time for both elevators
+            //Calculate total time
             int e1time = e1.getRecords().waitingTime.add(e1.getRecords().travelingTime).intValue();
+            
+            //Add the new passenger to the elevator
+            e1.resetSerivceStatus();
+            ElevatorInterface e2 = addToElevator(e1, p);
+
+            //Run the elevator with the passenger until empty 
+            emptyElevator(e2);
+            
+            //Calculate total time
             int e2time = e2.getRecords().waitingTime.add(e2.getRecords().travelingTime).intValue();
+            
+            //Calculate time caused by adding the new passenger
             int totTime = e2time - e1time;
             
+            if (totTime < 0) {
+                System.out.println("\nERROR\n");
+                System.out.println("E1 time: " + e1time + ", E2 time: " + e2time);
+                System.out.println(e1.getRecords().getStringRepresentation());
+                System.out.println(e2.getRecords().getStringRepresentation());
+                System.exit(1);
+            }
+
             //Check if better than previous best
             if (totTime < bestTime) {
                 bestTime = totTime;
                 bestIndex = i;
             } 
-         
         }
         
         return bestIndex;
@@ -103,7 +119,7 @@ public class SearchBasedCollective extends Algorithm {
     
     /* Assigns all new calls in the call list to an elevator */
     public ArrayList<ArrayList<ElevatorInterface>> manageCalls(
-            ArrayList<ArrayList<ElevatorInterface>> allElevators, LinkedList<Passenger> calls) {
+    ArrayList<ArrayList<ElevatorInterface>> allElevators, LinkedList<Passenger> calls) {
         //Iterate through all new calls
         while(!calls.isEmpty()) {
             Passenger p = calls.removeFirst();
@@ -130,9 +146,11 @@ public class SearchBasedCollective extends Algorithm {
             //Fetch a suitable elevator in the elevators list
             int elIndex = getElevator(elevators, p);
             
+            //DEBUG UTSKRIFT
+            System.out.print("Chosen index: " + elIndex + ", ");
+            
             //Assign the passenger to an elevator
             ElevatorInterface e = addToElevator(elevators.get(elIndex), p);
-
 
             //Update allElevators
             allElevators.get(rideType).set(elIndex, e);

@@ -10,10 +10,10 @@ import java.util.HashMap;
  */
 public class DDElevator implements ElevatorInterface{   
     /* Fields */
-    private ElevatorSpecs specs;
-    private int[] floors; 
-    private int[] zonedFloors;
-    private LinkedList<ElevatorQueueObject> queue;
+    private final ElevatorSpecs specs;
+    private final int[] floors; 
+    private final int[] zonedFloors;
+    private final LinkedList<ElevatorQueueObject> queue;
     private LinkedList<Passenger> lowerCarPassengers;
     private LinkedList<Passenger> upperCarPassengers;
     private int waitingTime;
@@ -29,7 +29,7 @@ public class DDElevator implements ElevatorInterface{
      * Constructor 
      * Used for cloning
      */
-    private DDElevator(ElevatorSpecs s, int[] f, int[] z, LinkedList<ElevatorQueueObject> q, 
+    public DDElevator(ElevatorSpecs s, int[] f, int[] z, LinkedList<ElevatorQueueObject> q, 
 		    LinkedList<Passenger> lc, LinkedList<Passenger> uc, int w, float cf, BigInteger twt, 
 		    BigInteger ttt, BigDecimal ttd, BigInteger ps) {
         specs = s;
@@ -61,7 +61,6 @@ public class DDElevator implements ElevatorInterface{
         queue = new LinkedList<ElevatorQueueObject>();
         lowerCarPassengers = new LinkedList<Passenger>();
         upperCarPassengers = new LinkedList<Passenger>();
-        queue = new LinkedList<ElevatorQueueObject>();
         waitingTime = 0;
         currentUpperFloor = currentFloor;
         distancePerFloor = (float)specs.getBuildingHeight() / (float)specs.getFloors();
@@ -86,7 +85,6 @@ public class DDElevator implements ElevatorInterface{
         queue = new LinkedList<ElevatorQueueObject>();
         lowerCarPassengers = new LinkedList<Passenger>();
         upperCarPassengers = new LinkedList<Passenger>();
-        queue = new LinkedList<ElevatorQueueObject>();
         waitingTime = 0;
         currentUpperFloor = currentFloor;
         distancePerFloor = (float)specs.getBuildingHeight() / (float)specs.getFloors();
@@ -435,13 +433,15 @@ public class DDElevator implements ElevatorInterface{
     }
     
     /* See ElevatorInterface for details */
-    public ElevatorInterface clone() {
-        return new DDElevator(specs, floors, zonedFloors, queue, lowerCarPassengers, upperCarPassengers, waitingTime, 
-        currentUpperFloor, BigInteger.ZERO, BigInteger.ZERO, BigDecimal.ZERO, BigInteger.ZERO);
+    public int[] getZonedFloors() {
+        return zonedFloors;
     }
     
     /* See ElevatorInterface for details */
-    public int[] getZonedFloors() {
-        return zonedFloors;
+    public void resetSerivceStatus() {
+        totalWaitTime = BigInteger.ZERO;
+        totalTravelTime = BigInteger.ZERO;
+        totalTravelDistance = BigDecimal.ZERO;
+        passengersServed = BigInteger.ZERO;
     }
 }

@@ -336,13 +336,15 @@ public class Elevator implements ElevatorInterface {
     }
     
     /* See ElevatorInterface for details */
-    public ElevatorInterface clone() {
-        return new Elevator(specs, floors, zonedFloors, queue, currentPassengers, waitingTime, 
-        currentFloor, BigInteger.ZERO, BigInteger.ZERO, BigDecimal.ZERO, BigInteger.ZERO);
+    public int[] getZonedFloors() {
+        return zonedFloors;
     }
     
     /* See ElevatorInterface for details */
-    public int[] getZonedFloors() {
-        return zonedFloors;
+    public void resetSerivceStatus() {
+        totalWaitTime = BigInteger.ZERO;
+        totalTravelTime = BigInteger.ZERO;
+        totalTravelDistance = BigDecimal.ZERO;
+        passengersServed = BigInteger.ZERO;
     }
 }

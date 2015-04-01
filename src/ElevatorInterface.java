@@ -10,11 +10,9 @@ import java.util.HashMap;
  */
 public interface ElevatorInterface {
     /**
-     * Returns a clone of this ElevatorInterface object.
-     * NOTE: The clone has its service record variables reset to 0, i.e.
-     * like it was just created.
+     * Resets the service status counters to 0.
      */
-    public ElevatorInterface clone();
+    public void resetSerivceStatus();
     
     /** 
      * Allows passengers to embark and disembark on the current floor
