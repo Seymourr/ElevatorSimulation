@@ -444,4 +444,27 @@ public class DDElevator implements ElevatorInterface{
         totalTravelDistance = BigDecimal.ZERO;
         passengersServed = BigInteger.ZERO;
     }
+    
+    /* See ElevatorInterface for details */
+    public DDElevator duplicate() {
+        //Duplicate queue
+        LinkedList<ElevatorQueueObject> newQueue = new LinkedList<ElevatorQueueObject>();
+        for (int i = 0; i < queue.size(); i++) {
+            newQueue.add(i, queue.get(i));
+        }
+    
+        //Duplicate lowerCarPassengers
+        LinkedList<Passenger> lcp = new LinkedList<Passenger>();
+        for (int i = 0; i < lowerCarPassengers.size(); i++) {
+            lcp.add(i, lowerCarPassengers.get(i));
+        }
+        //Duplicate upperCarPassengers
+        LinkedList<Passenger> ucp = new LinkedList<Passenger>();
+        for (int i = 0; i < upperCarPassengers.size(); i++) {
+            ucp.add(i, upperCarPassengers.get(i));
+        }
+        
+        return new DDElevator(specs, floors, zonedFloors, newQueue, lcp, ucp, waitingTime, 
+        currentUpperFloor, BigInteger.ZERO, BigInteger.ZERO, BigDecimal.ZERO, BigInteger.ZERO);
+    }
 }

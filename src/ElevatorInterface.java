@@ -10,6 +10,11 @@ import java.util.HashMap;
  */
 public interface ElevatorInterface {
     /**
+     * Returns a semi-deep copy of this Elevator.
+     */
+    public ElevatorInterface duplicate();
+    
+    /**
      * Resets the service status counters to 0.
      */
     public void resetSerivceStatus();

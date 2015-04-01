@@ -54,13 +54,15 @@ public class SearchBasedCollective extends Algorithm {
         return e;
     }
     
-    /* Run the elevators until it is empty */
-    private ElevatorInterface emptyElevator(ElevatorInterface e) {
+    /* Run the elevators until it is empty, return the amount of time it took */
+    private int emptyElevator(ElevatorInterface e) {
+        e.resetSerivceStatus();
         while (!e.getQueue().isEmpty()) {
             e.openDoors();
             e.updateElevator();
         }
-        return e;
+        int etime = e.getRecords().waitingTime.add(e.getRecords().travelingTime).intValue();
+        return etime;
     }
     
     /* Returns an index of a suitable elevator for the given passenger */
@@ -76,29 +78,33 @@ public class SearchBasedCollective extends Algorithm {
 
             //Reset elevator service status
             ElevatorInterface e1 = elevators.get(i);
-            e1.resetSerivceStatus();
-
+            
+            //DEBUG
+            // System.out.println("\nFirst: \n");
+            // System.out.println(e1.getRecords().getStringRepresentation());
+            
             //Run elevator until empty
-            emptyElevator(e1);
+            int e1time = emptyElevator(e1.duplicate());
             
-            //TODO Need to clone before emptying
-            
-            //Calculate total time
-            int e1time = e1.getRecords().waitingTime.add(e1.getRecords().travelingTime).intValue();
-            
+            //DEBUG
+            // System.out.println("\nSecond: \n");
+            // System.out.println(e1.getRecords().getStringRepresentation());
+
             //Add the new passenger to the elevator
-            e1.resetSerivceStatus();
-            ElevatorInterface e2 = addToElevator(e1, p);
+            ElevatorInterface e2 = e1.duplicate();
+            e2 = addToElevator(e2, p);
 
             //Run the elevator with the passenger until empty 
-            emptyElevator(e2);
+            int e2time = emptyElevator(e2);
             
-            //Calculate total time
-            int e2time = e2.getRecords().waitingTime.add(e2.getRecords().travelingTime).intValue();
-            
-            //Calculate time caused by adding the new passenger
+            //DEBUG
+            // System.out.println("\nThird: \n");
+            // System.out.println(e1.getRecords().getStringRepresentation());
+
+            //Calculate extra time caused by adding the new passenger
             int totTime = e2time - e1time;
             
+            //Error check
             if (totTime < 0) {
                 System.out.println("\nERROR\n");
                 System.out.println("E1 time: " + e1time + ", E2 time: " + e2time);
