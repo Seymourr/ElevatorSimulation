@@ -27,7 +27,8 @@ public class Main {
 	private static int waitingTime;
 	private static int numberOfCalls;
 	private static int debug;
-	/**
+	
+    /**
 	 * Read all specifications for this simulation from file, and returns an object carrying all these
 	 * in a proper manor. 
 	 * NOTE: The specifications written in the file appear in a certain order, and this order is assumed to be the same
@@ -113,7 +114,7 @@ public class Main {
 		int cnt = 0;
 		System.out.println("Now starting simulation with " + trafficAmount + " passengers per period");
 		for(int i = 0; i < specs.getSimulationDays(); i++) {
-			cnt += simulateDay(new SearchBasedCollective(specs), trafficAmount); 
+			cnt += simulateDay(new SingleAutomatic(specs), trafficAmount); 
 			System.out.println("Day " + i + " complete" + " Served: " + cnt + " so far finished: " + debug);
 	}
 		printResults(new BigInteger("" + cnt));

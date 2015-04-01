@@ -69,10 +69,10 @@ public abstract class Algorithm {
             //Check passenger ride is within the zone
             if (checkContainsZonedFloor(el, p.getOrigin())) {
                 if (checkContainsZonedFloor(el, p.getDestination())) {
-                    //Origin and destination both within range
+                    //Origin and destination both within range, ok!
                     retEles.add(el);
                 } else if (!isLobbyFloor(el, p.getOrigin())) {
-                    //Interfloor traffic 
+                    //Interfloor traffic originating from the zone of this elevator, ok!
                     retEles.add(el); 
                 }
                 retEles.add(el); 
@@ -192,12 +192,18 @@ public abstract class Algorithm {
 		ArrayList<Integer> legitElevators = new ArrayList<Integer>();
 		int index = -1;
 		Random r = new Random();
+        
+        //DEBUG UTSKRIFT
+        // System.out.println("Amount of zoned elevators: " + zonedElevators.size());
 
 		for(int i = 0; i < zonedElevators.size(); i++) {
 			if(elevatorContainsFloor(zonedElevators.get(i), p.getOrigin(), p.getDestination())) {
 				legitElevators.add(i);
 			}
 		}
+        
+        //DEBUG UTSKRIFT
+        // System.out.println("Amount of legit elevators: " + legitElevators.size());
 
 		if(legitElevators.isEmpty()) {
 			throw new RuntimeException("No eligable elevator found in getRandomElevator");
@@ -246,6 +252,10 @@ public abstract class Algorithm {
 		}
 
 		index = r.nextInt(temp.size());
+        
+        //DEBUG UTSKRIFT
+        System.out.println("Randomindex: " + index);
+        
 		if(specs.zoningUsed()) {
 			for(int i = 0; i < elevatorsOriginal.size(); i++) {
 				if(similarElevator(zonedElevators.get(temp.get(index)).getZonedFloors(), elevatorsOriginal.get(i).getZonedFloors())) {
@@ -255,6 +265,9 @@ public abstract class Algorithm {
 			}
 		}
 		
+        //DEBUG UTSKRIFT
+        System.out.println("Index: " + index);
+        
 		return index;
 
 	}
