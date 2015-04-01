@@ -110,7 +110,7 @@ public class Main {
 		}
        
         //Perform the simulation
-		int trafficAmount = specs.getHeavyTraffic();
+		int trafficAmount = 2000; //specs.getHeavyTraffic();
 		int cnt = 0;
 		System.out.println("Now starting simulation with " + trafficAmount + " passengers per period");
 		for(int i = 0; i < specs.getSimulationDays(); i++) {
@@ -387,7 +387,7 @@ public class Main {
 		printCallAmount();
 		cnt += trafficAmount;
 
-		/*	
+			
 		simulatePeriod(alg, TrafficType.REGULAR, trafficAmount/3);
 		printCallAmount();
 		cnt += trafficAmount/3;
@@ -404,7 +404,7 @@ public class Main {
 		simulatePeriod(alg, TrafficType.DOWNPEAK, trafficAmount);
 		printCallAmount();
 		cnt += trafficAmount;	
-	*/
+		
 			
 		System.out.println("Now going into rest calls");
 		handleRestCalls(alg); // Extra time needed to empty system

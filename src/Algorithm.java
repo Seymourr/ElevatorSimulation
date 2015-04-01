@@ -2,7 +2,6 @@
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Random;
-import java.util.Stack;
 
 public abstract class Algorithm {
 	ElevatorSpecs specs;	
@@ -46,21 +45,17 @@ public abstract class Algorithm {
     }
      
     /**
-     * Returns a list of the indexes of the elevators in the given list of elevators that
+     * Returns a list of the elevators in the given list of elevators that
      * can be used to serve the given passenger when zoning is used.
      */
-    protected int[] getZonedElevators (ArrayList<ElevatorInterface> eles, Passenger p) {
-        //If zoning is not used all elevators can be used, return a list of all indexes
+    protected ArrayList<ElevatorInterface> getZonedElevators (
+    ArrayList<ElevatorInterface> eles, Passenger p) {
+        //If zoning is not used all elevators can be used
         if (!specs.zoningUsed()) {
-            int[] retArr = new int[eles.size()];
-            for (int i = 0; i < eles.size(); i++) {
-                retArr[i] = i;
-            }
-            return retArr;
+            return eles;
         } 
-        
         //Create the return list
-        ArrayList<Integer> retEles = new ArrayList<Integer>();
+        ArrayList<ElevatorInterface> retEles = new ArrayList<ElevatorInterface>();
         
         //Iterate through the elevators and check which are in the correct zone
         for (int i = 0; i < eles.size(); i++) {
@@ -75,11 +70,12 @@ public abstract class Algorithm {
             if (checkContainsZonedFloor(el, p.getOrigin())) {
                 if (checkContainsZonedFloor(el, p.getDestination())) {
                     //Origin and destination both within range, ok!
-                    retEles.add(i);
+                    retEles.add(el);
                 } else if (!isLobbyFloor(el, p.getOrigin())) {
                     //Interfloor traffic originating from the zone of this elevator, ok!
-                    retEles.add(i); 
+                    retEles.add(el); 
                 }
+                retEles.add(el); 
             }
         }
         
@@ -88,13 +84,7 @@ public abstract class Algorithm {
             throw new RuntimeException("Empty list in getZonedElevators");
         }
         
-        //Convert ArrayList to array
-        int[] retArr = new int[retEles.size()];
-        for (int i = 0; i < retEles.size(); i++) {
-            retArr[i] = retEles.get(i);
-        }
-        
-        return retArr;
+        return retEles;
     }
     
 	/**
@@ -196,60 +186,98 @@ public abstract class Algorithm {
 	}
 
 	/**
-	* Returns a random elevator position in a list of elevators
+	* Returns a semi-random elevator position in a list of elevators
 	*/
-
-	protected int getRandomTest(ArrayList<ElevatorInterface> e) {
-		Random r = new Random();
-		return r.nextInt(e.size());
-	}
-	
-	protected int getRandomElevator(ArrayList<ElevatorInterface> elevators, int[] zonedIndexes, 
-    Passenger p) {
+	protected int getRandomElevator(ArrayList<ElevatorInterface> elevatorsOriginal, ArrayList<ElevatorInterface> zonedElevators, Passenger p) {
+		ArrayList<Integer> legitElevators = new ArrayList<Integer>();
 		int index = -1;
 		Random r = new Random();
-	
-		
-        //Create a list of elevator indexes that will be filled with potential candidates
-        ArrayList<Integer> potentialElevatorIndexes = new ArrayList<Integer>();
         
-        //Try to find idle (and non-full) elevators
-		for (Integer i : zonedIndexes) {
-            ElevatorStatusObject esq = elevators.get(i).getStatus();
-			if (esq.direction == 0 && esq.passengers < specs.getCarryCapacity()) {
-				potentialElevatorIndexes.add(i);
+        //DEBUG UTSKRIFT
+        // System.out.println("Amount of zoned elevators: " + zonedElevators.size());
+
+		for(int i = 0; i < zonedElevators.size(); i++) {
+			if(elevatorContainsFloor(zonedElevators.get(i), p.getOrigin(), p.getDestination())) {
+				legitElevators.add(i);
+			}
+		}
+        
+        //DEBUG UTSKRIFT
+        // System.out.println("Amount of legit elevators: " + legitElevators.size());
+
+		if(legitElevators.isEmpty()) {
+			throw new RuntimeException("No eligable elevator found in getRandomElevator");
+		}
+
+		ArrayList<Integer> bestElevators = new ArrayList<Integer>();
+		for(int i = 0; i < legitElevators.size(); i++) {
+			if(zonedElevators.get(legitElevators.get(i)).getStatus().direction == 0 && zonedElevators.get(legitElevators.get(i)).getStatus().passengers < specs.getCarryCapacity()){
+				bestElevators.add(legitElevators.get(i));
 			}
 		}
 
-        //Try to find elevators that are not full
-		if (potentialElevatorIndexes.isEmpty()) {
-			for (Integer i : zonedIndexes) {
-                ElevatorStatusObject esq = elevators.get(i).getStatus();
-				if (esq.passengers < specs.getCarryCapacity()) {
-					potentialElevatorIndexes.add(i);
+		if(bestElevators.isEmpty()) {
+			for(int i = 0; i < legitElevators.size(); i++) {
+				if(zonedElevators.get(legitElevators.get(i)).getStatus().passengers < specs.getCarryCapacity()) {
+					bestElevators.add(legitElevators.get(i));
 				}
 			}
 		}
 
-        //If we get here, all elevators are full, just return a random elevator
-		if (potentialElevatorIndexes.isEmpty()) {
-			int indexOfElevatorIndex = r.nextInt(zonedIndexes.length);
-			return zonedIndexes[indexOfElevatorIndex];
-		}
-
-		//Of the potential elevators fetched, find the closest one
-		float bestDistance = Integer.MAX_VALUE;
-        int bestIndex = 0;
-		for(Integer i : potentialElevatorIndexes) {
-            ElevatorStatusObject esq = elevators.get(i).getStatus();
-            float distance = Math.abs(esq.floor - (float)p.getOrigin());
-			if (distance < bestDistance) {
-				bestDistance = distance;
-                bestIndex = i;
+		if(bestElevators.isEmpty()) {
+			//All elevators are full, return a random one
+			int tempIndex = 0;
+			tempIndex = r.nextInt(legitElevators.size());
+			for(int i = 0; i < elevatorsOriginal.size(); i++) {
+				if(similarElevator(zonedElevators.get(legitElevators.get(tempIndex)).getZonedFloors(), elevatorsOriginal.get(i).getZonedFloors())) {
+					return i;
+				}
 			}
 		}
 
-		return bestIndex; 
+		//Get closest elevator
+		index = 0;
+		ArrayList<Integer> temp = new ArrayList<Integer>();
+		for(int i = 0; i < bestElevators.size(); i++) {
+			if(Math.abs(zonedElevators.get(bestElevators.get(i)).getStatus().floor - p.getOrigin()) < Math.abs(zonedElevators.get(bestElevators.get(index)).getStatus().floor - p.getOrigin())) {
+				index = i;
+			}
+		}
+
+
+		for(int i = 0; i < bestElevators.size(); i++) {
+			if(Math.abs(zonedElevators.get(bestElevators.get(i)).getStatus().floor - p.getOrigin()) == Math.abs(zonedElevators.get(bestElevators.get(index)).getStatus().floor - p.getOrigin())) {
+				temp.add(bestElevators.get(i));
+			}
+		}
+
+		index = r.nextInt(temp.size());
+        
+        //DEBUG UTSKRIFT
+      
+        
+		if(specs.zoningUsed()) {
+			for(int i = 0; i < elevatorsOriginal.size(); i++) {
+				if(similarElevator(zonedElevators.get(temp.get(index)).getZonedFloors(), elevatorsOriginal.get(i).getZonedFloors())) {
+				index = i;
+				break;
+				}
+			}
+		}
+		
+        //DEBUG UTSKRIFT
+       
+        
+		return index;
+
+	}
+		
+	private boolean similarElevator(int[] a, int[] b) {
+		if(a.length != b.length) return false;
+		for(int i = 0; i < a.length; i++) {
+			if(a[i] != b[i]) return false;
+		}
+		return true;
 	}
 }
 

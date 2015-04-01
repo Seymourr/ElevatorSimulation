@@ -2,16 +2,16 @@
 7200 //Amount of minutes in a traffic period
 500 //Low traffic passenger amount
 1500 //Medium traffic passenger amount
-5000 //Heavy traffic passenger amount
+2500 //Heavy traffic passenger amount
 100 //Number of floors
 50 //Skylobby floor (Must be in even floor)
 10   //Distance between floors
 40 //Number of shafts was 70
 400 //Building height
 15  //Car carry capacity
-20   //Car speed (Average)
+70   //Car speed (Average)
 5  //Floor delay
-single //local elevator
+double //local elevator
 double //shuttle elevator
 10   //Number of shuttles was 10
 false //Is equally distributed zoning used? (Not implemented yet)

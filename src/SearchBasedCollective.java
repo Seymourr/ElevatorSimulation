@@ -80,8 +80,16 @@ public class SearchBasedCollective extends Algorithm {
             ElevatorInterface e = elevators.get(i);
             ElevatorInterface e1 = e.duplicate();
             
+            //DEBUG
+            // System.out.println("\nFirst: \n");
+            // System.out.println(e1.getRecords().getStringRepresentation());
+            
             //Run elevator until empty
             int e1time = emptyElevator(e1);
+            
+            //DEBUG
+            // System.out.println("\nSecond: \n");
+            // System.out.println(e1.getRecords().getStringRepresentation());
 
             //Add the new passenger to the elevator
             ElevatorInterface e2 = e.duplicate();
@@ -89,20 +97,21 @@ public class SearchBasedCollective extends Algorithm {
 
             //Run the elevator with the passenger until empty 
             int e2time = emptyElevator(e2);
+            
+            //DEBUG
+            // System.out.println("\nThird: \n");
+            // System.out.println(e1.getRecords().getStringRepresentation());
 
             //Calculate extra time caused by adding the new passenger
             int totTime = e2time - e1time;
             
             //Error check
-            if (totTime < -1) {
-                System.out.println("Search did something fishy");
-                // System.out.println("\nERROR\n");
-                // System.out.println("E1 time: " + e1time + ", E2 time: " + e2time);
-                // System.out.println(e.getStatus().getStringRepresentation());
-                // System.out.println(p.getOrigin() + ", " + p.getDestination());
-                // System.out.println(e1.getRecords().getStringRepresentation());
-                // System.out.println(e2.getRecords().getStringRepresentation());
-                // System.exit(1);
+            if (totTime < 0) {
+                System.out.println("\nERROR\n");
+                System.out.println("E1 time: " + e1time + ", E2 time: " + e2time);
+                System.out.println(e1.getRecords().getStringRepresentation());
+                System.out.println(e2.getRecords().getStringRepresentation());
+                System.exit(1);
             }
 
             //Check if better than previous best
