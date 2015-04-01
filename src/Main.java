@@ -110,7 +110,7 @@ public class Main {
 		}
        
         //Perform the simulation
-		int trafficAmount = 2000; //specs.getHeavyTraffic();
+		int trafficAmount = specs.getHeavyTraffic();
 		int cnt = 0;
 		System.out.println("Now starting simulation with " + trafficAmount + " passengers per period");
 		for(int i = 0; i < specs.getSimulationDays(); i++) {

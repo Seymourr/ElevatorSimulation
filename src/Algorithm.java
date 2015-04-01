@@ -185,16 +185,63 @@ public abstract class Algorithm {
 		return (inOrigin && goingToDestination);
 	}
 
-	/**
-	* Returns a semi-random elevator position in a list of elevators
-	*/
-	protected int getRandomElevator(ArrayList<ElevatorInterface> elevatorsOriginal, ArrayList<ElevatorInterface> zonedElevators, Passenger p) {
-		ArrayList<Integer> legitElevators = new ArrayList<Integer>();
+
+
+	protected int getRandomElevator(ArrayList<ElevatorInterface> e, int[] z, Passenger p) {
 		int index = -1;
 		Random r = new Random();
+
+
+        //Create a list of elevator indexes that will be filled with potential candidates
+        ArrayList<Integer> potentialElevatorIndexes = new ArrayList<Integer>();
         
-        //DEBUG UTSKRIFT
-        // System.out.println("Amount of zoned elevators: " + zonedElevators.size());
+        //Try to find idle (and non-full) elevators
+		for (Integer i : z) {
+            ElevatorStatusObject esq = e.get(i).getStatus();
+			if (esq.direction == 0 && esq.passengers < specs.getCarryCapacity()) {
+				potentialElevatorIndexes.add(i);
+			}
+		}
+
+        //Try to find elevators that are not full
+		if (potentialElevatorIndexes.isEmpty()) {
+			for (Integer i : z) {
+                ElevatorStatusObject esq = e.get(i).getStatus();
+				if (esq.passengers < specs.getCarryCapacity()) {
+					potentialElevatorIndexes.add(i);
+				}
+			}
+		}
+
+        //If we get here, all elevators are full, just return a random elevator
+		if (potentialElevatorIndexes.isEmpty()) {
+			int indexOfElevatorIndex = r.nextInt(z.length);
+			return z[indexOfElevatorIndex];
+		}
+
+		//Of the potential elevators fetched, find the closest one
+		float bestDistance = Integer.MAX_VALUE;
+        int bestIndex = 0;
+		for(Integer i : potentialElevatorIndexes) {
+            ElevatorStatusObject esq = e.get(i).getStatus();
+            float distance = Math.abs(esq.floor - (float)p.getOrigin());
+			if (distance < bestDistance) {
+				bestDistance = distance;
+                bestIndex = i;
+			}
+		}
+
+		return bestIndex; 
+	}
+/*
+	/**
+	* Returns a semi-random elevator position in a list of elevators
+	
+	protected int getRandomElevator(ArrayList<ElevatorInterface> elevatorsOriginal, ArrayList<ElevatorInterface> zonedElevators, Passenger p) {
+		int index = -1;
+		Random r = new Random();
+ 	
+ 	ArrayList<Integer> legitElevators = new ArrayList<Integer>();
 
 		for(int i = 0; i < zonedElevators.size(); i++) {
 			if(elevatorContainsFloor(zonedElevators.get(i), p.getOrigin(), p.getDestination())) {
@@ -271,7 +318,7 @@ public abstract class Algorithm {
 		return index;
 
 	}
-		
+	*/	
 	private boolean similarElevator(int[] a, int[] b) {
 		if(a.length != b.length) return false;
 		for(int i = 0; i < a.length; i++) {
