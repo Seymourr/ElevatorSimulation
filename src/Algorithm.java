@@ -45,17 +45,17 @@ public abstract class Algorithm {
     }
      
     /**
-     * Returns a list of the elevators in the given list of elevators that
+     * Returns a list of the indexes of the elevators in the given list of elevators that
      * can be used to serve the given passenger when zoning is used.
      */
-    protected ArrayList<ElevatorInterface> getZonedElevators (
+    protected ArrayList<Integer> getZonedElevators (
     ArrayList<ElevatorInterface> eles, Passenger p) {
         //If zoning is not used all elevators can be used
         if (!specs.zoningUsed()) {
             return eles;
         } 
         //Create the return list
-        ArrayList<ElevatorInterface> retEles = new ArrayList<ElevatorInterface>();
+        ArrayList<Integer> retEles = new ArrayList<Integer>();
         
         //Iterate through the elevators and check which are in the correct zone
         for (int i = 0; i < eles.size(); i++) {
@@ -70,12 +70,11 @@ public abstract class Algorithm {
             if (checkContainsZonedFloor(el, p.getOrigin())) {
                 if (checkContainsZonedFloor(el, p.getDestination())) {
                     //Origin and destination both within range, ok!
-                    retEles.add(el);
+                    retEles.add(i);
                 } else if (!isLobbyFloor(el, p.getOrigin())) {
                     //Interfloor traffic originating from the zone of this elevator, ok!
-                    retEles.add(el); 
-                }
-                retEles.add(el); 
+                    retEles.add(i); 
+                } 
             }
         }
         
