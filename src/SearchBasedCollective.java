@@ -77,21 +77,22 @@ public class SearchBasedCollective extends Algorithm {
             }
 
             //Reset elevator service status
-            ElevatorInterface e1 = elevators.get(i);
+            ElevatorInterface e = elevators.get(i);
+            ElevatorInterface e1 = e.duplicate();
             
             //DEBUG
             // System.out.println("\nFirst: \n");
             // System.out.println(e1.getRecords().getStringRepresentation());
             
             //Run elevator until empty
-            int e1time = emptyElevator(e1.duplicate());
+            int e1time = emptyElevator(e1);
             
             //DEBUG
             // System.out.println("\nSecond: \n");
             // System.out.println(e1.getRecords().getStringRepresentation());
 
             //Add the new passenger to the elevator
-            ElevatorInterface e2 = e1.duplicate();
+            ElevatorInterface e2 = e.duplicate();
             e2 = addToElevator(e2, p);
 
             //Run the elevator with the passenger until empty 
