@@ -27,7 +27,8 @@ public class Main {
 	private static int waitingTime;
 	private static int numberOfCalls;
 	private static int debug;
-	/**
+	
+    /**
 	 * Read all specifications for this simulation from file, and returns an object carrying all these
 	 * in a proper manor. 
 	 * NOTE: The specifications written in the file appear in a certain order, and this order is assumed to be the same

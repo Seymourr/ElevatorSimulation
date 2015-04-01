@@ -46,7 +46,8 @@ public class SelectiveCollective extends Algorithm {
  	* Returns a index of a elevator
  	*/
 	protected int getElevator(ArrayList<ElevatorInterface> elevators, Passenger p) {
-		return getRandomElevator(elevators, getZonedElevators(elevators, p), p);
+        int[] zonedIndexes = getZonedElevators(elevators, p);
+		return getRandomElevator(elevators, zonedIndexes, p);
 	}
 
 
