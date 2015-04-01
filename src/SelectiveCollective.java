@@ -4,10 +4,10 @@ import java.util.Random;
 import java.util.HashMap;
 
 public class SelectiveCollective extends Algorithm {
+
 	public SelectiveCollective(ElevatorSpecs spec) {
 		this.specs = spec;
 	}
-
 
 	private class pointHolder {
 		public int pickUpPoint;
@@ -50,13 +50,13 @@ public class SelectiveCollective extends Algorithm {
 		return getRandomElevator(elevators, zonedIndexes, p);
 	}
 
-
-
 	protected ArrayList<ElevatorInterface> assignLocalWithSelectiveCollective(ArrayList<ElevatorInterface> elevators, Passenger p) {
 		int elevatorIndex = getElevator(elevators, p);
-			boolean s = false;
-		//Check double decked possibilty, addto where?
-		CarPosition pos = getCarPos(elevators.get(elevatorIndex), p);
+
+		CarPosition pos = CarPosition.NULL;
+		if(specs.getLocal() == ElevatorType.DOUBLE) {
+			pos = getCarPos(elevators.get(elevatorIndex), p);
+		}
 
 		int passengerDirection = 1;
 		if(p.getOrigin() > p.getDestination()) {
@@ -64,13 +64,11 @@ public class SelectiveCollective extends Algorithm {
 		}
 
 		if(passengerDirection == elevators.get(elevatorIndex).getStatus().direction) {
-		
 			if((passengerDirection == 1 && elevators.get(elevatorIndex).getStatus().floor <= p.getOrigin()) || (passengerDirection == -1 && elevators.get(elevatorIndex).getStatus().floor >= p.getOrigin())) {
 				//assign so that it picks up on the way
 				elevators.set(elevatorIndex, pickUpOnTheWay(elevators.get(elevatorIndex), p, passengerDirection, pos));
 			} else {
 				//assign so that it picks up after turning twice
-				s = true;
 				elevators.set(elevatorIndex, pickUpOnReverse(elevators.get(elevatorIndex), p, passengerDirection, pos));
 			}
 		} else if(elevators.get(elevatorIndex).getStatus().direction == 0) { //Empty, idle elevator
@@ -85,6 +83,8 @@ public class SelectiveCollective extends Algorithm {
 		} else {
 			elevators.set(elevatorIndex, pickUpOnReverse(elevators.get(elevatorIndex), p, passengerDirection, pos)); //Elevator going in opposite direction
 		}
+
+		//DEBUGG STUFF UP NEXT
 		int inQueue = 0;
 		for(int i = 0; i < elevators.get(elevatorIndex).getQueue().size(); i++) {
 				if(elevators.get(elevatorIndex).getQueue().get(i).getPassenger() == p) {
@@ -98,7 +98,6 @@ public class SelectiveCollective extends Algorithm {
 			System.out.println(p.getOrigin() + " " + p.getDestination() + " " + inQueue);
 			System.out.println("E direction: " + elevators.get(elevatorIndex).getStatus().direction);
 			System.out.println("E floor: " + elevators.get(elevatorIndex).getStatus().floor);
-			System.out.println(s);
 			for(int i = 0; i < elevators.get(elevatorIndex).getFloors().length; i++) {
 				System.out.print(" " + elevators.get(elevatorIndex).getFloors()[i]);
 			}
@@ -112,18 +111,23 @@ public class SelectiveCollective extends Algorithm {
 			return elevators;
 	}
 
+	/*
+	* Pick up passenger with an elevator heading the same direction as the passenger,
+	* available to pick up the passenger in the same direction.
+	*/
 	public ElevatorInterface pickUpOnTheWay(ElevatorInterface elevator, Passenger p, int passDir, CarPosition pos) {
 		int pickUpPosition = -1;
 		int dropPosition = -1;
+
 		int callDest = -1;
 		int preCall = -1;
 			
-		pointHolder res = getPickUpPoint(elevator, p, passDir, 0, (int)elevator.getStatus().floor);
+		pointHolder res = getPickUpPoint(elevator, p, passDir, 0, elevator.getStatus().floor);
 		pickUpPosition = res.pickUpPoint;
 		dropPosition = getDropOffPoint(elevator, res, p, passDir);
 
 		if(pickUpPosition == -1 ||dropPosition == -1) {
-			System.out.println("ERROR IN SAME, FIX");
+			System.out.println("ERROR IN PICKUPONTHEWAY, FIX");
 			System.exit(0);
 		}
 
@@ -136,6 +140,10 @@ public class SelectiveCollective extends Algorithm {
 		return elevator;
 	}
 
+	/*
+	* Pick up the passenger with an elevator when the elevator is heading the same direction as the passenger,
+	* and has the possibility to pick up the passenger.
+	*/
 	public ElevatorInterface pickUpOnReverse(ElevatorInterface elevator, Passenger p, int passDir, CarPosition pos) {
 		int pickUpPosition = -1;
 		int dropPosition = -1;
@@ -164,7 +172,8 @@ public class SelectiveCollective extends Algorithm {
 			return elevator;
 		}
 
-		//Elevator is going in opposite direction of passengers travel after reverse
+		//Elevator is going in opposite direction of passenger after reverse
+
 		//Assign pickup
 		int reverseFloor = -1;
 		if(elevator.getQueue().get(reversePoint).getActionType() == ElevatorAction.PICKUP) {
@@ -183,69 +192,72 @@ public class SelectiveCollective extends Algorithm {
 			}
 		}
 
-		pointHolder dropInfo;
+		pointHolder pointInfo;
 		if(pickUpPosition == -1) {
-			dropInfo = getPickUpPoint(elevator, p, passDir, reversePoint, reverseFloor);
-			pickUpPosition = dropInfo.pickUpPoint;
+			pointInfo = getPickUpPoint(elevator, p, passDir, reversePoint, reverseFloor);
+			pickUpPosition = pointInfo.pickUpPoint;
 		} else {
-			dropInfo = new pointHolder(pickUpPosition, false);
+			pointInfo = new pointHolder(pickUpPosition, false);
 		}
 		
-		dropPosition = getDropOffPoint(elevator, dropInfo, p, passDir);
+		dropPosition = getDropOffPoint(elevator, pointInfo, p, passDir);
 				
-			if(pickUpPosition == -1 ||dropPosition == -1) {
-				System.out.println("ERROR IN REVERSE, FIX");
-				System.exit(0);
-			}
-			if(!elevator.addToQueue(p, pickUpPosition, dropPosition, pos)) {
-				System.out.println("Error picking up passenger going from " + p.getOrigin() + " to " +p.getDestination());
-				System.out.println("Pickupposition: " + pickUpPosition + " Dropposition: " + dropPosition + " Pos in elevator: " + pos);
-				System.out.println(elevator.getStatus().getStringRepresentation());
-				System.out.println("Queue size: " + elevator.getQueue().size());
-			}
-			return elevator;
+		if(pickUpPosition == -1 ||dropPosition == -1) {
+			System.out.println("ERROR IN REVERSE, FIX");
+			System.exit(0);
 		}
 
+		if(!elevator.addToQueue(p, pickUpPosition, dropPosition, pos)) {
+			System.out.println("Error picking up passenger going from " + p.getOrigin() + " to " +p.getDestination());
+			System.out.println("Pickupposition: " + pickUpPosition + " Dropposition: " + dropPosition + " Pos in elevator: " + pos);
+			System.out.println(elevator.getStatus().getStringRepresentation());
+			System.out.println("Queue size: " + elevator.getQueue().size());
+		}
+			return elevator;
+	}
 
-	private pointHolder getPickUpPoint(ElevatorInterface elevator, Passenger p, int passDir, int indexPoint, int floor) {
+	/*
+	* Calculates in which position in the given elevators queue the passenger will be picked up.
+	*/
+	private pointHolder getPickUpPoint(ElevatorInterface elevator, Passenger p, int passDir, int indexPoint, float floor) {
 		int pickUpPosition = -1;
+
 		int preCall = -1;
 		int callDest =-1;
 		boolean willReverse = false;
 		pointHolder result;
+
 		if(floor == p.getOrigin()) {
-			pickUpPosition = 0; //???
+			pickUpPosition = 0; //On same floor
 		} else {
 			for(int i = indexPoint; i < elevator.getQueue().size(); i++) {
 				preCall = callDest;
 				if(elevator.getQueue().get(i).getActionType() == ElevatorAction.PICKUP) {
-				callDest = elevator.getQueue().get(i).getPassenger().getOrigin();
+					callDest = elevator.getQueue().get(i).getPassenger().getOrigin();
 				} else {
 					callDest = elevator.getQueue().get(i).getPassenger().getDestination();
 				}
 				if(passDir == 1) {
 					if(preCall > callDest) {
-						//Reverse, add to reverse position
 						willReverse = true;
-						pickUpPosition = i;
+						pickUpPosition = i;	//Reverse, add to reverse position
 						break;
 					} else if(callDest >= p.getOrigin()) {
-						pickUpPosition = i;
+						pickUpPosition = i; //Pick up before next destination
 						break;
 					}
 				} else {
 					if(preCall < callDest && preCall != -1) {
-						//Reverse, add to reverse position
 						willReverse = true;
-						pickUpPosition = i;
+						pickUpPosition = i;	//Reverse, add to reverse position
 						break;
 					} else if(callDest <= p.getOrigin()) {
-						pickUpPosition = i;
+						pickUpPosition = i; //Pick up before next destination
 						break;
 					}
 				}
 			}
-			//Is all calls in the queue done prior to passengers floor without a reverse?
+			//Is all calls in the queue done prior to passenger floor without a reverse?
 			if(pickUpPosition == -1) {
 				pickUpPosition = elevator.getQueue().size(); 
 			}
@@ -255,39 +267,41 @@ public class SelectiveCollective extends Algorithm {
 		return result;
 	}
 
+	/*
+	* Calculates in which position in the given elevators queue the passenger should be dropped off at.
+	*/
 	private int getDropOffPoint(ElevatorInterface elevator, pointHolder pickUpData, Passenger p, int passDir) {
 		boolean willReverse = pickUpData.willReverse;
 		int pickUpPosition = pickUpData.pickUpPoint;
 		int dropPosition = -1;
 		int preCall = -1;
 		int callDest = -1;
+
 		if(willReverse) {
-			dropPosition = pickUpPosition + 1;
+			dropPosition = pickUpPosition + 1; //Drop off before reverse
 		} else {
 			for(int i = 0; i < elevator.getQueue().size(); i++) {
-				if(i > pickUpPosition) {
+				if(i > pickUpPosition) { //Skip ahead to relevant queue positions
 					preCall = callDest;
 					if(elevator.getQueue().get(i).getActionType() == ElevatorAction.PICKUP) {
-					callDest = elevator.getQueue().get(i).getPassenger().getOrigin();
+						callDest = elevator.getQueue().get(i).getPassenger().getOrigin();
 					} else {
-					callDest = elevator.getQueue().get(i).getPassenger().getDestination();
+						callDest = elevator.getQueue().get(i).getPassenger().getDestination();
 					}
 					if(passDir == 1) {
 						if(preCall > callDest) {
-							//Reverse, add to reverse position
-							dropPosition = i;
+							dropPosition = i; 	//Reverse, add to reverse position
 							break;
 						} else if(callDest >= p.getDestination()) {
-							dropPosition = i;
+							dropPosition = i;  //Drop off before next destination
 							break;
 						}
 					} else {
 						if(preCall < callDest && preCall != -1) {
-							//Reverse, add to reverse position
-							dropPosition = i;
+							dropPosition = i; 	//Reverse, add to reverse position
 							break;
 						} else if(callDest <= p.getDestination()) {
-							dropPosition = i;
+							dropPosition = i;  //Drop off before next destination
 							break;
 						}
 					}
@@ -295,7 +309,7 @@ public class SelectiveCollective extends Algorithm {
 			}
 			//Is all calls in the queue done prior to passengers destination without a reverse?
 			if(dropPosition == -1) {
-				dropPosition = elevator.getQueue().size(); 
+				dropPosition = elevator.getQueue().size(); //Just put to end of list (final thing to do)
 				if(dropPosition == pickUpPosition) {
 					dropPosition += 1;
 				}
@@ -304,11 +318,16 @@ public class SelectiveCollective extends Algorithm {
 		return dropPosition;
 	}
 
+
+	/*
+	* Returns the queue point where the given elevator will reverse, if it does that.
+	*/
 	private int getReversePoint(ElevatorInterface elevator, Passenger p, int start) {
 		int reversePoint = -1;
 
 		int callDest = -1;
 		int preCall = -1;
+
 		for(int i = start; i < elevator.getQueue().size(); i++) {
 			preCall = callDest;
 			if(elevator.getQueue().get(i).getActionType() == ElevatorAction.PICKUP) {

@@ -94,24 +94,24 @@ public abstract class Algorithm {
 	 * shuttle.
 	 */
 	public ArrayList<ElevatorInterface> assignShuttleElevator(ArrayList<ElevatorInterface> elevators, Passenger p) {
-		int index = getElevator(elevators, p);
+		int elevatorIndex = getElevator(elevators, p);
 		int from = 0;
-		if(elevators.get(index).getStatus().floor != p.getOrigin()) {
-			from = elevators.get(index).getQueue().size();
+		if(elevators.get(elevatorIndex).getStatus().floor != p.getOrigin()) {
+			from = elevators.get(elevatorIndex).getQueue().size();
 		}
-		int to = elevators.get(index).getQueue().size() + 1;
+		int to = elevators.get(elevatorIndex).getQueue().size() + 1;
 
 		CarPosition pos = CarPosition.NULL;
 		if(specs.getShuttle() == ElevatorType.DOUBLE) {
 			pos = getCarPosShuttle(p);
 
-		if(pos == CarPosition.NULL) {
-			System.out.println("ERROR IN DECIDING POSITION FOR DD, ABORTING");
-			System.exit(0);
-		}
+			if(pos == CarPosition.NULL) {
+				System.out.println("ERROR IN DECIDING POSITION FOR DD, ABORTING");
+				System.exit(0);
+			}
 		
 		}
-		elevators.get(index).addToQueue(p, from, to, pos);
+		elevators.get(elevatorIndex).addToQueue(p, from, to, pos);
 		return elevators;
 	}
 

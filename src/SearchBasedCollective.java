@@ -37,15 +37,15 @@ public class SearchBasedCollective extends Algorithm {
         float ePos = e.getStatus().floor;
         
         //Do the assignment
-        if (p.getOrigin() >= ePos && eDir == 1) {
+        if (p.getOrigin() >= ePos && eDir == 1 && pDir == 1) {  //EDIT: La till krav att pDIR == 1 också
             //Elevator going up, passenger on the way
             e =  sc.pickUpOnTheWay(e, p, pDir, c);
-        } else if (p.getOrigin() <= ePos && eDir == -1) {
+        } else if (p.getOrigin() <= ePos && eDir == -1 && pDir == -1) { //EDIT: La till krav att pDIR == -1 också
             //Elevator going down, passenger on the way
              e =   sc.pickUpOnTheWay(e, p, pDir, c);
         } else if (eDir == 0) {
             //Elevator idle
-             e =   sc.pickUpOnTheWay(e, p, pDir, c);
+             e =   sc.pickUpOnTheWay(e, p, pDir, c); 
         } else {
             //Surely not on the way
              e =   sc.pickUpOnReverse(e, p, pDir, c);
