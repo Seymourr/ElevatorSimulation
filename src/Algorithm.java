@@ -75,7 +75,6 @@ public abstract class Algorithm {
                     //Interfloor traffic 
                     retEles.add(el); 
                 }
-                retEles.add(el); 
             }
         }
         
