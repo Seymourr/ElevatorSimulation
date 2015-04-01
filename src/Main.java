@@ -110,11 +110,11 @@ public class Main {
 		}
        
         //Perform the simulation
-		int trafficAmount = 4000; //specs.getHeavyTraffic();
+		int trafficAmount = specs.getHeavyTraffic();
 		int cnt = 0;
 		System.out.println("Now starting simulation with " + trafficAmount + " passengers per period");
 		for(int i = 0; i < specs.getSimulationDays(); i++) {
-			cnt += simulateDay(new SearchBasedCollective(specs), trafficAmount); 
+			cnt += simulateDay(new SingleAutomatic(specs), trafficAmount); 
 			System.out.println("Day " + i + " complete" + " Served: " + cnt + " so far finished: " + debug);
 	}
 		printResults(new BigInteger("" + cnt));
@@ -381,13 +381,13 @@ public class Main {
 	 * @param trafficAmount
 	 */
 	public static int simulateDay(Algorithm alg, int trafficAmount){
-		int cnta = 0;
+		int cnt = 0;
 		System.out.println("Entered day");
 		simulatePeriod(alg, TrafficType.UPPEAK, trafficAmount);
 		printCallAmount();
-		cnta += trafficAmount;
-/*
-			
+		cnt += trafficAmount;
+
+		/*	
 		simulatePeriod(alg, TrafficType.REGULAR, trafficAmount/3);
 		printCallAmount();
 		cnt += trafficAmount/3;
@@ -404,13 +404,13 @@ public class Main {
 		simulatePeriod(alg, TrafficType.DOWNPEAK, trafficAmount);
 		printCallAmount();
 		cnt += trafficAmount;	
-		*/	
+	*/
 			
 		System.out.println("Now going into rest calls");
 		handleRestCalls(alg); // Extra time needed to empty system
 
 		System.out.println("Simulation finished, system empty");
-		return cnta;
+		return cnt;
 	}
     
     	

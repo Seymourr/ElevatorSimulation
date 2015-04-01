@@ -18,11 +18,18 @@
  	{
  		while(!calls.isEmpty()) {
  			Passenger p = calls.removeFirst();
+ 			if(p.getOrigin() == specs.getLobbyFloor() + 1 ||p.getOrigin() == specs.getSkylobbyfloor() + 1) {
+ 				if(p.getDestination() == specs.getLobbyFloor() + 1 || p.getDestination() == specs.getSkylobbyfloor() + 1) {
+ 						System.out.println("Yes!");
+ 				}
+ 			
+ 			}
  			if(containsFloor(allElevators.get(0), p.getOrigin(), p.getDestination())) {
  				//Bot ride
  				allElevators.set(0, assignLocalWithSingleAutomatic(allElevators.get(0), p));
  			} else if(containsFloor(allElevators.get(1), p.getOrigin(), p.getDestination())) {
  				//Shuttle ride
+
  				allElevators.set(1,  assignShuttleElevator(allElevators.get(1), p));
  			} else if(containsFloor(allElevators.get(2), p.getOrigin(), p.getDestination())) {
  				//Top ride
@@ -42,8 +49,9 @@
  	* Returns a index of a elevator, attempting to provide a empty one. If no such is found, a random one is returned. 
  	*/
 	protected int getElevator(ArrayList<ElevatorInterface> elevators, Passenger p) {
-        int[] zonedIndexes = getZonedElevators(elevators, p);
-		return getRandomElevator(elevators, zonedIndexes, p);
+      //  int[] zonedIndexes = getZonedElevators(elevators, p);
+		//return getRandomElevator(elevators, zonedIndexes, p);
+		return getRandomTest(elevators);
 	}
 
 	/**
@@ -62,7 +70,11 @@
 		} else if(specs.getLocal() == ElevatorType.DOUBLE) {
 			int elevatorIndex = getElevator(elevators, p);
 			CarPosition pos = getCarPos(elevators.get(elevatorIndex), p);
-			elevators.get(elevatorIndex).addToQueue(p, elevators.get(elevatorIndex).getQueue().size(), elevators.get(elevatorIndex).getQueue().size() + 1, pos);
+			boolean b = elevators.get(elevatorIndex).addToQueue(p, elevators.get(elevatorIndex).getQueue().size(), elevators.get(elevatorIndex).getQueue().size() + 1, pos);
+			if(!b) {
+				System.out.println("Error, addToQueue returned false");
+				System.exit(0);	
+			}
 		} else {
 			System.out.println("Something went wrong with assigning elevators, ABORTING SIMULATION");
 			System.exit(0);

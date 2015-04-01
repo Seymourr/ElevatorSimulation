@@ -198,11 +198,18 @@ public abstract class Algorithm {
 	/**
 	* Returns a random elevator position in a list of elevators
 	*/
+
+	protected int getRandomTest(ArrayList<ElevatorInterface> e) {
+		Random r = new Random();
+		return r.nextInt(e.size());
+	}
+	
 	protected int getRandomElevator(ArrayList<ElevatorInterface> elevators, int[] zonedIndexes, 
     Passenger p) {
 		int index = -1;
 		Random r = new Random();
-
+	
+		
         //Create a list of elevator indexes that will be filled with potential candidates
         ArrayList<Integer> potentialElevatorIndexes = new ArrayList<Integer>();
         
@@ -242,7 +249,7 @@ public abstract class Algorithm {
 			}
 		}
 
-		return bestIndex;
+		return bestIndex; 
 	}
 }
 
