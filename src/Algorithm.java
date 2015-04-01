@@ -68,15 +68,13 @@ public abstract class Algorithm {
             
             //Check passenger ride is within the zone
             if (checkContainsZonedFloor(el, p.getOrigin())) {
-            	/*
                 if (checkContainsZonedFloor(el, p.getDestination())) {
                     //Origin and destination both within range
                     retEles.add(el);
-                } else if (isLobbyFloor(el, p.getDestination())) {
-                    //Interfloor ride with origin in range
+                } else if (!isLobbyFloor(el, p.getOrigin())) {
+                    //Interfloor traffic 
                     retEles.add(el); 
                 }
-                */
                 retEles.add(el); 
             }
         }
