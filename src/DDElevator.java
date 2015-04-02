@@ -356,9 +356,7 @@ public class DDElevator implements ElevatorInterface{
     public ElevatorStatusObject getStatus() {
         //Fetch destination
     	if (queue.isEmpty()) {
-    		return new ElevatorStatusObject(
-                currentUpperFloor, 0, -1, upperCarPassengers.size(), lowerCarPassengers.size()
-            );
+    		return new ElevatorStatusObject(currentUpperFloor, 0, -1);
     	}
     	
         //Fetch the next destination
@@ -411,9 +409,7 @@ public class DDElevator implements ElevatorInterface{
             dir = -1;
         }
         
-        return new ElevatorStatusObject(
-            currentUpperFloor, dir, dest, upperCarPassengers.size(), lowerCarPassengers.size()
-        );
+        return new ElevatorStatusObject(currentUpperFloor, dir, dest);
     }
     
     /* See ElevatorInterface for details */
@@ -466,5 +462,20 @@ public class DDElevator implements ElevatorInterface{
         
         return new DDElevator(specs, floors, zonedFloors, newQueue, lcp, ucp, waitingTime, 
         currentUpperFloor, BigInteger.ZERO, BigInteger.ZERO, BigDecimal.ZERO, BigInteger.ZERO);
+    }
+    
+    /* See ElevatorInterface for details */
+    public boolean isIdle() {
+        return queue.isEmpty();
+    }
+    
+    /* See ElevatorInterface for details */
+    public int currentPassengers(CarPosition pos) {
+        if (pos == CarPosition.UPPER) {
+            return upperCarPassengers.size();
+        } else if (pos == CarPosition.LOWER) {
+            return lowerCarPassengers.size();
+        }
+        throw new IllegalArgumentException("Invalid CarPosition.");
     }
 }

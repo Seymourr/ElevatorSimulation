@@ -10,12 +10,22 @@ import java.util.HashMap;
  */
 public interface ElevatorInterface {
     /**
-     * Returns a semi-deep copy of this Elevator.
+     * Returns the amount of Passengers currently inside this ElevatorInterface.
+     */
+    public int currentPassengers(CarPosition pos);
+    
+    /**
+     * Returns true if this ElevatorInterface is currently idle.
+     */
+    public boolean isIdle();
+    
+    /**
+     * Returns a semi-deep copy of this ElevatorInterface.
      */
     public ElevatorInterface duplicate();
     
     /**
-     * Resets the service status counters to 0.
+     * Resets the service status counters of this elevator to 0.
      */
     public void resetSerivceStatus();
     

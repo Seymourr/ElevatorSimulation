@@ -17,28 +17,12 @@ public class ElevatorStatusObject {
     public final float floor; //Current floor (upper floor for double decked)
     public final int direction; //Up or down
     public final int destination; //Headed to which floor
-    public final int passengers; //Total Passengers inside
-    public final int upperCarPassengers;
-    public final int lowerCarPassengers;
 
     /* Constructor for single deckers */
-    public ElevatorStatusObject(float f, int dir, int dest, int cont) {
+    public ElevatorStatusObject(float f, int dir, int dest) {
        floor = f;
        direction = dir;
        destination = dest;
-       passengers = cont;
-       upperCarPassengers = -1;
-       lowerCarPassengers = -1;
-    }
-    
-    /* Constructor for double deckers */
-    public ElevatorStatusObject(float f, int dir, int dest, int upperPas, int lowerPass) {
-       floor = f;
-       direction = dir;
-       destination = dest;
-       upperCarPassengers = upperPas;
-       lowerCarPassengers = lowerPass;
-       passengers = upperPas + lowerPass;
     }
     
     /* Converts this ElevatorStatusObject to a nice little String */
@@ -47,7 +31,6 @@ public class ElevatorStatusObject {
             "Current Floor: " + floor + "\n" +
             "Current Direction: " + direction + "\n" +
             "Current Destination: " + destination + "\n" +
-            "Number of Souls Onboard: " + passengers  + "\n" +
             "************************************";
         return s;
     }

@@ -287,7 +287,7 @@ public class Elevator implements ElevatorInterface {
     public ElevatorStatusObject getStatus() {
         //Fetch destination
     	if (queue.isEmpty()) {
-    		return new ElevatorStatusObject(currentFloor, 0, -1, currentPassengers.size());
+    		return new ElevatorStatusObject(currentFloor, 0, -1);
     	}
     	
         //Fetch next call
@@ -316,7 +316,7 @@ public class Elevator implements ElevatorInterface {
             dir = -1;
         }
         
-        return new ElevatorStatusObject(currentFloor, dir, dest, currentPassengers.size());
+        return new ElevatorStatusObject(currentFloor, dir, dest);
     }
     
     /* See ElevatorInterface for details */
@@ -364,5 +364,18 @@ public class Elevator implements ElevatorInterface {
         
         return new Elevator(specs, floors, zonedFloors, newQueue, lcp, waitingTime, 
         currentFloor, BigInteger.ZERO, BigInteger.ZERO, BigDecimal.ZERO, BigInteger.ZERO);
+    }
+    
+    /* See ElevatorInterface for details */
+    public boolean isIdle() {
+        return queue.isEmpty();
+    }
+    
+    /* See ElevatorInterface for details */
+    public int currentPassengers(CarPosition pos) {
+        if (pos != CarPosition.NULL) {
+            throw new IllegalArgumentException("Invalid CarPosition.");
+        }
+        return currentPassengers.size();
     }
 }
