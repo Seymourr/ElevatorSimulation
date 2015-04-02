@@ -3,63 +3,13 @@ import java.util.LinkedList;
 import java.util.Random;
 
 public abstract class Algorithm {
-
-	
-	ElevatorSpecs specs;	
+    ElevatorSpecs specs;	
 	public abstract ArrayList<ArrayList<ElevatorInterface>> manageCalls(ArrayList<ArrayList<ElevatorInterface>> elevators, LinkedList<Passenger> calls);
 	protected abstract int getElevator(ArrayList<ElevatorInterface> elevators, Passenger p);
 
-
-	/**
-	* Attempts to pick an optimal shuttle for the given passenger. The optimal shuttle is the idle one at 
-	* the same floor as the passenger. If no optimal shuttle is found, the passenger is assinged to a random
-	* shuttle.
-	*/
-	public ArrayList<ElevatorInterface> assignShuttleElevator(ArrayList<ElevatorInterface> elevators, Passenger p) {
-		int chosenElevator = -1;
-		for(int i = 0; i < elevators.size(); i++) {
-			if(elevators.get(i).getStatus().passengers < specs.getCarryCapacity()) {
-				if(elevators.get(i).getStatus().floor == p.getOrigin() || elevators.get(i).getStatus().floor - 1 == p.getOrigin()) {
-					chosenElevator = i;
-					break;
-				}
-			}
-		}
-
-		int from = 0;
-
-		if(chosenElevator == -1) {
-			//No optimal elevator was found, assign a random one
-			Random r = new Random();
-			chosenElevator = r.nextInt(elevators.size());
-			from = elevators.get(chosenElevator).getQueue().size();
-			for(int i = 0; i < elevators.get(chosenElevator).getQueue().size(); i++) {
-				if(elevators.get(chosenElevator).getQueue().get(i).getPassenger().getOrigin() == p.getOrigin() && elevators.get(chosenElevator).getQueue().get(i).getActionType() == ElevatorAction.PICKUP) {
-					from = i;
-					break;
-				}
-			}
-		
-		} 
-		int to = elevators.get(chosenElevator).getQueue().size() + 1;
-
-		CarPosition pos = CarPosition.NULL;
-		if(specs.getShuttle() == ElevatorType.DOUBLE) {
-			pos = getCarPosShuttle(p);
-
-		if(pos == CarPosition.NULL) {
-			System.out.println("ERROR IN DECIDING POSITION FOR DD, ABORTING");
-			System.exit(0);
-		}
-		
-		}
-		elevators.get(chosenElevator).addToQueue(p, from, to, pos);
-		return elevators;
-		
-	}
-
-
-	private CarPosition getCarPosShuttle(Passenger p) {
+    
+    /* Help function to assignShuttleElevator */
+    private CarPosition getCarPosShuttle(Passenger p) {
 		CarPosition pos = CarPosition.NULL;
 		if(p.getOrigin() == specs.getSkylobbyfloor() || p.getOrigin() == specs.getLobbyFloor()) {
 			pos = CarPosition.LOWER;
@@ -67,7 +17,35 @@ public abstract class Algorithm {
 			pos = CarPosition.UPPER;
 		}
 		return pos;
-	 }
+	}
+
+	/**
+	 * Attempts to pick an optimal shuttle for the given passenger. The optimal shuttle is the idle one at 
+	 * the same floor as the passenger. If no optimal shuttle is found, the passenger is assinged 
+     * to a random
+	 * shuttle.
+	 */
+	public ArrayList<ElevatorInterface> assignShuttleElevator(ArrayList<ElevatorInterface> elevators, Passenger p) {
+		int elevatorIndex = getElevator(elevators, p);
+		int from = 0;
+		if(elevators.get(elevatorIndex).getStatus().floor != p.getOrigin()) {
+			from = elevators.get(elevatorIndex).getQueue().size();
+		}
+		int to = elevators.get(elevatorIndex).getQueue().size() + 1;
+
+		CarPosition pos = CarPosition.NULL;
+		if(specs.getShuttle() == ElevatorType.DOUBLE) {
+			pos = getCarPosShuttle(p);
+
+			if(pos == CarPosition.NULL) {
+				System.out.println("ERROR IN DECIDING POSITION FOR DD, ABORTING");
+				System.exit(0);
+			}
+		
+		}
+		elevators.get(elevatorIndex).addToQueue(p, from, to, pos);
+		return elevators;
+	}
 
 
 	protected CarPosition getCarPos(ElevatorInterface elevator, Passenger p) {
@@ -89,65 +67,6 @@ public abstract class Algorithm {
 		}
 		return pos;
 	}
-/*
-		if(elevator.getStatus().floor == p.getOrigin()) {
-				if(elevator.getStatus().upperCarPassengers < specs.getCarryCapacity()) {
-					pos = CarPosition.UPPER;
-				} else if(elevator.getStatus().lowerCarPassengers < specs.getCarryCapacity()) {
-					pos = CarPosition.LOWER;
-					p.shift();
-				} else {
-					pos = CarPosition.UPPER; //No space in elevator, just assign it to upper
-				}
-		} else if(elevator.getStatus().floor - 1 == p.getOrigin()){
-				if(elevator.getStatus().lowerCarPassengers < specs.getCarryCapacity()) {
-					pos = CarPosition.LOWER;
-				} else if(elevator.getStatus().upperCarPassengers < specs.getCarryCapacity()) {
-					pos = CarPosition.UPPER;
-					p.shift();
-				} else {
-					pos = CarPosition.LOWER; //No space in elevator, just assign it to lower
-				}
-		} else {
-			//Not parked at close proximity, decide up or down for incoming elevator
-			int pickingUpAtOtherFloor = 0;
-			int pickingUpAtPassengerFloor = 0;
-			for(int i = 0; i < elevator.getQueue().size(); i++) {
-				if(elevator.getQueue().get(i).getPassenger().getOrigin() == p.getOrigin() && elevator.getQueue().get(i).getActionType() == ElevatorAction.PICKUP) {
-					pickingUpAtPassengerFloor +=1;
-				} else if((elevator.getQueue().get(i).getPassenger().getOrigin() == p.getOrigin() + 1 || elevator.getQueue().get(i).getPassenger().getOrigin() == p.getOrigin() - 1) && elevator.getQueue().get(i).getActionType() == ElevatorAction.PICKUP){
-					pickingUpAtOtherFloor +=1;
-				}
-			}
-
-			if(pickingUpAtPassengerFloor < specs.getCarryCapacity()) {
-				if(p.getOrigin() == specs.getSkylobbyfloor() || p.getOrigin() == specs.getLobbyFloor()) {
-					pos = CarPosition.LOWER;
-				} else {
-					pos = CarPosition.UPPER;
-				}
-			} else if(pickingUpAtOtherFloor < specs.getCarryCapacity()) {
-				if(p.getOrigin() == specs.getSkylobbyfloor() || p.getOrigin() == specs.getLobbyFloor()) {
-					pos = CarPosition.UPPER;
-				} else {
-					pos = CarPosition.LOWER;
-				}
-			} else {
-				//Not even incoming elevator can afford, assign it to closest cart
-				if(p.getOrigin() == specs.getSkylobbyfloor() || p.getOrigin() == specs.getLobbyFloor()) {
-					pos = CarPosition.LOWER;
-				} else {
-					pos = CarPosition.UPPER;
-				}
-			}
-
-		}
-		return pos;
-
-	}
-*/
-
-
 
 	/**
  	 * Checks that a given origin and destination is within the range of given elevators. 
