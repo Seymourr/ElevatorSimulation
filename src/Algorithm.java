@@ -197,7 +197,11 @@ public abstract class Algorithm {
 		return (inOrigin && goingToDestination);
 	}
 
-
+    //DEBUG
+	protected int getRandomTest(ArrayList<ElevatorInterface> e) {
+		Random r = new Random();
+		return r.nextInt(e.size());
+	}
 
 	protected int getRandomElevator(ArrayList<ElevatorInterface> e, int[] z, Passenger p) {
 		int index = -1;

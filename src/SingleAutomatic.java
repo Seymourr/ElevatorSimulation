@@ -52,12 +52,13 @@
  	* Returns a index of a elevator, attempting to provide a empty one. If no such is found, a random one is returned. 
  	*/
 	protected int getElevator(ArrayList<ElevatorInterface> elevators, Passenger p) {
-        int[] zonedIndexes = getZonedElevators(elevators, p);
-        if (elevators.size() != zonedIndexes.length && !specs.zoningUsed()) {
-            throw new RuntimeException("getZoned did not find all elevators.");
-        }
+        //int[] zonedIndexes = getZonedElevators(elevators, p);
+        // if (elevators.size() != zonedIndexes.length && !specs.zoningUsed()) {
+            // throw new RuntimeException("getZoned did not find all elevators.");
+        // }
         //printArr(zonedIndexes);
-		return getRandomElevator(elevators, zonedIndexes, p);
+		//return getRandomElevator(elevators, zonedIndexes, p);
+        return getRandomTest(elevators);
 	}
 
 	/**
