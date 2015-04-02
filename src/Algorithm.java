@@ -47,7 +47,7 @@ public abstract class Algorithm {
 		return elevators;
 	}
 
-
+    /* Fetch car position for next ride for the given passenger and elevator */
 	protected CarPosition getCarPos(ElevatorInterface elevator, Passenger p) {
         CarPosition pos = CarPosition.NULL;
         
@@ -67,7 +67,7 @@ public abstract class Algorithm {
 		}
 		return pos;
 	}
-
+    
 	/**
  	 * Checks that a given origin and destination is within the range of given elevators. 
 	 * @param temp
