@@ -1,0 +1,52 @@
+Waitingtime, Traveltime, elevatortypes (local then shuttle), eventual zoning
+S(2500)
+25, 36, ss
+25, 36, sd
+25, 36, dd
+30, 36, ss, z
+27, 36, sd, z
+26, 36, dd, z
+
+S(6000)
+112, 36, ss
+108, 36, sd
+112, 36, dd
+110, 36, ss, z
+116, 36, sd, z
+115, 36, dd, z
+
+S(7200)
+626, 36, ss
+649, 36, sd
+673, 36, dd
+598, 36, ss, z
+626, 36, sd, z
+639, 36, dd, z
+
+
+SC(2500)
+25, 36, ss
+25, 35, sd
+25, 36, dd
+26, 36, ss, z
+27, 36, sd, z
+26, 36, dd, z
+
+SC(6000)
+105, 36, ss
+113, 36, sd
+110, 36, dd
+129, 35, ss, z
+120, 37, sd, z
+119, 36, dd, z
+
+SC(7200)
+613, 36, ss
+642, 36, sd
+654. 36. dd
+673, 36, ss, z
+632, 36, sd, z
+725, 36, dd, z
+
+
+

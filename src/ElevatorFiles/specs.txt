@@ -1,17 +1,17 @@
 7  //Number of simulationdays (repeat of simulations)
 7200 //Amount of minutes in a traffic period
 2500 //Low traffic passenger amount
-5000 //Medium traffic passenger amount
-10000 //Heavy traffic passenger amount
+6000 //Medium traffic passenger amount
+7200 //Heavy traffic passenger amount
 100 //Number of floors
 50 //Skylobby floor (Must be in even floor)
 10   //Distance between floors
-40 //Number of shafts 
+70 //Number of shafts 
 400 //Building height
 12  //Car carry capacity
-20   //Car speed (Average)
-10  //Floor delay
+30   //Car speed (Average)
+15  //Floor delay
 double //local elevator
 double //shuttle elevator
-10   //Number of shuttles was 10
+20   //Number of shuttles was 10
 false //Is equally distributed zoning used? (Not implemented yet)

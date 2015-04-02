@@ -71,7 +71,7 @@ public class SelectiveCollective extends Algorithm {
 				//assign so that it picks up after turning twice
 				elevators.set(elevatorIndex, pickUpOnReverse(elevators.get(elevatorIndex), p, passengerDirection, pos));
 			}
-		} else if(elevators.get(elevatorIndex).getStatus().direction == 0) { //Empty, idle elevator
+		} else if(elevators.get(elevatorIndex).isIdle()) { //Empty, idle elevator
 			int from = elevators.get(elevatorIndex).getQueue().size();
 			int to = from + 1;
 			if(!elevators.get(elevatorIndex).addToQueue(p, from, to, pos)) {

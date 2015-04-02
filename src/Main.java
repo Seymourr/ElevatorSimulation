@@ -112,9 +112,13 @@ public class Main {
         //Perform the simulation
 		int trafficAmount = specs.getHeavyTraffic();
 		int cnt = 0;
+		System.out.println(allElevators.get(0).size());
+		System.out.println(allElevators.get(1).size());
+		System.out.println(allElevators.get(2).size());
+
 		System.out.println("Now starting simulation with " + trafficAmount + " passengers per period");
 		for(int i = 0; i < specs.getSimulationDays(); i++) {
-			cnt += simulateDay(new SelectiveCollective(specs), trafficAmount); 
+			cnt += simulateDay(new SingleAutomatic(specs), trafficAmount); 
 			System.out.println("Day " + i + " complete" + " Served: " + cnt + " so far finished: " + debug);
 	}
 		printResults(new BigInteger("" + cnt));
