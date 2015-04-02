@@ -45,17 +45,24 @@ public abstract class Algorithm {
     }
      
     /**
-     * Returns a list of the elevators in the given list of elevators that
+     * Returns a list of indexes of the elevators in the given list of elevators that
      * can be used to serve the given passenger when zoning is used.
      */
-    protected ArrayList<ElevatorInterface> getZonedElevators (
+    protected int[] getZonedElevators (
     ArrayList<ElevatorInterface> eles, Passenger p) {
         //If zoning is not used all elevators can be used
         if (!specs.zoningUsed()) {
-            return eles;
-        } 
+            //DEBUG
+            //System.out.println("Not using zoning.");
+            int[] retArr = new int[eles.size()];
+            for (int i = 0; i < eles.size(); i++) {
+                retArr[i] = i;
+            }
+            return retArr;
+        }
+        
         //Create the return list
-        ArrayList<ElevatorInterface> retEles = new ArrayList<ElevatorInterface>();
+        ArrayList<Integer> retEles = new ArrayList<Integer>();
         
         //Iterate through the elevators and check which are in the correct zone
         for (int i = 0; i < eles.size(); i++) {
@@ -70,12 +77,11 @@ public abstract class Algorithm {
             if (checkContainsZonedFloor(el, p.getOrigin())) {
                 if (checkContainsZonedFloor(el, p.getDestination())) {
                     //Origin and destination both within range, ok!
-                    retEles.add(el);
+                    retEles.add(i);
                 } else if (!isLobbyFloor(el, p.getOrigin())) {
                     //Interfloor traffic originating from the zone of this elevator, ok!
-                    retEles.add(el); 
+                    retEles.add(i); 
                 }
-                retEles.add(el); 
             }
         }
         
@@ -84,7 +90,13 @@ public abstract class Algorithm {
             throw new RuntimeException("Empty list in getZonedElevators");
         }
         
-        return retEles;
+        //Convert ArrayList to int[]
+        int[] retArr = new int[retEles.size()];
+        for (int i = 0; i < retEles.size(); i++) {
+            retArr[i] = retEles.get(i);
+        }
+        
+        return retArr;
     }
     
 	/**
@@ -191,17 +203,29 @@ public abstract class Algorithm {
 		int index = -1;
 		Random r = new Random();
 
+        //Validity check
+        if (e.size() != z.length && !specs.zoningUsed()) {
+            throw new RuntimeException("getZoned did not find all elevators.");
+        }
 
         //Create a list of elevator indexes that will be filled with potential candidates
         ArrayList<Integer> potentialElevatorIndexes = new ArrayList<Integer>();
         
         //Try to find idle (and non-full) elevators
-		for (Integer i : z) {
+		for (int i : z) {
             ElevatorStatusObject esq = e.get(i).getStatus();
 			if (esq.direction == 0 && esq.passengers < specs.getCarryCapacity()) {
 				potentialElevatorIndexes.add(i);
 			}
 		}
+        
+        //DEBUG
+        for (int i = 0; i < potentialElevatorIndexes.size(); i++) {
+            ElevatorInterface el = e.get(potentialElevatorIndexes.get(i));
+            if (el.getStatus().direction != 0) {
+                throw new RuntimeException("potentialElevatorIndexes contains invalid indexes.");
+            }
+        }
 
         //Try to find elevators that are not full
 		if (potentialElevatorIndexes.isEmpty()) {

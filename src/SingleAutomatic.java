@@ -36,6 +36,16 @@
 
  		return allElevators;
  	}
+    
+    /**
+     * Prints out the given array
+     */
+    private void printArr(int[] a) {
+        for (int i = 0; i < a.length; i++) {
+            System.out.print(a[i] + ", ");
+        }
+        System.out.println("\n");
+    }
 	
 
  	/**
@@ -43,6 +53,10 @@
  	*/
 	protected int getElevator(ArrayList<ElevatorInterface> elevators, Passenger p) {
         int[] zonedIndexes = getZonedElevators(elevators, p);
+        if (elevators.size() != zonedIndexes.length && !specs.zoningUsed()) {
+            throw new RuntimeException("getZoned did not find all elevators.");
+        }
+        //printArr(zonedIndexes);
 		return getRandomElevator(elevators, zonedIndexes, p);
 	}
 
