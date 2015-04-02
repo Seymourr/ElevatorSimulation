@@ -105,9 +105,82 @@ public abstract class Algorithm {
 		return (inOrigin && goingToDestination);
 	}
 
+    /* Fetches a random elevator and returns its index */
+    //TODO This function is the issue
+    protected int getRandomElevator(ArrayList<ElevatorInterface> e, Passenger p) {
+        //Fill the parameter z by itself for now 
+        int[] z = new int[e.size()];
+        for (int i = 0; i < e.size(); i++) {
+            z[i] = i;
+        }
+        
+        /* Sanity check */
+        if (e.size() != z.length) {
+            throw new RuntimeException ("Z has incorrect size");
+        }
+        
+		int index = -1;
+		Random r = new Random();
+
+        //Validity check
+        if (e.size() != z.length && !specs.zoningUsed()) {
+            throw new RuntimeException("getZoned did not find all elevators.");
+        }
+
+        //Create a list of elevator indexes that will be filled with potential candidates
+        ArrayList<Integer> potentialElevatorIndexes = new ArrayList<Integer>();
+        
+        //Try to find idle (and non-full) elevators
+		for (int i : z) {
+            ElevatorStatusObject esq = e.get(i).getStatus();
+			if (esq.direction == 0 && esq.passengers < specs.getCarryCapacity()) {
+				potentialElevatorIndexes.add(i);
+			}
+		}
+        
+        //DEBUG
+        for (int i = 0; i < potentialElevatorIndexes.size(); i++) {
+            ElevatorInterface el = e.get(potentialElevatorIndexes.get(i));
+            if (el.getStatus().direction != 0) {
+                throw new RuntimeException("potentialElevatorIndexes contains invalid indexes.");
+            }
+        }
+
+        //Try to find elevators that are not full
+		if (potentialElevatorIndexes.isEmpty()) {
+			for (Integer i : z) {
+                ElevatorStatusObject esq = e.get(i).getStatus();
+				if (esq.passengers < specs.getCarryCapacity()) {
+					potentialElevatorIndexes.add(i);
+				}
+			}
+		}
+
+        //If we get here, all elevators are full, just return a random elevator
+		if (potentialElevatorIndexes.isEmpty()) {
+			int indexOfElevatorIndex = r.nextInt(z.length);
+			return z[indexOfElevatorIndex];
+		}
+
+		//Of the potential elevators fetched, find the closest one
+		float bestDistance = Integer.MAX_VALUE;
+        int bestIndex = 0;
+		for(Integer i : potentialElevatorIndexes) {
+            ElevatorStatusObject esq = e.get(i).getStatus();
+            float distance = Math.abs(esq.floor - (float)p.getOrigin());
+			if (distance < bestDistance) {
+				bestDistance = distance;
+                bestIndex = i;
+			}
+		}
+
+		return bestIndex; 
+	}
+    
 	/**
 	* Returns a semi-random elevator position in a list of elevators
 	*/
+    /*
 	protected int getRandomElevator(ArrayList<ElevatorInterface> elevators, Passenger p) {
 		ArrayList<ElevatorInterface> temp = new ArrayList<ElevatorInterface>();
 		ArrayList<Integer> temp2 = new ArrayList<Integer>();
@@ -165,6 +238,7 @@ public abstract class Algorithm {
 		return temp2.get(number);
 		
 	}
+    */
 
 }
 
