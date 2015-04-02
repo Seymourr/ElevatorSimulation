@@ -1,4 +1,4 @@
-7  //Number of simulationdays (repeat of simulations)
+1  //Number of simulationdays (repeat of simulations)
 7200 //Amount of minutes in a traffic period
 500 //Low traffic passenger amount
 1500 //Medium traffic passenger amount

@@ -4,8 +4,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.math.BigInteger;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.LinkedList;
 import java.util.HashMap;
 
@@ -26,9 +24,7 @@ public class Main {
 	private static int travellingTime;
 	private static int waitingTime;
 	private static int numberOfCalls;
-	private static int debug;
-	
-    /**
+	/**
 	 * Read all specifications for this simulation from file, and returns an object carrying all these
 	 * in a proper manor. 
 	 * NOTE: The specifications written in the file appear in a certain order, and this order is assumed to be the same
@@ -102,22 +98,21 @@ public class Main {
        // testTrafficGen();
     
         //Create the elevators
- 	      if(specs.zoningUsed()) {
-        	createZonedElevators();
-        	printZoning();
-       } else {
+ //       if(specs.zoningUsed()) {
+  //      	createZonedElevators();
+  //      	printZoning();
+   //     } else {
 			createElevators();
-		}
-       
+	//	}
+   //     
         //Perform the simulation
-		int trafficAmount = specs.getHeavyTraffic();
-		int cnt = 0;
+		int trafficAmount = 2000; //specs.getHeavyTraffic();;
 		System.out.println("Now starting simulation with " + trafficAmount + " passengers per period");
 		for(int i = 0; i < specs.getSimulationDays(); i++) {
-			cnt += simulateDay(new SingleAutomatic(specs), trafficAmount); 
-			System.out.println("Day " + i + " complete" + " Served: " + cnt + " so far finished: " + debug);
-	}
-		printResults(new BigInteger("" + cnt));
+			simulateDay(new SingleAutomatic(specs), trafficAmount); 
+			System.out.println("Day " + i + " complete");
+		}
+		printResults(new BigInteger("" + (specs.getSimulationDays() * trafficAmount *5)));
 	
 //		for(int i = 0; i < specs.getSimulationDays(); i++) {}
 //		simulatePeriod(alg, TrafficType.DOWNPEAK, trafficAmount);
@@ -137,8 +132,8 @@ public class Main {
 			System.out.println("***************************************");
 			for(int j = 0; j < allElevators.get(i).size(); j++) {
 				System.out.print("Served floors: ");
-				for(int k = 0; k < allElevators.get(i).get(j).getZonedFloors().length; k++) {
-					System.out.print(allElevators.get(i).get(j).getZonedFloors()[k] + " , ");
+				for(int k = 0; k < allElevators.get(i).get(j).getFloors().length; k++) {
+					System.out.print(allElevators.get(i).get(j).getFloors()[k] + " , ");
 				}
 				System.out.println();
 			}
@@ -157,16 +152,8 @@ public class Main {
         int botFloors = specs.getSkylobbyfloor();
         int topFloors = specs.getFloors() - specs.getSkylobbyfloor();
 
-        int[] bF = new int[specs.getSkylobbyfloor()];
-        for(int i = 0; i < bF.length; i++) {
-        	bF[i] = i;
-        }
-         int[] tF = new int[specs.getFloors() - specs.getSkylobbyfloor()];
-        for(int i = 0; i < tF.length; i++) {
-        	tF[i] = i + specs.getSkylobbyfloor();
-        }
-        localElevatorsBottom = getZonedElevators(botFloors, specs.getLobbyFloor(), specs.getSkylobbyfloor(), bF);
-        localElevatorsTop = getZonedElevators(topFloors, specs.getSkylobbyfloor(), specs.getSkylobbyfloor(), tF);
+        localElevatorsBottom = getZonedElevators(botFloors, specs.getLobbyFloor(), specs.getSkylobbyfloor());
+        localElevatorsTop = getZonedElevators(topFloors, specs.getSkylobbyfloor(), specs.getSkylobbyfloor());
 
         //Create shuttles
         int[] shuttleFloors;
@@ -203,7 +190,7 @@ public class Main {
 
    }
 
-    private static ArrayList<ElevatorInterface> getZonedElevators(int amntFloors, int lobby, int limit, int[] standardFloors) {
+    private static ArrayList<ElevatorInterface> getZonedElevators(int amntFloors, int lobby, int limit) {
 
     	ArrayList<ElevatorInterface> elevators = new ArrayList<ElevatorInterface>();
     	int minzone = 1;
@@ -248,9 +235,9 @@ public class Main {
 
         		if(specs.getLocal() == ElevatorType.SINGLE) {
         			
-        			elevators.add(new Elevator(specs, standardFloors, floors, floors[0]));
+        			elevators.add(new Elevator(specs, floors, floors[0]));
         		} else {
-        			elevators.add(new DDElevator(specs, standardFloors, floors, floors[0]));
+        			elevators.add(new DDElevator(specs, floors, floors[0]));
         		}
         		remainingElevators -= 1;
         	}
@@ -282,9 +269,9 @@ public class Main {
 
         		if(specs.getLocal() == ElevatorType.SINGLE) {
         			
-        			elevators.add(new Elevator(specs, standardFloors, floors, floors[0]));
+        			elevators.add(new Elevator(specs, floors, floors[0]));
         		} else {
-        			elevators.add(new DDElevator(specs, standardFloors, floors, floors[0]));
+        			elevators.add(new DDElevator(specs, floors, floors[0]));
         		}
         		remainingElevators -= 1;
         }
@@ -380,37 +367,28 @@ public class Main {
 	 * @param alg
 	 * @param trafficAmount
 	 */
-	public static int simulateDay(Algorithm alg, int trafficAmount){
-		int cnt = 0;
+	public static void simulateDay(Algorithm alg, int trafficAmount){
 		System.out.println("Entered day");
 		simulatePeriod(alg, TrafficType.UPPEAK, trafficAmount);
-		printCallAmount();
-		cnt += trafficAmount;
+		System.out.println(printCallAmount());
+		simulatePeriod(alg, TrafficType.REGULAR, trafficAmount/3);
+		System.out.println(printCallAmount());
 
-			
-		simulatePeriod(alg, TrafficType.REGULAR, trafficAmount/3);
-		printCallAmount();
-		cnt += trafficAmount/3;
-			
 		simulatePeriod(alg, TrafficType.LUNCH, trafficAmount/2);
-		debug -= trafficAmount / 2; //Removing extra calls made by lunch
-		printCallAmount();
-		cnt += trafficAmount/2;
-			
+		System.out.println(printCallAmount());
+
 		simulatePeriod(alg, TrafficType.REGULAR, trafficAmount/3);
-		printCallAmount();
-		cnt += trafficAmount/3;
-		
+		System.out.println(printCallAmount());
+
 		simulatePeriod(alg, TrafficType.DOWNPEAK, trafficAmount);
-		printCallAmount();
-		cnt += trafficAmount;	
-		
-			
+		System.out.println(printCallAmount());
+
 		System.out.println("Now going into rest calls");
 		handleRestCalls(alg); // Extra time needed to empty system
 
 		System.out.println("Simulation finished, system empty");
-		return cnt;
+		 //Maybe consider dividing by amount of calls instead?
+		//TODO: Something to manage time from this day (UPDATE: NOT FINISHED?)
 	}
     
     	
@@ -422,8 +400,8 @@ public class Main {
 	 */
 	public static void simulatePeriod(Algorithm alg, TrafficType t, int trafficAmount) {
 		LinkedList<Call> traffic = new LinkedList<Call>(trafficGen.getTraffic(t, trafficAmount));
-     //   	testTraffic(traffic); //Debugging
-		int temps = 0;
+        //	testTraffic(traffic); //Debugging
+		
 		numberOfCalls += traffic.size();
 		for(int second_i = 0; second_i < specs.getPeriodTime(); second_i++) {
 			//People get off elevators
@@ -435,7 +413,6 @@ public class Main {
             //New calls at this second?
 			while(!traffic.isEmpty() && traffic.getFirst().getCallTime() == second_i) {
                 calls.add(new Passenger(traffic.removeFirst(), specs));
-                temps += 1;
             }
 			
 			//Manage new calls (algorithm call)
@@ -467,53 +444,36 @@ public class Main {
 		BigInteger totalWaitingTime = new BigInteger("0");
 		BigInteger totalTravelingTime = new BigInteger("0");
         
-        int bt = 0;
-        int tt = 0;
-        int st = 0;
-        System.out.println("************** LOCAL BOT ************");
+      //  System.out.println("************** LOCAL BOT ************");
         
 		for(int i = 0; i < localElevatorsBottom.size(); i++){
-			if(localElevatorsBottom.get(i).getRecords().ridesServed.intValue() > 0){
-            System.out.println(localElevatorsBottom.get(i).getRecords().getStringRepresentation()); // DEBUG UTSKRIFTER HÄR
-            }
+       //     System.out.println(localElevatorsBottom.get(i).getRecords().getStringRepresentation()); // DEBUG UTSKRIFTER HÄR
 			totalWaitingTime = totalWaitingTime.add(localElevatorsBottom.get(i).getRecords().waitingTime);
 			totalTravelingTime = totalTravelingTime.add(localElevatorsBottom.get(i).getRecords().travelingTime);
-			bt += Integer.parseInt(localElevatorsBottom.get(i).getRecords().ridesServed.toString());
 		}
         
-        System.out.println("************** LOCAL TOP ************");
+     //   System.out.println("************** LOCAL TOP ************");
 		
 		for(int i = 0; i < localElevatorsTop.size(); i++){
-				if(localElevatorsTop.get(i).getRecords().ridesServed.intValue()  > 0){
-           System.out.println(localElevatorsTop.get(i).getRecords().getStringRepresentation()); // DEBUG UTSKRIFTER HÄR
-       }
+     //       System.out.println(localElevatorsTop.get(i).getRecords().getStringRepresentation()); // DEBUG UTSKRIFTER HÄR
 			totalWaitingTime = totalWaitingTime.add(localElevatorsTop.get(i).getRecords().waitingTime);
 			totalTravelingTime = totalTravelingTime.add(localElevatorsTop.get(i).getRecords().travelingTime);
-			tt += Integer.parseInt(localElevatorsTop.get(i).getRecords().ridesServed.toString());
 		}
         
-        System.out.println("************** SHUTTLES ************");
+     //   System.out.println("************** SHUTTLES ************");
 		
 		for(int i = 0; i < shuttleElevators.size(); i++){
-			if(shuttleElevators.get(i).getRecords().ridesServed.intValue()  > 0){
-            System.out.println(shuttleElevators.get(i).getRecords().getStringRepresentation()); // DEBUG UTSKRIFTER HÄR
-        }	
+      //      System.out.println(shuttleElevators.get(i).getRecords().getStringRepresentation()); // DEBUG UTSKRIFTER HÄR
 			totalWaitingTime = totalWaitingTime.add(shuttleElevators.get(i).getRecords().waitingTime);
 			totalTravelingTime = totalTravelingTime.add(shuttleElevators.get(i).getRecords().travelingTime);
-			st +=  Integer.parseInt(shuttleElevators.get(i).getRecords().ridesServed.toString());
 		}
 		
 		System.out.println("***RESULTS ARE THE FOLLOWING***");
 		System.out.println("Total waiting time: " + totalWaitingTime.toString() + " virtual seconds");
 		System.out.println("Total traveling time: " + totalTravelingTime.toString() + " virtual seconds");
-		System.out.println("Average waiting time: " + (new BigDecimal(totalWaitingTime)).divide(new BigDecimal(passengerAmount), 2, RoundingMode.HALF_UP).toString() + " virtual seconds");
-		System.out.println("Average squared waiting time: " + ((new BigDecimal(totalWaitingTime)).pow(2)).divide((new BigDecimal(passengerAmount)).pow(2), 2, RoundingMode.HALF_UP).toString() + " virtual seconds");
-		System.out.println("Average traveling time: " + (new BigDecimal(totalTravelingTime)).divide(new BigDecimal(passengerAmount), 2, RoundingMode.HALF_UP).toString() + " virtual seconds");
-		System.out.println("Average squared traveling time: " +  ((new BigDecimal(totalTravelingTime)).pow(2)).divide((new BigDecimal(passengerAmount)).pow(2), 2, RoundingMode.HALF_UP).toString() + " virtual seconds");
-		System.out.println("Bot calls served: " + bt);
-		System.out.println("Top calls served: " + tt);
-		System.out.println("Shuttle calls served: " + st);
-		System.out.println("Out of " + passengerAmount.toString() + " passengers, this many finished their journey:" + debug);
+		System.out.println("Average Total waiting time: " + totalWaitingTime.divide(passengerAmount).toString() + " virtual seconds");
+		System.out.println("Average Total traveling time: " + totalTravelingTime.divide(passengerAmount).toString() + " virtual seconds");
+		System.out.println("Average Total waiting time (With calls): " + totalWaitingTime.divide(new BigInteger(numberOfCalls + "")).toString() + " virtual seconds");
 	}
 	
 	/**
@@ -526,7 +486,7 @@ public class Main {
 			LinkedList<Passenger> calls = updateElevatorOnOff();
 			updateElevatorPosition();
 			allElevators = alg.manageCalls(allElevators, calls);
-		/*	int current = printCallAmount();
+			int current = printCallAmount();
 			if(previous == current) {
 				cnt +=1;
 			} else {
@@ -548,7 +508,6 @@ public class Main {
 				
 				System.exit(0);
 			}
-			*/
 		}
 	}
 
@@ -559,7 +518,7 @@ public class Main {
 				temp += allElevators.get(i).get(j).getQueue().size();
 			}
 		}
-		System.out.println(temp);
+		//System.out.println(temp);
 		return temp;
 	}
 
@@ -571,19 +530,19 @@ public class Main {
 		boolean isEmpty = true;
 		
 		for(int i = 0; i < allElevators.get(0).size(); i++){
-			if(allElevators.get(0).get(i).getQueue().size() > 0 ||allElevators.get(0).get(i).getStatus().passengers > 0){
+			if(allElevators.get(0).get(i).getQueue().size() > 0){
 				isEmpty = false;
 				return isEmpty;
 			}
 		}
 		for(int i = 0; i < allElevators.get(1).size(); i++){
-			if(allElevators.get(1).get(i).getQueue().size() > 0 ||allElevators.get(1).get(i).getStatus().passengers > 0){
+			if(allElevators.get(1).get(i).getQueue().size() > 0){
 				isEmpty = false;
 				return isEmpty;
 			}
 		}
 		for(int i = 0; i < allElevators.get(2).size(); i++){
-			if(allElevators.get(2).get(i).getQueue().size() > 0 ||allElevators.get(2).get(i).getStatus().passengers > 0){
+			if(allElevators.get(2).get(i).getQueue().size() > 0){
 				isEmpty = false;
 				return isEmpty;
 			}
@@ -611,8 +570,8 @@ public class Main {
 	 * @return An ArrayList containing people who will continue their traveling. 
 	 */
 	private static LinkedList<Passenger> updateElevatorOnOff(){
-
 	 LinkedList<Passenger> disembarked = new LinkedList<Passenger>();
+		
 	 for(int i = 0; i < allElevators.size(); i++) {
 	 	for(int j = 0; j < allElevators.get(i).size(); j++) {
 	 		 HashMap<CarPosition, Passenger[]> temp = allElevators.get(i).get(j).openDoors();
@@ -622,11 +581,7 @@ public class Main {
 					if(dest != -1) 
 						{
 							disembarked.add(k);
-
-						} else {
-							debug+=1;
 						} 
-
 				}
                 
             }

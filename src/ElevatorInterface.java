@@ -3,21 +3,15 @@ import java.util.LinkedList;
 import java.util.HashMap;
 
 /**
- * Interface for the elevator implementing classes. The set of zoning floors
- * potentially used by the elevator implementing this interface are inteded 
- * as storage assistance for the algorithm only. No check for the validity
- * for these are performed.
+ * Interface for the elevator implementing classes.
  */
 public interface ElevatorInterface {
     /**
-     * Returns a semi-deep copy of this Elevator.
+     * Returns a clone of this ElevatorInterface object.
+     * NOTE: The clone has its service record variables reset to 0, i.e.
+     * like it was just created.
      */
-    public ElevatorInterface duplicate();
-    
-    /**
-     * Resets the service status counters to 0.
-     */
-    public void resetSerivceStatus();
+    public ElevatorInterface clone();
     
     /** 
      * Allows passengers to embark and disembark on the current floor
@@ -75,11 +69,4 @@ public interface ElevatorInterface {
      * Returns a list of floors this elevator operates on.
      */
     public int[] getFloors();
-    
-    /**
-     * Returns a list of floors this elevator is zoned for.
-     * This will return the same floors as getFloors() if
-     * zoning is not used.
-     */
-    public int[] getZonedFloors();
 }
