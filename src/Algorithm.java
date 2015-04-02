@@ -105,6 +105,10 @@ public abstract class Algorithm {
 	 */
 	public ArrayList<ElevatorInterface> assignShuttleElevator(ArrayList<ElevatorInterface> elevators, Passenger p) {
 		int index = getElevator(elevators, p);
+		int from = elevators.get(index).getQueue().size();
+		int to = from+1;
+		CarPosition pos = getCarPosShuttle(p);
+		/*
 		int from = 0;
 		if(elevators.get(index).getStatus().floor != p.getOrigin()) {
 			from = elevators.get(index).getQueue().size();
@@ -120,7 +124,8 @@ public abstract class Algorithm {
 			System.exit(0);
 		}
 		
-		}
+		}*/
+	
 		elevators.get(index).addToQueue(p, from, to, pos);
 		return elevators;
 	}
@@ -203,10 +208,10 @@ public abstract class Algorithm {
         //Create a list of elevator indexes that will be filled with potential candidates
         ArrayList<Integer> potentialElevatorIndexes = new ArrayList<Integer>();
         
-        //Try to find idle (and non-full) elevators
+        //Try to find idle elevators
 		for (Integer i : z) {
-            ElevatorStatusObject esq = e.get(i).getStatus();
-			if (esq.direction == 0 && esq.passengers < specs.getCarryCapacity()) {
+            ElevatorInterface esq = e.get(i);
+			if (esq.isIdle()) { 
 				potentialElevatorIndexes.add(i);
 			}
 		}
@@ -214,8 +219,9 @@ public abstract class Algorithm {
         //Try to find elevators that are not full
 		if (potentialElevatorIndexes.isEmpty()) {
 			for (Integer i : z) {
-                ElevatorStatusObject esq = e.get(i).getStatus();
-				if (esq.passengers < specs.getCarryCapacity()) {
+               ElevatorInterface esq = e.get(i);
+               CarPosition potPos = getCarPos(esq, p);
+				if (esq.currentPassengers(potPos) < specs.getCarryCapacity()) {
 					potentialElevatorIndexes.add(i);
 				}
 			}

@@ -8,48 +8,26 @@ import java.util.LinkedList;
  * Implementation of a Collective algorithm using a search based assignment
  * strategy.
  */
-public class SearchBasedCollective extends Algorithm {
+public class SearchBasedAutomatic extends Algorithm {
     /* Fields */
     private ElevatorSpecs specs;
-    private SelectiveCollective sc;
+    private SingleAutomatic sc;
     
     /* Constructor */
-    public SearchBasedCollective(ElevatorSpecs spec) {
+    public SearchBasedAutomatic(ElevatorSpecs spec) {
         specs = spec;
-        sc = new SelectiveCollective(spec);
+        sc = new SingleAutomatic(spec);
     }
     
     /* Adds the passenger to the elevator using SelectiveCollective, returns the elevator again */
     private ElevatorInterface addToElevator(ElevatorInterface e, Passenger p) {
         //Calculate passenger direction
-        int pDir = 1;
-		if (p.getOrigin() > p.getDestination()) {
-			pDir = -1;
-		}
+    
         
         //Calculate car position to use
         CarPosition c = getCarPos(e, p);
         
-        //Fetch elevator direction
-        int eDir = e.getStatus().direction;
-        
-        //Fetch elevator position
-        float ePos = e.getStatus().floor;
-        
-        //Do the assignment
-        if(e.isIdle()) {
-            e.addToQueue(p, e.getQueue().size(), e.getQueue().size() + 1, c);
-        } else if(eDir == pDir) {
-            if(eDir == 1 && pDir == 1 && p.getOrigin() >= ePos || eDir == -1 && pDir == -1 && p.getOrigin() <= ePos) {
-                e = sc.pickUpOnTheWay(e, p, pDir, c);
-            } else {
-                e =   sc.pickUpOnReverse(e, p, pDir, c);
-            }
-        } else {
-            //Surely not on the way
-             e =   sc.pickUpOnReverse(e, p, pDir, c);
-        }
-
+        e.addToQueue(p, e.getQueue().size(), e.getQueue().size() + 1, c);
         return e;
     }
     
@@ -134,13 +112,8 @@ public class SearchBasedCollective extends Algorithm {
               System.out.println("E1: " + e1.getQueue().size());
               */
             //Run the elevator with the passenger until empty 
-                      System.out.println("DEBUG");
-             System.out.println(e1.getRecords().getStringRepresentation());
-              System.out.println(e2.getRecords().getStringRepresentation());
             int e2time = emptyElevator(e2);
-             System.out.println(e1.getRecords().getStringRepresentation());
-              System.out.println(e2.getRecords().getStringRepresentation());
-             System.out.println("DEBUG");
+            
             //DEBUG
             // System.out.println("\nThird: \n");
             // System.out.println(e1.getRecords().getStringRepresentation());

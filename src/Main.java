@@ -405,7 +405,7 @@ public class Main {
 		printCallAmount();
 		cnt += trafficAmount;	
 		
-			
+		
 		System.out.println("Now going into rest calls");
 		handleRestCalls(alg); // Extra time needed to empty system
 
@@ -444,7 +444,7 @@ public class Main {
 		}
 	}
 	
-
+/*  <<NOT OPERATIONAL DUE TO RECENT CHANGES >>
 	private static void debugPrint() {
 		if(systemEmpty()) {
 			return;
@@ -459,6 +459,7 @@ public class Main {
 			}
 		}
 	}
+	*/
 	/**
 	 * Print out the total waiting and average time of the system, including the average passenger case.
 	 * @param passengerAmount
@@ -571,19 +572,19 @@ public class Main {
 		boolean isEmpty = true;
 		
 		for(int i = 0; i < allElevators.get(0).size(); i++){
-			if(allElevators.get(0).get(i).getQueue().size() > 0 ||allElevators.get(0).get(i).getStatus().passengers > 0){
+			if(!allElevators.get(0).get(i).isIdle()){
 				isEmpty = false;
 				return isEmpty;
 			}
 		}
 		for(int i = 0; i < allElevators.get(1).size(); i++){
-			if(allElevators.get(1).get(i).getQueue().size() > 0 ||allElevators.get(1).get(i).getStatus().passengers > 0){
+			if(!allElevators.get(1).get(i).isIdle()){
 				isEmpty = false;
 				return isEmpty;
 			}
 		}
 		for(int i = 0; i < allElevators.get(2).size(); i++){
-			if(allElevators.get(2).get(i).getQueue().size() > 0 ||allElevators.get(2).get(i).getStatus().passengers > 0){
+			if(!allElevators.get(2).get(i).isIdle()){
 				isEmpty = false;
 				return isEmpty;
 			}

@@ -227,7 +227,7 @@ public class SelectiveCollective extends Algorithm {
 		boolean willReverse = false;
 		pointHolder result;
 
-		if(floor == p.getOrigin()) {
+		if(floor == (float)p.getOrigin()) {
 			pickUpPosition = 0; //On same floor
 		} else {
 			for(int i = indexPoint; i < elevator.getQueue().size(); i++) {
