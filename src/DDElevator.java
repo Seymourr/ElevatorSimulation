@@ -10,9 +10,10 @@ import java.util.HashMap;
  */
 public class DDElevator implements ElevatorInterface{   
     /* Fields */
-    private ElevatorSpecs specs;
-    private int[] floors; 
-    private LinkedList<ElevatorQueueObject> queue;
+    private final ElevatorSpecs specs;
+    private final int[] floors; 
+    private final int[] zonedFloors;
+    private final LinkedList<ElevatorQueueObject> queue;
     private LinkedList<Passenger> lowerCarPassengers;
     private LinkedList<Passenger> upperCarPassengers;
     private int waitingTime;
@@ -28,10 +29,9 @@ public class DDElevator implements ElevatorInterface{
      * Constructor 
      * Used for cloning
      */
-    private DDElevator(ElevatorSpecs s, int[] f, LinkedList<ElevatorQueueObject> q, 
-        LinkedList<Passenger> lc, LinkedList<Passenger> uc, int w, float cf, BigInteger twt, 
-        BigInteger ttt, BigDecimal ttd, BigInteger ps) 
-    {
+    public DDElevator(ElevatorSpecs s, int[] f, int[] z, LinkedList<ElevatorQueueObject> q, 
+		    LinkedList<Passenger> lc, LinkedList<Passenger> uc, int w, float cf, BigInteger twt, 
+		    BigInteger ttt, BigDecimal ttd, BigInteger ps) {
         specs = s;
         floors = f;
         queue = q;
@@ -44,10 +44,37 @@ public class DDElevator implements ElevatorInterface{
         totalTravelTime = ttt;
         totalTravelDistance = ttd;
         passengersServed = ps;
+        zonedFloors = z;
     }
     
     /**
-     * Constructor 
+     * Constructor used for zoning
+     *
+     * @param spec The specifications for this elevator.
+     * @param floors The set of floors to operate on.
+     * @param zonedFloors The set of floors used for zoning.
+     * $param currentFloor The current position of the upper car.
+     */
+    public DDElevator(ElevatorSpecs spec, int[] floors, int zonedFloors[], float currentFloor) {
+        specs = spec;
+        this.floors = floors;
+        queue = new LinkedList<ElevatorQueueObject>();
+        lowerCarPassengers = new LinkedList<Passenger>();
+        upperCarPassengers = new LinkedList<Passenger>();
+        waitingTime = 0;
+        currentUpperFloor = currentFloor;
+        distancePerFloor = (float)specs.getBuildingHeight() / (float)specs.getFloors();
+        this.zonedFloors = zonedFloors;
+        
+        totalWaitTime = new BigInteger("0");
+        totalTravelTime = new BigInteger("0");
+        totalTravelDistance = new BigDecimal("0");
+        passengersServed = new BigInteger("0");
+    }
+    
+    /**
+     * Constructor used without zoning
+     *
      * @param spec The specifications for this elevator.
      * @param floors The set of floors to operate on.
      * $param currentFloor The current position of the upper car.
@@ -58,10 +85,10 @@ public class DDElevator implements ElevatorInterface{
         queue = new LinkedList<ElevatorQueueObject>();
         lowerCarPassengers = new LinkedList<Passenger>();
         upperCarPassengers = new LinkedList<Passenger>();
-        queue = new LinkedList<ElevatorQueueObject>();
         waitingTime = 0;
         currentUpperFloor = currentFloor;
         distancePerFloor = (float)specs.getBuildingHeight() / (float)specs.getFloors();
+        zonedFloors = floors;
         
         totalWaitTime = new BigInteger("0");
         totalTravelTime = new BigInteger("0");
@@ -406,8 +433,38 @@ public class DDElevator implements ElevatorInterface{
     }
     
     /* See ElevatorInterface for details */
-    public ElevatorInterface clone() {
-        return new DDElevator(specs, floors, queue, lowerCarPassengers, upperCarPassengers, waitingTime, 
+    public int[] getZonedFloors() {
+        return zonedFloors;
+    }
+    
+    /* See ElevatorInterface for details */
+    public void resetSerivceStatus() {
+        totalWaitTime = BigInteger.ZERO;
+        totalTravelTime = BigInteger.ZERO;
+        totalTravelDistance = BigDecimal.ZERO;
+        passengersServed = BigInteger.ZERO;
+    }
+    
+    /* See ElevatorInterface for details */
+    public DDElevator duplicate() {
+        //Duplicate queue
+        LinkedList<ElevatorQueueObject> newQueue = new LinkedList<ElevatorQueueObject>();
+        for (int i = 0; i < queue.size(); i++) {
+            newQueue.add(i, queue.get(i));
+        }
+    
+        //Duplicate lowerCarPassengers
+        LinkedList<Passenger> lcp = new LinkedList<Passenger>();
+        for (int i = 0; i < lowerCarPassengers.size(); i++) {
+            lcp.add(i, lowerCarPassengers.get(i));
+        }
+        //Duplicate upperCarPassengers
+        LinkedList<Passenger> ucp = new LinkedList<Passenger>();
+        for (int i = 0; i < upperCarPassengers.size(); i++) {
+            ucp.add(i, upperCarPassengers.get(i));
+        }
+        
+        return new DDElevator(specs, floors, zonedFloors, newQueue, lcp, ucp, waitingTime, 
         currentUpperFloor, BigInteger.ZERO, BigInteger.ZERO, BigDecimal.ZERO, BigInteger.ZERO);
     }
 }
