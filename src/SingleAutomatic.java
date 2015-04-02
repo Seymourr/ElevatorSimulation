@@ -49,15 +49,16 @@
 	* Assigns calls to local elevators or double decked elevators (depending on the elevator type).
 	*/
 	private ArrayList<ElevatorInterface> assignLocalWithSingleAutomatic(ArrayList<ElevatorInterface> elevators, Passenger p) {
-		if(specs.getLocal() == ElevatorType.SINGLE) {
-			int elevatorIndex = getElevator(elevators, p);
-			elevators.get(elevatorIndex).addToQueue(p, elevators.get(elevatorIndex).getQueue().size(), elevators.get(elevatorIndex).getQueue().size() + 1, CarPosition.NULL);
-		} else if(specs.getLocal() == ElevatorType.DOUBLE) {
-			int elevatorIndex = getElevator(elevators, p);
-			CarPosition pos = getCarPos(elevators.get(elevatorIndex), p);
-			elevators.get(elevatorIndex).addToQueue(p, elevators.get(elevatorIndex).getQueue().size(), elevators.get(elevatorIndex).getQueue().size() + 1, pos);
-		} else {
-			System.out.println("Something went wrong with assigning elevators, ABORTING SIMULATION");
+		int elevatorIndex = getElevator(elevators, p);
+		CarPosition pos = CarPosition.NULL;
+
+		if(specs.getLocal() == ElevatorType.DOUBLE) {
+			pos = getCarPos(elevators.get(elevatorIndex), p);
+		}
+
+		boolean b = elevators.get(elevatorIndex).addToQueue(p, elevators.get(elevatorIndex).getQueue().size(), elevators.get(elevatorIndex).getQueue().size() + 1, pos);
+		if(!b) {
+			System.out.println("Error, addToQueue returned false");
 			System.exit(0);
 		}
 
