@@ -227,42 +227,55 @@ public class SelectiveCollective extends Algorithm {
 		boolean willReverse = false;
 		pointHolder result;
 
-		if(floor == (float)p.getOrigin()) {
-			pickUpPosition = 0; //On same floor
-		} else {
-			for(int i = indexPoint; i < elevator.getQueue().size(); i++) {
-				preCall = callDest;
-				if(elevator.getQueue().get(i).getActionType() == ElevatorAction.PICKUP) {
-					callDest = elevator.getQueue().get(i).getPassenger().getOrigin();
-				} else {
-					callDest = elevator.getQueue().get(i).getPassenger().getDestination();
-				}
-				if(passDir == 1) {
-					if(preCall > callDest) {
-						willReverse = true;
-						pickUpPosition = i;	//Reverse, add to reverse position
-						break;
-					} else if(callDest >= p.getOrigin()) {
-						pickUpPosition = i; //Pick up before next destination
-						break;
-					}
-				} else {
-					if(preCall < callDest && preCall != -1) {
-						willReverse = true;
-						pickUpPosition = i;	//Reverse, add to reverse position
-						break;
-					} else if(callDest <= p.getOrigin()) {
-						pickUpPosition = i; //Pick up before next destination
-						break;
-					}
-				}
-			}
-			//Is all calls in the queue done prior to passenger floor without a reverse?
-			if(pickUpPosition == -1) {
-				pickUpPosition = elevator.getQueue().size(); 
+
+		//NÅNTING I DENNA LOOP GÖR SÅ ATT RESULTATET TAR LÄNGRE/MINDRE TID. FIX OR IGNORE
+		//Det går att ignorera o få bättre resultat (dock inte collective då..)
+/*
+		for(int i = indexPoint; i < elevator.getQueue().size(); i++) {
+			preCall = callDest;
+			if(elevator.getQueue().get(i).getActionType() == ElevatorAction.PICKUP) {
+				callDest = elevator.getQueue().get(i).getPassenger().getOrigin();
+			} else {
+				callDest = elevator.getQueue().get(i).getPassenger().getDestination();
 			}
 
+			if(passDir == 1) {
+				if(preCall > callDest) {
+					willReverse = true;
+					pickUpPosition = i;
+					break;
+				} else if(callDest >= p.getOrigin()) {
+					pickUpPosition = i;
+					break;
+				}
+			} else {
+				if(preCall < callDest && preCall != -1) {
+					willReverse = true;
+					pickUpPosition = i;
+					break;
+				} else if(callDest <= p.getOrigin()) {
+					pickUpPosition = i;
+					break;
+				}
+			}
 		}
+	*/	
+	//Is all calls in the queue done prior to passenger floor without a reverse?
+		if(pickUpPosition == -1) {
+			pickUpPosition = elevator.getQueue().size();
+		}
+
+	//	if((int)floor == p.getOrigin()) {
+	//		pickUpPosition = 0; //On same floor
+	//	} 
+
+		
+
+
+	//
+		
+//		pickUpPosition = elevator.getQueue().size();
+	//	System.out.println(indexPoint);
 		result = new pointHolder(pickUpPosition, willReverse);
 		return result;
 	}
@@ -276,7 +289,7 @@ public class SelectiveCollective extends Algorithm {
 		int dropPosition = -1;
 		int preCall = -1;
 		int callDest = -1;
-
+		
 		if(willReverse) {
 			dropPosition = pickUpPosition + 1; //Drop off before reverse
 		} else {
@@ -307,6 +320,7 @@ public class SelectiveCollective extends Algorithm {
 					}
 				}
 			}
+			
 			//Is all calls in the queue done prior to passengers destination without a reverse?
 			if(dropPosition == -1) {
 				dropPosition = elevator.getQueue().size(); //Just put to end of list (final thing to do)
@@ -315,6 +329,7 @@ public class SelectiveCollective extends Algorithm {
 				}
 			}
 		}
+	
 		return dropPosition;
 	}
 

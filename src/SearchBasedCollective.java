@@ -21,36 +21,39 @@ public class SearchBasedCollective extends Algorithm {
     
     /* Adds the passenger to the elevator using SelectiveCollective, returns the elevator again */
     private ElevatorInterface addToElevator(ElevatorInterface e, Passenger p) {
+      
+        //Calculate car position to use
+        CarPosition c = getCarPos(e, p);
+     
         //Calculate passenger direction
         int pDir = 1;
 		if (p.getOrigin() > p.getDestination()) {
 			pDir = -1;
 		}
-        
-        //Calculate car position to use
-        CarPosition c = getCarPos(e, p);
-        
+
+     
         //Fetch elevator direction
         int eDir = e.getStatus().direction;
         
         //Fetch elevator position
         float ePos = e.getStatus().floor;
-        
-        //Do the assignment
-        if(e.isIdle()) {
-            e.addToQueue(p, e.getQueue().size(), e.getQueue().size() + 1, c);
-        } else if(eDir == pDir) {
-            if(eDir == 1 && pDir == 1 && p.getOrigin() >= ePos || eDir == -1 && pDir == -1 && p.getOrigin() <= ePos) {
-                e = sc.pickUpOnTheWay(e, p, pDir, c);
-            } else {
-                e =   sc.pickUpOnReverse(e, p, pDir, c);
-            }
-        } else {
-            //Surely not on the way
-             e =   sc.pickUpOnReverse(e, p, pDir, c);
-        }
 
-        return e;
+        if(pDir == eDir) {
+            if((pDir == 1 && ePos <= p.getOrigin()) || (pDir == -1 && ePos >= p.getOrigin())) {
+                return sc.pickUpOnTheWay(e, p, pDir, c);
+            } else {
+                return sc.pickUpOnReverse(e, p, pDir, c);
+            }
+        } else if(e.isIdle()) {
+            int from = e.getQueue().size();
+            int to = from + 1;
+            e.addToQueue(p, from, to, c);
+            return e;
+        } else {
+            return sc.pickUpOnReverse(e, p, pDir, c);
+        }
+    
+        
     }
     
     /* Run the elevators until it is empty, return the amount of time it took */
@@ -133,23 +136,24 @@ public class SearchBasedCollective extends Algorithm {
             System.out.println("E2: " + e2.getQueue().size());
               System.out.println("E1: " + e1.getQueue().size());
               */
-            //Run the elevator with the passenger until empty 
-                      System.out.println("DEBUG");
-             System.out.println(e1.getRecords().getStringRepresentation());
-              System.out.println(e2.getRecords().getStringRepresentation());
+         //Run the elevator with the passenger until empty 
+       //               System.out.println("DEBUG");
+        //     System.out.println(e1.getRecords().getStringRepresentation());
+           //   System.out.println(e2.getRecords().getStringRepresentation());
             int e2time = emptyElevator(e2);
+              /* 
              System.out.println(e1.getRecords().getStringRepresentation());
               System.out.println(e2.getRecords().getStringRepresentation());
              System.out.println("DEBUG");
             //DEBUG
             // System.out.println("\nThird: \n");
             // System.out.println(e1.getRecords().getStringRepresentation());
-
+    */
             //Calculate extra time caused by adding the new passenger
             int totTime = e2time - e1time;
             
             //Error check
-            if (totTime < 0) {
+            if (totTime < -1) {
                 System.out.println("\nERROR\n");
                 System.out.println("E1 time: " + e1time + ", E2 time: " + e2time);
                 System.out.println(e1.getRecords().getStringRepresentation());
