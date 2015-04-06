@@ -31,7 +31,7 @@ public class SearchBasedCollective extends Algorithm {
 			pDir = -1;
 		}
 
-     
+        /*
         //Fetch elevator direction
         int eDir = e.getStatus().direction;
         
@@ -52,7 +52,9 @@ public class SearchBasedCollective extends Algorithm {
         } else {
             return sc.pickUpOnReverse(e, p, pDir, c);
         }
-    
+        */
+        e.addToQueue(p, e.getQueue().size(), e.getQueue().size() + 1, c);
+        return e;
         
     }
     

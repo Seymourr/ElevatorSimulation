@@ -110,7 +110,7 @@ public class Main {
 		}
        
         //Perform the simulation
-		int trafficAmount = 3000; //specs.getMediumTraffic();
+		int trafficAmount = specs.getLowTraffic();
 		int cnt = 0;
 		System.out.println(allElevators.get(0).size());
 		System.out.println(allElevators.get(1).size());
@@ -118,7 +118,7 @@ public class Main {
 
 		System.out.println("Now starting simulation with " + trafficAmount + " passengers per period");
 		for(int i = 0; i < specs.getSimulationDays(); i++) {
-			cnt += simulateDay(new SearchBasedCollective(specs), trafficAmount); 
+			cnt += simulateDay(new SingleAutomatic(specs), trafficAmount); 
 			System.out.println("Day " + i + " complete" + " Served: " + cnt + " so far finished: " + debug);
 	}
 		printResults(new BigInteger("" + cnt));
@@ -430,6 +430,7 @@ public class Main {
 		int temps = 0;
 		numberOfCalls += traffic.size();
 		for(int second_i = 0; second_i < specs.getPeriodTime(); second_i++) {
+
 			//People get off elevators
 			LinkedList<Passenger> calls = updateElevatorOnOff();
 			numberOfCalls += calls.size();

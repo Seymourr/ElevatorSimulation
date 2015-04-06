@@ -200,7 +200,62 @@ public abstract class Algorithm {
 		return (inOrigin && goingToDestination);
 	}
 
+
 	protected int getRandomElevator(ArrayList<ElevatorInterface> e, int[] z, Passenger p) {
+		int index = -1;
+		Random r = new Random();
+		ArrayList<Integer> elev = new ArrayList<Integer>();
+
+		//Find the elevator/s which are not full
+		for(Integer i : z) {
+			ElevatorInterface esq = e.get(i);
+			CarPosition c = getCarPos(esq, p);
+			if(esq.currentPassengers(c) < specs.getCarryCapacity()) {
+				elev.add(i);
+			}
+		}
+
+		if(elev.isEmpty()) {
+			return z[r.nextInt(z.length)];
+		}
+		//Look for elevators with lowest queue size
+
+		int bestSize = Integer.MAX_VALUE;
+		for(Integer i : elev) {
+			if(e.get(i).getQueue().size() < bestSize) {
+				bestSize = e.get(i).getQueue().size();
+			}
+		}
+
+		ArrayList<Integer> lowQueue = new ArrayList<Integer>();
+		//Add all elevators which  have the lowest size
+		for(Integer i : elev) {
+			if(e.get(i).getQueue().size() == bestSize) lowQueue.add(i);
+		}
+
+		//Of the potential elevators fetched, find the closest one
+
+		float bestDistance = Integer.MAX_VALUE;
+        int bestIndex = 0;
+		for(Integer i : lowQueue) {
+            ElevatorStatusObject esq = e.get(i).getStatus();
+            float distance = Math.abs(esq.floor - (float)p.getOrigin());
+			if (distance < bestDistance) {
+				bestDistance = distance;
+                bestIndex = i;
+			}
+		}
+
+		if(elev.isEmpty()) {
+			System.out.println("ERROR: SEMI RANDOM NOT WORKING PROPERLY");
+			System.exit(0);
+		}
+	//	System.out.println("BestINdex: " + bestIndex);
+		return bestIndex;
+
+
+	}
+	protected int getRRandomElevator(ArrayList<ElevatorInterface> e, int[] z, Passenger p) {
 		int index = -1;
 		Random r = new Random();
 
@@ -232,6 +287,7 @@ public abstract class Algorithm {
 			int indexOfElevatorIndex = r.nextInt(z.length);
 			return z[indexOfElevatorIndex];
 		}
+
 
 		//Of the potential elevators fetched, find the closest one
 		float bestDistance = Integer.MAX_VALUE;

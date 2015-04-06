@@ -227,7 +227,7 @@ public class SelectiveCollective extends Algorithm {
 		boolean willReverse = false;
 		pointHolder result;
 
-
+		//Pickupposition = 0 ger buggen.
 		//NÅNTING I DENNA LOOP GÖR SÅ ATT RESULTATET TAR LÄNGRE/MINDRE TID. FIX OR IGNORE
 		//Det går att ignorera o få bättre resultat (dock inte collective då..)
 /*
@@ -274,8 +274,9 @@ public class SelectiveCollective extends Algorithm {
 
 	//
 		
-//		pickUpPosition = elevator.getQueue().size();
+		pickUpPosition = elevator.getQueue().size();
 	//	System.out.println(indexPoint);
+		//pickUpPosition = 0;
 		result = new pointHolder(pickUpPosition, willReverse);
 		return result;
 	}
