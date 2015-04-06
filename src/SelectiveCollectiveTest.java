@@ -52,9 +52,19 @@ public class SelectiveCollectiveTest extends Algorithm {
 
 		int pickUp = getPoint(elevators.get(elevatorIndex), p, index start, p.getOrigin());
 		int dropOff = getPoint(elevators.get(elevatorIndex), p, pickUp. p.getDestination());
+		if(pickUp == dropOff) {
+			dropOff += 1;
+		}
+		boolean b = elevators.get(elevatorIndex).addToQueue(p, pickUp, dropOff, pos);
+		if(!b) {
+			System.out.println("FATAL ERROR in selective collective");
+			System.exit(0);
+		}
 		return elevators;
 	}
 
+
+	//TODO: Fix for double decked
 	public int getPoint(ElevatorInterface e, Passenger p, int startIndex, int floor) {
 		int point = -1;
 		int pDir = (p.getDestination() - p.getOrigin())/Math.abs(p.getDestination() - p.getOrigin());
