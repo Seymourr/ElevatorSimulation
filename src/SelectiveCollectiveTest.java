@@ -142,7 +142,7 @@ public class SelectiveCollectiveTest extends Algorithm {
         
         //obvious
         if (pickUpIndex == iQ.size()) {
-              System.out.println("Returned 2");
+            System.out.println("Returned 2");
             return pickUpIndex + 1;
         }
         
@@ -166,27 +166,28 @@ public class SelectiveCollectiveTest extends Algorithm {
         
         //check if should pick up before loop
         if (isBetween(pickUpFloor, getUpperFloor(iQ.get(pickUpIndex)), floor)) {
-            System.out.println("Arg 1: " + pickUpFloor);
-            System.out.println("Arg 2: " + getUpperFloor(iQ.get(pickUpIndex)));
-            System.out.println("Arg 3: " + floor);
-              System.out.println("Returned 3");
+            System.out.println("Returned 3");
             return pickUpIndex + 1;
         }
         
-        //calculate upcomming direction
+        //Calculate next direction
         int nextDir = 0;
-        int tempDir2 = getUpperFloor(iQ.get(pickUpIndex)) - pickUpFloor;
-        if (tempDir2 > 0) {
-            nextDir = 1;
-        } else if (tempDir2 < 0) {
-            nextDir = -1;
+        int index;
+        for (index = pickUpIndex; index < iQ.size(); index++) {
+            if (getUpperFloor(iQ.get(index)) > p.getOrigin()) {
+                nextDir = 1;
+                break;
+            } else if (getUpperFloor(iQ.get(index)) < p.getOrigin()) {
+                nextDir = -1;
+                break;
+            }
         }
         
-        //elevator turning but passenger further in previous direction
-        if (preDir == pDir && nextDir != pDir) {
-        System.out.println("Returned 4");
-            return pickUpIndex + 1; //BUGG! FIX.
+        //If the elevator is about to travel in the wrong direction, add dropoff immediatly
+        if (nextDir != pDir) {
+            return index + 1;
         }
+        
         
         //main loop, find suitable index
 		for(int i = pickUpIndex; i < iQ.size() - 1; i++) {
@@ -204,10 +205,7 @@ public class SelectiveCollectiveTest extends Algorithm {
 
             //between these queue objects, perfect
             if (isBetween(t1, t2, floor)) {
-                System.out.println(t1);
-                System.out.println(t2);
-                System.out.println(floor);
-                  System.out.println("Returned 5");
+                System.out.println("Returned 5");
                 return i + 2;
             }
 
@@ -215,9 +213,15 @@ public class SelectiveCollectiveTest extends Algorithm {
                //elevator turning but passenger further in previous direction
                 if ((floor - t2) / Math.abs(floor - t2) == preDir) {
                     System.out.println("Returned 6");
-                	return i + 1;
-                    //return i + 2;
+                    if (iQ.get(i).getActionType() == ElevatorAction.PICKUP) {
+                        //Append first
+                        return i + 1;
+                    } else if (iQ.get(i).getActionType() == ElevatorAction.DROPOFF) {
+                        //Fetch next object of type pickup
+                        return fetchQueueIndex(iQ, floor, i + 2);
+                    }
                 } else {
+                    //We dont wanna be here
                     System.out.println("Pickupindex was: " + pickUpIndex);
                     System.out.println("pickUpFloor was: " + pickUpFloor);
                     System.out.println("Drop off floor should be: " + floor);
@@ -240,8 +244,19 @@ public class SelectiveCollectiveTest extends Algorithm {
             //update previous dir
             preDir = dir;
 		}
-          System.out.println("Returned 7");
+        System.out.println("Returned 7");
         return e.getQueue().size() + 1;
+    }
+    
+    /* Fetch next queue index of type pickup */
+    public int fetchQueueIndex(LinkedList<ElevatorQueueObject> iQ, int floor, int startIndex) {
+        for (int i = startIndex; i < iQ.size(); i++) {
+            if (getUpperFloor(iQ.get(i)) != floor ||
+            iQ.get(i).getActionType() == ElevatorAction.PICKUP) {
+                return i;
+            }
+        }
+        return iQ.size();
     }
     
     /* Fetch pick up point, should work for double decked as well */
@@ -266,7 +281,7 @@ public class SelectiveCollectiveTest extends Algorithm {
         
         //if q is empty, return first index
         if (iQ.isEmpty()) {
-            return 0;
+            return 0; //DONE
         }
         
         //initiate previous direction as the direct between current elevator floor and first queue object
@@ -280,15 +295,50 @@ public class SelectiveCollectiveTest extends Algorithm {
         
         //check if pick up should take place before first queue object
         if (preDir == pDir) {
-            int f1 = getUpperFloor(iQ.get(0));
-            float f2 = e.getStatus().floor;
-            if(f1 > f2 && (floor <= f1 && floor >= f2)) return 0;
-            if(f1 < f2 && (floor >= f1 && floor <= f2)) return 0;
-            if(f1 == f2 && floor == f1) return 0;
+            int q1 = getUpperFloor(iQ.get(0));
+            float elev = e.getStatus().floor;
+
+            if (elev < q1 && floor >= elev) {
+                if (floor < q1) {
+                    //Free to add
+                    return 0;
+                } else if (floor == q1) {
+                    //Find suitable index for pickup
+                    if (iQ.get(0).getActionType() == ElevatorAction.PICKUP) {
+                        //Append first
+                        return 0;
+                    } else if (iQ.get(0).getActionType() == ElevatorAction.DROPOFF) {
+                        //Fetch next object of type pickup
+                        return fetchQueueIndex(iQ, floor, 1);
+                    }
+                }
+            } else if (elev > q1 && floor <= elev) {
+                if (floor > q1) {
+                    //Free to add
+                    return 0;
+                } else if (floor == q1) {
+                    //Find suitable index for pickup
+                    if (iQ.get(0).getActionType() == ElevatorAction.PICKUP) {
+                        //Append first
+                        return 0;
+                    } else if (iQ.get(0).getActionType() == ElevatorAction.DROPOFF) {
+                        //Fetch next object of type pickup
+                        return fetchQueueIndex(iQ, floor, 1);
+                    }
+                }
+            } else if (elev == q1 && floor == elev) {
+                if (iQ.get(0).getActionType() == ElevatorAction.PICKUP) {
+                    //Append first
+                    return 0;
+                } else if (iQ.get(0).getActionType() == ElevatorAction.DROPOFF) {
+                    //Fetch next object of type pickup
+                    return fetchQueueIndex(iQ, floor, 1);
+                }
+            }
         }
         
         //main loop, find suitable index
-		for(int i = 0; i < iQ.size() - 1; i++) {
+		for (int i = 0; i < iQ.size() - 1; i++) {
 			int t1 = getUpperFloor(iQ.get(i + 1)); //Queue object i+1
 			int t2 = getUpperFloor(iQ.get(i)); //Queue object i
 			int t3 = t1 - t2; //Floor difference
@@ -305,15 +355,32 @@ public class SelectiveCollectiveTest extends Algorithm {
 			if (pDir == dir) {
                 //correct direction and between these queue objects, perfect
 				if (isBetween(t1, t2, floor)) {
-					return i + 1;
+                    if (t1 == floor) {
+                        //Add pickups after dropoffs are completed
+                        if (iQ.get(i + 1).getActionType() == ElevatorAction.PICKUP) {
+                            //Append first
+                            return i + 1;
+                        } else if (iQ.get(i + 1).getActionType() == ElevatorAction.DROPOFF) {
+                            //Fetch next object of type pickup
+                            return fetchQueueIndex(iQ, floor, i + 2);
+                        }
+                    } else {
+                        return i + 1;
+                    }
 				}
 			} 
 
 			if (preDir != dir && preDir != 0) {
-                    //elevator turning but passenger further in previous direction
+                //elevator turning but passenger further in previous direction
                 if ((floor - t2) / Math.abs(floor - t2) == preDir) {
-                    System.out.println("Returned pickup 1");
-                	return i;
+                    //Add pickups after dropoffs are completed
+                    if (iQ.get(i).getActionType() == ElevatorAction.PICKUP) {
+                        //Append first
+                        return i;
+                    } else if (iQ.get(i).getActionType() == ElevatorAction.DROPOFF) {
+                        //Fetch next object of type pickup
+                        return fetchQueueIndex(iQ, floor, i + 1);
+                    }
                 }               
 			}
             
@@ -323,27 +390,6 @@ public class SelectiveCollectiveTest extends Algorithm {
 
         return e.getQueue().size();
     }
-
-	// private int specialCase(ElevatorInterface e, Passenger p, int floor, int pDir) {
-		// if(e.getQueue().size() == 0) {
-			// return 0;
-		// }
-		// int index = -1;
-		// for(int i = 0; i < e.getQueue().size(); i++) {
-			// int mAbs = Math.abs((int)e.getStatus().floor - getUpperFloor(e.getQueue().get(i)));
-			// if(mAbs == 0) {
-				// return 0; //Special case, for now. 
-			// }
-			// int dir = ((int)e.getStatus().floor - getUpperFloor(e.getQueue().get(i)))/ mAbs;
-			// if(dir == pDir && isBetween(getUpperFloor(e.getQueue().get(i)), (int)e.getStatus().floor, floor)) {
-				// index = i;
-			// }
-		// }
-		// if(index == -1) {
-			// index = e.getQueue().size();
-		// }
-		// return index;
-	// }
     
     /* Return the relevant upper floor for this elevator queue object */
 	public int getUpperFloor(ElevatorQueueObject q) {
