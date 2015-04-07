@@ -54,11 +54,10 @@ public class TestSelCol {
 		Call c2 = new Call(0, 3, 1);
         Call c3 = new Call(0, 7, 1);
 		Call c4 = new Call(0, 4, 6);
-	/*	Call c4 = new Call(0, 0, 15);
-		Call c5 = new Call(0, 0, 7);
-		Call c6 = new Call(0, 0, 14);
+		Call c5 = new Call(0, 3, 8);
+		Call c6 = new Call(0, 0, 1);
 		Call c7 = new Call(0, 0, 11);
-        Call c8 = new Call(2, 1, 4);
+       /* Call c8 = new Call(2, 1, 4);
         Call c9 = new Call(2, 4, 2);
 */
 		
@@ -70,7 +69,7 @@ public class TestSelCol {
 			specs = null;
 		}
         
-        Call[] calls = {c1, c2, c3, c4};
+        Call[] calls = {c1, c2, c3, c4, c5, c6, c7};
         
         //Convert calls to passengers
         LinkedList<Passenger> passengers = new LinkedList<Passenger>();
