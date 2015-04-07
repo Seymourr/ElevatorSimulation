@@ -307,9 +307,11 @@ public class SelectiveCollectiveTest extends Algorithm {
 					return i + 1;
 				}
 			} 
+
 			if (preDir != dir && preDir != 0) {
-               //elevator turning but passenger further in previous direction
-                if (floor - t2 / Math.abs(floor - t2) == preDir) {
+                    //elevator turning but passenger further in previous direction
+                if ((floor - t2) / Math.abs(floor - t2) == preDir) {
+                    System.out.println("Returned pickup 1");
                 	return i;
                 }               
 			}
