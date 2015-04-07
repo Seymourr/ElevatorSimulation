@@ -50,13 +50,17 @@ public class TestSelCol {
     /* Main */
     public static void main (String[] args) {
         //Generate some calls 
-		Call c1 = new Call(0, 0, 12);
-		Call c2 = new Call(0, 0, 14);
-		Call c3 = new Call(0, 0, 10);
-		Call c4 = new Call(0, 0, 15);
+		Call c1 = new Call(0, 1, 2);
+		Call c2 = new Call(0, 3, 1);
+        Call c3 = new Call(0, 7, 1);
+		Call c4 = new Call(0, 4, 6);
+	/*	Call c4 = new Call(0, 0, 15);
 		Call c5 = new Call(0, 0, 7);
 		Call c6 = new Call(0, 0, 14);
-		Call c7 = new Call(0, 0, 11);		
+		Call c7 = new Call(0, 0, 11);
+        Call c8 = new Call(2, 1, 4);
+        Call c9 = new Call(2, 4, 2);
+*/
 		
         //Load specs
         ElevatorSpecs specs;
@@ -66,7 +70,7 @@ public class TestSelCol {
 			specs = null;
 		}
         
-        Call[] calls = {c1, c2, c3, c4, c5, c6, c7};
+        Call[] calls = {c1, c2, c3, c4};
         
         //Convert calls to passengers
         LinkedList<Passenger> passengers = new LinkedList<Passenger>();
@@ -89,7 +93,7 @@ public class TestSelCol {
         //Do the testing
         for (Passenger p : passengers) {
             int pick = alg.getPickUpPoint(e, p, p.getOrigin(), CarPosition.NULL);
-            int drop = alg.getDropOffPoint(e, p, p.getOrigin(), CarPosition.NULL, pick);
+            int drop = alg.getDropOffPoint(e, p, p.getDestination(), CarPosition.NULL, pick);
             if (!e.addToQueue(p, pick, drop, CarPosition.NULL)) {
                 System.out.println("ERROR");
             }

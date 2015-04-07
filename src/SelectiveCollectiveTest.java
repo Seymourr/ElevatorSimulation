@@ -92,7 +92,7 @@ public class SelectiveCollectiveTest extends Algorithm {
         
         //fetch drop-off point
 		int dropOff = getDropOffPoint(elevators.get(elevatorIndex), p, p.getDestination(), pos, pickUp);
-        
+
 		if(pickUp >= dropOff) {
             throw new RuntimeException("Should not get here.");
 			//dropOff = pickUp + 1;
@@ -136,11 +136,13 @@ public class SelectiveCollectiveTest extends Algorithm {
             if (pickUpIndex != 0) {
                 throw new RuntimeException("Wierd argument in getDropOffPoint.");
             }
+            System.out.println("Returned 1");
             return 1;
         }
         
         //obvious
         if (pickUpIndex == iQ.size()) {
+              System.out.println("Returned 2");
             return pickUpIndex + 1;
         }
         
@@ -164,6 +166,10 @@ public class SelectiveCollectiveTest extends Algorithm {
         
         //check if should pick up before loop
         if (isBetween(pickUpFloor, getUpperFloor(iQ.get(pickUpIndex)), floor)) {
+            System.out.println("Arg 1: " + pickUpFloor);
+            System.out.println("Arg 2: " + getUpperFloor(iQ.get(pickUpIndex)));
+            System.out.println("Arg 3: " + floor);
+              System.out.println("Returned 3");
             return pickUpIndex + 1;
         }
         
@@ -178,7 +184,8 @@ public class SelectiveCollectiveTest extends Algorithm {
         
         //elevator turning but passenger further in previous direction
         if (preDir == pDir && nextDir != pDir) {
-            return pickUpIndex + 1;
+        System.out.println("Returned 4");
+            return pickUpIndex + 1; //BUGG! FIX.
         }
         
         //main loop, find suitable index
@@ -197,12 +204,17 @@ public class SelectiveCollectiveTest extends Algorithm {
 
             //between these queue objects, perfect
             if (isBetween(t1, t2, floor)) {
-                return i + 1;
+                System.out.println(t1);
+                System.out.println(t2);
+                System.out.println(floor);
+                  System.out.println("Returned 5");
+                return i + 2;
             }
 
 			if (preDir != dir && preDir != 0) {
                //elevator turning but passenger further in previous direction
                 if (floor - t2 / Math.abs(floor - t2) == preDir) {
+                      System.out.println("Returned 6");
                 	return i + 1;
                 } else {
                     System.out.println("Pickupindex was: " + pickUpIndex);
@@ -227,7 +239,7 @@ public class SelectiveCollectiveTest extends Algorithm {
             //update previous dir
             preDir = dir;
 		}
-
+          System.out.println("Returned 7");
         return e.getQueue().size() + 1;
     }
     
@@ -298,7 +310,7 @@ public class SelectiveCollectiveTest extends Algorithm {
 			if (preDir != dir && preDir != 0) {
                //elevator turning but passenger further in previous direction
                 if (floor - t2 / Math.abs(floor - t2) == preDir) {
-                	return i + 1;
+                	return i;
                 }               
 			}
             
