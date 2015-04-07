@@ -17,6 +17,9 @@ public class Passenger {
 	private int origin = -1;
 	private ElevatorSpecs spec;
     
+    private int finalgoal;
+    private int earlyorigin;
+    
     /** 
 	 * Constructor 
      * Calculates the partial goals for the passenger in the given call toward
@@ -29,6 +32,10 @@ public class Passenger {
         
         int goal = c.getDestination();
         origin = c.getOriginFloor();
+        
+        finalgoal = goal; //DEBUG
+        earlyorigin = origin; //DEBUG
+
         int skylobby = spec.getSkylobbyfloor();
 		int lobby = spec.getLobbyFloor();
 		
@@ -65,6 +72,9 @@ public class Passenger {
         if (currentDestination == -1 || origin == -1) {
             return;
         }
+        
+        int oldorigin = origin;
+        int olddest = currentDestination;
         
         if (currentDestination == spec.getLobbyFloor()) {
             if (origin == spec.getSkylobbyfloor() + 1) {
@@ -118,6 +128,13 @@ public class Passenger {
                     origin = spec.getSkylobbyfloor();
                 }
             }
+        }
+        
+        if (origin == currentDestination) {
+            throw new RuntimeException("Passenger fucked up. Old origin was: " + oldorigin 
+                + ", new origin was: " + origin + ", old destination was: " + olddest
+                + ", new destination was: " + currentDestination + ", early origin was: "
+                + earlyorigin + ", final goal was: " + finalgoal);
         }
     }
 

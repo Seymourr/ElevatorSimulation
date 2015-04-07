@@ -11,7 +11,7 @@
 12  //Car carry capacity
 30   //Car speed (Average)
 10  //Floor delay
-single //local elevator
+double //local elevator
 double //shuttle elevator
 10   //Number of shuttles was 10
 false //Is equally distributed zoning used? (Not implemented yet)
