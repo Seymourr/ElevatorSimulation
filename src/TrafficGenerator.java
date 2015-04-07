@@ -40,6 +40,12 @@ public class TrafficGenerator {
 		while(number == specs.getSkylobbyfloor() || number == specs.getSkylobbyfloor() + 1) {
 			number = r.nextInt(high-low) + low;
 		}
+        
+        //If chosen lobby floor (1) change to lobby floor (0) for clarity
+        if (number == 1) {
+            number = 0;
+        }
+        
 		return number;
 	}
 	
