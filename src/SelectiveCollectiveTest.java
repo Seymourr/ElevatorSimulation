@@ -213,9 +213,10 @@ public class SelectiveCollectiveTest extends Algorithm {
 
 			if (preDir != dir && preDir != 0) {
                //elevator turning but passenger further in previous direction
-                if (floor - t2 / Math.abs(floor - t2) == preDir) {
-                      System.out.println("Returned 6");
+                if ((floor - t2) / Math.abs(floor - t2) == preDir) {
+                    System.out.println("Returned 6");
                 	return i + 1;
+                    //return i + 2;
                 } else {
                     System.out.println("Pickupindex was: " + pickUpIndex);
                     System.out.println("pickUpFloor was: " + pickUpFloor);
