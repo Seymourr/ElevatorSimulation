@@ -38,9 +38,52 @@ public class SelectiveCollectiveTest extends Algorithm {
  	* Returns a index of a elevator
  	*/
 	protected int getElevator(ArrayList<ElevatorInterface> elevators, Passenger p) {
-        int[] zonedIndexes = getZonedElevators(elevators, p);
-		return getRandomElevator(elevators, zonedIndexes, p);
+		 int[] zonedIndexes = getZonedElevators(elevators, p);
+		 return getRandomElevator(elevators, zonedIndexes, p);
 	}
+
+	//BUGGED FOR DOUBLE DECKED
+	protected int getSelectiveElevator(ArrayList<ElevatorInterface> e, int[] z, Passenger p) {
+		if(p.getDestination() - p.getOrigin() == 0) {
+			System.out.println(p.getDestination());
+			System.out.println(p.getOrigin());
+			System.out.println("ERROR: Origin and Destination cannot be the same. Traffic generator bugged (Double decked case)");
+			System.exit(0);
+		}
+		int pDir = (p.getDestination() - p.getOrigin()) /Math.abs(p.getDestination() - p.getOrigin());
+		ArrayList<Integer> potentialElevators = new ArrayList<Integer>();
+		for(Integer i : z) {
+			int eDir = e.get(i).getStatus().direction;
+			if(eDir == pDir) {
+				if(pDir == 1 && e.get(i).getStatus().floor < p.getOrigin()) {
+					potentialElevators.add(i);
+				} else if(pDir == -1 && e.get(i).getStatus().floor > p.getOrigin()) {
+					potentialElevators.add(i);
+				}
+			}
+		}
+
+		if(potentialElevators.isEmpty()) {
+			return getRandomElevator(e, z, p);
+		}
+
+		//Return the one with shortest queue
+		int index = 0;
+		int bestSize = e.get(potentialElevators.get(0)).getQueue().size();
+		for(int i = 0; i < potentialElevators.size(); i++) {
+			if(e.get(potentialElevators.get(i)).getQueue().size() < bestSize) {
+				index = i;
+				bestSize = e.get(potentialElevators.get(i)).getQueue().size();
+			}
+		}
+		return potentialElevators.get(index);
+       
+		
+
+	}
+		
+		
+	
 
 	protected ArrayList<ElevatorInterface> assignLocal(ArrayList<ElevatorInterface> elevators, Passenger p) {
 		int elevatorIndex = getElevator(elevators, p);
@@ -66,31 +109,38 @@ public class SelectiveCollectiveTest extends Algorithm {
 	}
 
 
-	//TODO: Fix for double decked
+	//TODO: Fix for double decked. Produce worse result than old selective collective..
 	public int getPoint(ElevatorInterface e, Passenger p, int startIndex, int floor) {
 		int point = -1;
 		int pAbs = Math.abs(p.getDestination() - p.getOrigin());
 		int pDir = (p.getDestination() - p.getOrigin())/pAbs;
 		LinkedList<ElevatorQueueObject> iQ = e.getQueue();
-		if(iQ.size() <= 3) {
-			return specialCase(e, p, floor, pDir);
-		}
-		int t1 = getFloor(iQ.get(startIndex + 1));
-		int t2 = getFloor(iQ.get(startIndex));
-		int preDir = (t1-t2)/Math.abs(t1-t2);
-		for(int i = startIndex + 1; i < iQ.size() - 1; i++) {
-			t1 = getFloor(iQ.get(i + 1));
-			t2 = getFloor(iQ.get(i));
-			int dir = (t1 - t2) / Math.abs(t1-t2);
+
+		int preDir = -1;
+		int dir = -1;
+		for(int i = startIndex; i < iQ.size() - 1; i++) {
+			int t1 = getFloor(iQ.get(i + 1));
+			int t2 = getFloor(iQ.get(i));
+			int t3 = t1 - t2;
+			if(t3 == 0) {
+				continue;
+			}
+			preDir = dir;
+			dir = t3/Math.abs(t3);
 			if(pDir == dir) {
 				if(isBetween(t1, t2, floor)) {
 					point = i + 1;
 				}
-			} else if( (floor - getFloor(iQ.get(i))) / Math.abs(floor - getFloor(iQ.get(i))) == pDir){
-				point = i + 1; //I + 1? Why do this?
+			} else if(preDir == pDir){
+				int t4 = floor - t2;
+				if(t4 != 0) {
+					if(t4/Math.abs(t4) == pDir) {
+						point = i + 1;
+					}
+				}
 			}
-			pDir = dir;
 		}
+
 		if(point == -1) {
 			point = e.getQueue().size();
 		}

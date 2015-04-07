@@ -10,9 +10,9 @@
 400 //Building height
 12  //Car carry capacity
 30   //Car speed (Average)
-15  //Floor delay
+10  //Floor delay
 single //local elevator
-single //shuttle elevator
+double //shuttle elevator
 10   //Number of shuttles was 10
 false //Is equally distributed zoning used? (Not implemented yet)
 //TODO: BESTÄM ORDENTLIGT VAD SOM SKA GÄLLA, INGA MER ÄNDRINGAR PLIX

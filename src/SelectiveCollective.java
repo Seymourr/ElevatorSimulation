@@ -230,7 +230,7 @@ public class SelectiveCollective extends Algorithm {
 		//Pickupposition = 0 ger buggen.
 		//NÅNTING I DENNA LOOP GÖR SÅ ATT RESULTATET TAR LÄNGRE/MINDRE TID. FIX OR IGNORE
 		//Det går att ignorera o få bättre resultat (dock inte collective då..)
-/*
+
 		for(int i = indexPoint; i < elevator.getQueue().size(); i++) {
 			preCall = callDest;
 			if(elevator.getQueue().get(i).getActionType() == ElevatorAction.PICKUP) {
@@ -259,7 +259,7 @@ public class SelectiveCollective extends Algorithm {
 				}
 			}
 		}
-	*/	
+	
 	//Is all calls in the queue done prior to passenger floor without a reverse?
 		if(pickUpPosition == -1) {
 			pickUpPosition = elevator.getQueue().size();
@@ -274,7 +274,7 @@ public class SelectiveCollective extends Algorithm {
 
 	//
 		
-		pickUpPosition = elevator.getQueue().size();
+	//	pickUpPosition = elevator.getQueue().size();
 	//	System.out.println(indexPoint);
 		//pickUpPosition = 0;
 		result = new pointHolder(pickUpPosition, willReverse);
