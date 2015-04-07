@@ -11,12 +11,12 @@ import java.util.LinkedList;
 public class SearchBasedCollective extends Algorithm {
     /* Fields */
     private ElevatorSpecs specs;
-    private SelectiveCollective sc;
+    private SelectiveCollectiveTest sc;
     
     /* Constructor */
     public SearchBasedCollective(ElevatorSpecs spec) {
         specs = spec;
-        sc = new SelectiveCollective(spec);
+        sc = new SelectiveCollectiveTest(spec);
     }
     
     /* Adds the passenger to the elevator using SelectiveCollective, returns the elevator again */
@@ -31,7 +31,25 @@ public class SearchBasedCollective extends Algorithm {
 			pDir = -1;
 		}
 
+           //fetch pick-up point
+        int pickUp = sc.getPoint(e, p, p.getOrigin(), c, 0);
+        
+        //fetch drop-off point
+        int dropOff = sc.getPoint(e, p, p.getDestination(), c, pickUp);
+        
+        if(pickUp >= dropOff) {
+            dropOff = pickUp + 1;
+        }
+        boolean b = e.addToQueue(p, pickUp, dropOff, c);
+        if(!b) {
+            System.out.println("FATAL ERROR in selective collective");
+            System.out.println(pickUp);
+            System.out.println(dropOff);
+            System.exit(0);
+        }
+        return e;
         /*
+        
         //Fetch elevator direction
         int eDir = e.getStatus().direction;
         
@@ -52,10 +70,12 @@ public class SearchBasedCollective extends Algorithm {
         } else {
             return sc.pickUpOnReverse(e, p, pDir, c);
         }
-        */
-        e.addToQueue(p, e.getQueue().size(), e.getQueue().size() + 1, c);
-        return e;
         
+    //    e.addToQueue(p, e.getQueue().size(), e.getQueue().size() + 1, c);
+//        return e;
+        */
+
+
     }
     
     /* Run the elevators until it is empty, return the amount of time it took */
@@ -85,18 +105,38 @@ public class SearchBasedCollective extends Algorithm {
             ElevatorInterface e1 = e.duplicate();
             
             //DEBUG
-            // System.out.println("\nFirst: \n");
-            // System.out.println(e1.getRecords().getStringRepresentation());
+             System.out.println("\nFirst: \n");
+             System.out.println(e1.getRecords().getStringRepresentation());
             
+
+             System.out.print("Queue: ");
+              for(int j = 0; j < e1.getQueue().size(); j++) {
+                    System.out.print(" " + sc.getUpperFloor(e1.getQueue().get(j)));
+                    if(e1.getQueue().get(j).getActionType() == ElevatorAction.PICKUP) {
+                        System.out.print("P");
+                    } else {
+                        System.out.print("D");
+                    }
+              }
+                for(int j = 0; j < e1.getQueue().size(); j++) {
+                  System.out.println();
+                    System.out.println("Passenger from: " + e1.getQueue().get(j).getPassenger().getOrigin() + " to: " + e1.getQueue().get(j).getPassenger().getDestination());
+              }
+              System.out.println();
+                System.out.println("Elevator position: " + e1.getStatus().floor);
             //Run elevator until empty
             int e1time = emptyElevator(e1);
             
             //DEBUG
-            // System.out.println("\nSecond: \n");
-            // System.out.println(e1.getRecords().getStringRepresentation());
+             System.out.println("\nSecond: \n");
+             System.out.println(e1.getRecords().getStringRepresentation());
+
 
             //Add the new passenger to the elevator
             ElevatorInterface e2 = e.duplicate();
+             //DEBUG
+             System.out.println("\nThree: \n");
+             System.out.println(e2.getRecords().getStringRepresentation());
             /*
                 System.out.println("E1 pre: " + e1.getQueue().size());
             System.out.println("E2 pre: " + e2.getQueue().size());
@@ -118,6 +158,23 @@ public class SearchBasedCollective extends Algorithm {
             }
             */
             e2 = addToElevator(e2, p);
+               System.out.print("Queue: ");
+               for(int j = 0; j < e2.getQueue().size(); j++) {
+                    System.out.print(" " + sc.getUpperFloor(e2.getQueue().get(j)));
+                       if(e2.getQueue().get(j).getActionType() == ElevatorAction.PICKUP) {
+                        System.out.print("P");
+                    } else {
+                        System.out.print("D");
+                    }
+
+              }
+              for(int j = 0; j < e2.getQueue().size(); j++) {
+                  System.out.println();
+                    System.out.println("Passenger from: " + e2.getQueue().get(j).getPassenger().getOrigin() + " to: " + e2.getQueue().get(j).getPassenger().getDestination());
+              }
+              System.out.println();
+              System.out.println("Elevator position: " + e2.getStatus().floor);
+
             /*
             if(e2.getQueue().size() > 0) {
                 int first = -1;
@@ -143,6 +200,8 @@ public class SearchBasedCollective extends Algorithm {
         //     System.out.println(e1.getRecords().getStringRepresentation());
            //   System.out.println(e2.getRecords().getStringRepresentation());
             int e2time = emptyElevator(e2);
+              System.out.println("\nFour: \n");
+             System.out.println(e2.getRecords().getStringRepresentation());
               /* 
              System.out.println(e1.getRecords().getStringRepresentation());
               System.out.println(e2.getRecords().getStringRepresentation());

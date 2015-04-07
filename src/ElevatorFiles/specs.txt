@@ -8,11 +8,11 @@
 10   //Distance between floors
 40 //Number of shafts 
 400 //Building height
-12  //Car carry capacity
-30   //Car speed (Average)
+5000  //Car carry capacity
+20   //Car speed (Average)
 10  //Floor delay
-double //local elevator
-double //shuttle elevator
+single //local elevator
+single //shuttle elevator
 10   //Number of shuttles was 10
 false //Is equally distributed zoning used? (Not implemented yet)
 //TODO: BESTÄM ORDENTLIGT VAD SOM SKA GÄLLA, INGA MER ÄNDRINGAR PLIX

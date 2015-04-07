@@ -118,7 +118,7 @@ public class Main {
 
 		System.out.println("Now starting simulation with " + trafficAmount + " passengers per period");
 		for(int i = 0; i < specs.getSimulationDays(); i++) {
-			cnt += simulateDay(new SelectiveCollectiveTest(specs), trafficAmount); 
+			cnt += simulateDay(new SearchBasedCollective(specs), trafficAmount); 
 			System.out.println("Day " + i + " complete" + " Served: " + cnt + " so far finished: " + debug);
 	}
 		printResults(new BigInteger("" + cnt));

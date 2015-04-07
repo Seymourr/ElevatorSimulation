@@ -165,7 +165,7 @@ public class Elevator implements ElevatorInterface {
         }
         
         //Update total travel time
-        totalTravelTime = totalTravelTime.add(BigInteger.valueOf(currentPassengers.size()));
+        totalTravelTime = totalTravelTime.add(BigInteger.valueOf((long)currentPassengers.size()));
         
         //Passengers boarding, no movement
         if (waitingTime > 0) {

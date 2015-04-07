@@ -91,7 +91,7 @@ public class SelectiveCollectiveTest extends Algorithm {
 		int pickUp = getPoint(elevators.get(elevatorIndex), p, p.getOrigin(), pos, 0);
         
         //fetch drop-off point
-		int dropOff = getPoint(elevators.get(elevatorIndex), p, p.getDestination(), pos, pickUp);
+		int dropOff = getPoint(elevators.get(elevatorIndex), p, p.getDestination(), pos, pickUp) + 1;
         
 		if(pickUp >= dropOff) {
 			dropOff = pickUp + 1;
@@ -186,10 +186,11 @@ public class SelectiveCollectiveTest extends Algorithm {
 				if (isBetween(t1, t2, floor)) {
 					return i + 1;
 				}
-			} else if (preDir != dir && preDir != 0) {
-                //elevator turning but passenger further in previous direction
+			} 
+			if (preDir != dir && preDir != 0) {
+               //elevator turning but passenger further in previous direction
                 if (floor - t2 / Math.abs(floor - t2) == preDir) {
-                    return i;
+                	return i + 1;
                 }               
 				// int t4 = floor - t2;
 				// if(t4 != 0) {
@@ -228,7 +229,7 @@ public class SelectiveCollectiveTest extends Algorithm {
 	// }
     
     /* Return the relevant upper floor for this elevator queue object */
-	private int getUpperFloor(ElevatorQueueObject q) {
+	public int getUpperFloor(ElevatorQueueObject q) {
 		int ret = 0;
 		if(q.getActionType() == ElevatorAction.PICKUP) {
 			ret = q.getPassenger().getOrigin();
