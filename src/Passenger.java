@@ -27,6 +27,7 @@ public class Passenger {
     //Mortal Finite Temporary wait and travel times
     public int tempwT = 0;
     public int temptT = 0;
+    public int calls = 0;
     
     /** 
 	 * Constructor 
@@ -165,14 +166,11 @@ public class Passenger {
         reviseDoubleDeckedTrip();
         
         //Update wait and travel times
+        calls += 1;
         wT += tempwT * tempwT;
         tempwT = 0;
         tT += temptT * temptT;
         temptT = 0;
-
-        //DEBUG
-        System.out.println(wT);
-        System.out.println(tT);
         
 		return currentDestination;
     }
