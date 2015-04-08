@@ -162,13 +162,17 @@ public class Passenger {
 			currentDestination = -1;
 		}
         
-        //Update wait and travel times
-        wT += tempwT^2;
-        tempwT = 0;
-        tT += temptT^2;
-        temptT = 0;
-        
         reviseDoubleDeckedTrip();
+        
+        //Update wait and travel times
+        wT += tempwT * tempwT;
+        tempwT = 0;
+        tT += temptT * temptT;
+        temptT = 0;
+
+        //DEBUG
+        System.out.println(wT);
+        System.out.println(tT);
         
 		return currentDestination;
     }
