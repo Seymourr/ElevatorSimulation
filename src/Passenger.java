@@ -20,6 +20,14 @@ public class Passenger {
     private int finalgoal;
     private int earlyorigin;
     
+    //Final square wait and travel times
+    public int wT = 0;
+    public int tT = 0;
+    
+    //Mortal Finite Temporary wait and travel times
+    public int tempwT = 0;
+    public int temptT = 0;
+    
     /** 
 	 * Constructor 
      * Calculates the partial goals for the passenger in the given call toward
@@ -153,6 +161,12 @@ public class Passenger {
 			origin = -1;
 			currentDestination = -1;
 		}
+        
+        //Update wait and travel times
+        wT += tempwT^2;
+        tempwT = 0;
+        tT += temptT^2;
+        temptT = 0;
         
         reviseDoubleDeckedTrip();
         

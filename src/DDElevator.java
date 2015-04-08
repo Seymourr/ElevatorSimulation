@@ -206,12 +206,19 @@ public class DDElevator implements ElevatorInterface{
         for (int i = 0; i < queue.size(); i++) {
             if (queue.get(i).getActionType() == ElevatorAction.PICKUP) {
                totalWaitTime = totalWaitTime.add(BigInteger.ONE);
+               queue.get(i).getPassenger().tempwT += 1;
             }
         }
         
         //Update total travel time
         totalTravelTime = totalTravelTime.add(BigInteger.valueOf(lowerCarPassengers.size()));
         totalTravelTime = totalTravelTime.add(BigInteger.valueOf(upperCarPassengers.size()));
+        for (int i = 0; i < lowerCarPassengers.size(); i++) {
+            lowerCarPassengers.get(i).temptT += 1;
+        }
+        for (int i = 0; i < upperCarPassengers.size(); i++) {
+            upperCarPassengers.get(i).temptT += 1;
+        }
         
         //Passengers boarding, no movement
         if (waitingTime > 0) {

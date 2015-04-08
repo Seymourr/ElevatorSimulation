@@ -161,11 +161,15 @@ public class Elevator implements ElevatorInterface {
         for (int i = 0; i < queue.size(); i++) {
             if (queue.get(i).getActionType() == ElevatorAction.PICKUP) {
                totalWaitTime = totalWaitTime.add(BigInteger.ONE);
+               queue.get(i).getPassenger().tempwT += 1;
             }
         }
         
         //Update total travel time
         totalTravelTime = totalTravelTime.add(BigInteger.valueOf((long)currentPassengers.size()));
+        for (int i = 0; i < currentPassengers.size(); i++) {
+            currentPassengers.get(i).temptT += 1;
+        }
         
         //Passengers boarding, no movement
         if (waitingTime > 0) {

@@ -97,76 +97,22 @@ public class SearchBasedCollective extends Algorithm {
 
             //Reset elevator service status
             ElevatorInterface e = elevators.get(i);
+            
+            //Duplicate
             ElevatorInterface e1 = e.duplicate();
-            
-            //DEBUG
-    /*        System.out.println("\nE1 status before: \n");
-            System.out.println(e1.getRecords().getStringRepresentation());
-            
-
-            System.out.print("E1 Queue: ");
-            for(int j = 0; j < e1.getQueue().size(); j++) {
-               System.out.print(" " + sc.getUpperFloor(e1.getQueue().get(j)));
-                if(e1.getQueue().get(j).getActionType() == ElevatorAction.PICKUP) {
-                    System.out.print("P");
-                } else {
-                    System.out.print("D");
-                }
-            }
-            
-            System.out.print("E1 Passengers: ");
-            for(int j = 0; j < e1.getQueue().size(); j++) {
-                System.out.println();
-                System.out.println("Passenger from: " + e1.getQueue().get(j).getPassenger().getOrigin() + " to: " + e1.getQueue().get(j).getPassenger().getDestination());
-            }
-            System.out.println();
-            System.out.println("E1 elevator position: " + e1.getStatus().floor);
-         */   
+ 
             //Run elevator until empty
             int e1time = emptyElevator(e1);
-            
-            //DEBUG
-       //    System.out.println("\nE1 after: \n");
-        //   System.out.println(e1.getRecords().getStringRepresentation());
-
 
             //Duplicate a new elevator
             ElevatorInterface e2 = e.duplicate();
-            
-            //DEBUG
-        //    System.out.println("\nE2 before: \n");
-        //  System.out.println(e2.getRecords().getStringRepresentation());
 
             //add the new passenger
             e2 = addToElevator(e2, p);
-            
-            //DEBUG
-         /*   System.out.print("E2 Queue: ");
-            for(int j = 0; j < e2.getQueue().size(); j++) {
-                System.out.print(" " + sc.getUpperFloor(e2.getQueue().get(j)));
-                if(e2.getQueue().get(j).getActionType() == ElevatorAction.PICKUP) {
-                    System.out.print("P");
-                } else {
-                    System.out.print("D");
-                }
-            }
-            
-            System.out.print("E2 Passengers: ");
-            for(int j = 0; j < e2.getQueue().size(); j++) {
-                System.out.println();
-                System.out.println("Passenger from: " + e2.getQueue().get(j).getPassenger().getOrigin() + " to: " + e2.getQueue().get(j).getPassenger().getDestination());
-            }
-            
-            System.out.println();
-            System.out.println("E2 elevator position: " + e2.getStatus().floor);
-*/
+
             //Run e2 until empty
             int e2time = emptyElevator(e2);
-            
-            //DEBUG
-      /*      System.out.println("\nE2 after: \n");
-            System.out.println(e2.getRecords().getStringRepresentation());
-*/
+
             //Calculate extra time caused by adding the new passenger
             int totTime = e2time - e1time;
             
