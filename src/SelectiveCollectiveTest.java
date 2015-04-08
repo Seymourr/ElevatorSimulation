@@ -148,21 +148,12 @@ public class SelectiveCollectiveTest extends Algorithm {
         
         //calculate previous direction
         int preDir = 0;
-        if (pickUpIndex == 0) {
-            int tempDir = getUpperFloor(iQ.get(pickUpIndex)) - pickUpFloor;
-            if (tempDir > 0) {
-                preDir = 1;
-            } else if (tempDir < 0) {
-                preDir = -1;
-            }    
-        } else {
-            int tempDir = pickUpFloor - getUpperFloor(iQ.get(pickUpIndex-1));
-            if (tempDir > 0) {
-                preDir = 1;
-            } else if (tempDir < 0) {
-                preDir = -1;
-            }  
-        }
+        int tempDir = getUpperFloor(iQ.get(pickUpIndex)) - pickUpFloor;
+        if (tempDir > 0) {
+            preDir = 1;
+        } else if (tempDir < 0) {
+            preDir = -1;
+        } 
         
         //check if should pick up before loop
         if (isBetween(pickUpFloor, getUpperFloor(iQ.get(pickUpIndex)), floor)) {

@@ -50,7 +50,7 @@ public class TestSelCol {
     /* Main */
     public static void main (String[] args) {
         //Generate some calls 
-     /* 
+      
         Call c1 = new Call(0, 0, 5);
         Call c2 = new Call(0, 44, 3);
         Call c3 = new Call(0, 7, 1);
@@ -66,14 +66,14 @@ public class TestSelCol {
         Call c13 = new Call(1,33,7);
         Call c14 = new Call(0, 0, 11);
         Call c15 = new Call(0, 11, 22);
-	  /*
+	 /*
         Call c1 = new Call(0, 7, 1);
         Call c2 = new Call(0, 3, 4);
-        Call c3 = new Call(0, 5, 3);    */
+        Call c3 = new Call(0, 5, 3);    
         //Load specs
         Call c2 = new Call(0, 80, 81);
         Call c3 = new Call (0, 81, 77);
-        Call c4 = new Call(0, 87, 50);
+        Call c4 = new Call(0, 87, 50); */
         ElevatorSpecs specs;
 		try {
 			specs = getSpecs();
@@ -81,7 +81,8 @@ public class TestSelCol {
 			specs = null;
 		}
         
-        Call[] calls = {c2, c3, c4};
+        //Call[] calls = {c2, c3, c4};
+        Call[] calls = {c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15};
         
         //Convert calls to passengers
         LinkedList<Passenger> passengers = new LinkedList<Passenger>();
@@ -90,13 +91,13 @@ public class TestSelCol {
         }
         
         //Specify elevator range
-        int[] floors = new int[specs.getFloors() -specs.getSkylobbyfloor()];
+        int[] floors = new int[specs.getSkylobbyfloor()];
         for(int i = 0; i < floors.length; i++) {
-        	floors[i] = i + specs.getSkylobbyfloor();
+        	floors[i] = i; // + specs.getSkylobbyfloor();
         }
         
         //Create the elevator
-        ElevatorInterface e = new Elevator(specs, floors, 50);
+        ElevatorInterface e = new Elevator(specs, floors, 0);
         //Create the algorithm object
         alg = new SelectiveCollectiveTest(specs);
         
@@ -108,7 +109,7 @@ public class TestSelCol {
                 System.out.println("ERROR");
             }
             printQueue(e);
-            System.out.print("\nPick was: " + pick + ", Drop was: " + drop + "\n");  
+            System.out.print("\nPick was: " + pick + ", Drop was: " + drop + "\n");            
         }
     }
 }
