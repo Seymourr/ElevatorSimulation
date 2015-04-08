@@ -110,7 +110,7 @@ public class Main {
 		}
        
         //Perform the simulation
-		int trafficAmount = specs.getLowTraffic();
+		int trafficAmount = specs.getHeavyTraffic();
 		int cnt = 0;
 		System.out.println(allElevators.get(0).size());
 		System.out.println(allElevators.get(1).size());
@@ -430,7 +430,14 @@ public class Main {
 		int temps = 0;
 		numberOfCalls += traffic.size();
 		for(int second_i = 0; second_i < specs.getPeriodTime(); second_i++) {
-
+            //DEBUG
+            // for (int k = 0; k < allElevators.get(1).size(); k++) {
+                // LinkedList<ElevatorQueueObject> q = allElevators.get(0).get(k).getQueue();
+                // if (q.size() > 10) {
+                    // System.out.println("Full queue");
+                // }
+            // }
+        
 			//People get off elevators
 			LinkedList<Passenger> calls = updateElevatorOnOff();
 			numberOfCalls += calls.size();

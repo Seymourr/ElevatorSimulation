@@ -4,7 +4,7 @@
 6000 //Medium traffic passenger amount
 7200 //Heavy traffic passenger amount
 100 //Number of floors
-50 //Skylobby floor (Must be in even floor)
+66 //Skylobby floor (Must be in even floor)
 10   //Distance between floors
 40 //Number of shafts 
 400 //Building height
@@ -13,6 +13,6 @@
 10  //Floor delay
 single //local elevator
 single //shuttle elevator
-10   //Number of shuttles was 10
+16   //Number of shuttles was 10
 false //Is equally distributed zoning used? (Not implemented yet)
 //TODO: BESTÄM ORDENTLIGT VAD SOM SKA GÄLLA, INGA MER ÄNDRINGAR PLIX

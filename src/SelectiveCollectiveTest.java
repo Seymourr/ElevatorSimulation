@@ -38,8 +38,8 @@ public class SelectiveCollectiveTest extends Algorithm {
  	* Returns a index of a elevator
  	*/
 	protected int getElevator(ArrayList<ElevatorInterface> elevators, Passenger p) {
-		 int[] zonedIndexes = getZonedElevators(elevators, p);
-		 return getRandomElevator(elevators, zonedIndexes, p);
+		int[] zonedIndexes = getZonedElevators(elevators, p);
+		return getRandomElevator(elevators, zonedIndexes, p);
 	}
 
 	// //BUGGED FOR DOUBLE DECKED
