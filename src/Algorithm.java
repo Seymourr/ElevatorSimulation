@@ -104,7 +104,8 @@ public abstract class Algorithm {
 	 * shuttle.
 	 */
 	public ArrayList<ElevatorInterface> assignShuttleElevator(ArrayList<ElevatorInterface> elevators, Passenger p) {
-		int index = getElevator(elevators, p);
+		int[] zonedIndexes = getZonedElevators(elevators, p);
+		int index = getRandomElevator(elevators, zonedIndexes, p);
 		int from = elevators.get(index).getQueue().size();
 		int to = from+1;
 		CarPosition pos = getCarPosShuttle(p);

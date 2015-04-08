@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.LinkedList;
 import java.util.HashMap;
+import java.math.MathContext;
 
 
 /**
@@ -27,6 +28,7 @@ public class Main {
 	private static int waitingTime;
 	private static int numberOfCalls;
 	private static int debug;
+    private static ArrayList<Passenger> finishedRides = new ArrayList<Passenger>();
 	
     /**
 	 * Read all specifications for this simulation from file, and returns an object carrying all these
@@ -118,7 +120,7 @@ public class Main {
 
 		System.out.println("Now starting simulation with " + trafficAmount + " passengers per period");
 		for(int i = 0; i < specs.getSimulationDays(); i++) {
-			cnt += simulateDay(new SearchBasedCollective(specs), trafficAmount); 
+			cnt += simulateDay(new SelectiveCollectiveTest(specs), trafficAmount); 
 			System.out.println("Day " + i + " complete" + " Served: " + cnt + " so far finished: " + debug);
 	}
 		printResults(new BigInteger("" + cnt));
@@ -387,28 +389,21 @@ public class Main {
 	public static int simulateDay(Algorithm alg, int trafficAmount){
 		int cnt = 0;
 		System.out.println("Entered day");
-		simulatePeriod(alg, TrafficType.UPPEAK, trafficAmount);
+		cnt += simulatePeriod(alg, TrafficType.UPPEAK, trafficAmount);
 		printCallAmount();
-		cnt += trafficAmount;
 
 			
-		simulatePeriod(alg, TrafficType.REGULAR, trafficAmount/3);
+		cnt += simulatePeriod(alg, TrafficType.REGULAR, trafficAmount/3);
 		printCallAmount();
-		cnt += trafficAmount/3;
 			
-		simulatePeriod(alg, TrafficType.LUNCH, trafficAmount/2);
-		debug -= trafficAmount / 2; //Removing extra calls made by lunch
+		cnt += simulatePeriod(alg, TrafficType.LUNCH, trafficAmount/2);
 		printCallAmount();
-		cnt += trafficAmount/2;
 			
-		simulatePeriod(alg, TrafficType.REGULAR, trafficAmount/3);
+		cnt += simulatePeriod(alg, TrafficType.REGULAR, trafficAmount/3);
 		printCallAmount();
-		cnt += trafficAmount/3;
 		
-		simulatePeriod(alg, TrafficType.DOWNPEAK, trafficAmount);
+		cnt += simulatePeriod(alg, TrafficType.DOWNPEAK, trafficAmount);
 		printCallAmount();
-		cnt += trafficAmount;	
-		
 		
 		System.out.println("Now going into rest calls");
 		handleRestCalls(alg); // Extra time needed to empty system
@@ -424,8 +419,9 @@ public class Main {
 	 * @param t
 	 * @param trafficAmount
 	 */
-	public static void simulatePeriod(Algorithm alg, TrafficType t, int trafficAmount) {
+	public static int simulatePeriod(Algorithm alg, TrafficType t, int trafficAmount) {
 		LinkedList<Call> traffic = new LinkedList<Call>(trafficGen.getTraffic(t, trafficAmount));
+        int trafficSize = traffic.size();
      //   	testTraffic(traffic); //Debugging
 		int temps = 0;
 		numberOfCalls += traffic.size();
@@ -454,6 +450,7 @@ public class Main {
 			allElevators = alg.manageCalls(allElevators, calls);
 		//	debugPrint();
 		}
+        return trafficSize;
 	}
 	
 /*  <<NOT OPERATIONAL DUE TO RECENT CHANGES >>
@@ -479,7 +476,25 @@ public class Main {
 	private static void printResults(BigInteger passengerAmount){
 		BigInteger totalWaitingTime = new BigInteger("0");
 		BigInteger totalTravelingTime = new BigInteger("0");
-        
+        BigDecimal squaredWaitingTime = new BigDecimal("0");
+        BigDecimal squaredTravelingTime = new BigDecimal("0");
+
+        int numberOfCalls = 0;
+        for(int i = 0; i < finishedRides.size(); i++) {
+            squaredWaitingTime = squaredWaitingTime.add(new BigDecimal("" + finishedRides.get(i).wT));
+            squaredTravelingTime = squaredTravelingTime.add(new BigDecimal("" + finishedRides.get(i).tT));
+            numberOfCalls += finishedRides.get(i).calls;
+        }
+
+        squaredWaitingTime = squaredWaitingTime.divide(new BigDecimal("" + numberOfCalls), 2, RoundingMode.HALF_UP);
+        squaredWaitingTime = new BigDecimal("" + Math.sqrt(squaredWaitingTime.intValue()));
+        squaredWaitingTime = squaredWaitingTime.setScale(2, RoundingMode.CEILING);
+
+        squaredTravelingTime = squaredTravelingTime.divide(new BigDecimal("" + numberOfCalls), 2, RoundingMode.HALF_UP);
+        squaredTravelingTime = new BigDecimal("" + Math.sqrt(squaredTravelingTime.intValue()));
+        squaredTravelingTime = squaredTravelingTime.setScale(2, RoundingMode.CEILING);
+
+        passengerAmount = new BigInteger("" + numberOfCalls);
         int bt = 0;
         int tt = 0;
         int st = 0;
@@ -520,9 +535,9 @@ public class Main {
 		System.out.println("Total waiting time: " + totalWaitingTime.toString() + " virtual seconds");
 		System.out.println("Total traveling time: " + totalTravelingTime.toString() + " virtual seconds");
 		System.out.println("Average waiting time: " + (new BigDecimal(totalWaitingTime)).divide(new BigDecimal(passengerAmount), 2, RoundingMode.HALF_UP).toString() + " virtual seconds");
-		System.out.println("Average squared waiting time: " + ((new BigDecimal(totalWaitingTime)).pow(2)).divide((new BigDecimal(passengerAmount)).pow(2), 2, RoundingMode.HALF_UP).toString() + " virtual seconds");
+		System.out.println("Average squared waiting time: " + squaredWaitingTime.toString() + " virtual seconds");
 		System.out.println("Average traveling time: " + (new BigDecimal(totalTravelingTime)).divide(new BigDecimal(passengerAmount), 2, RoundingMode.HALF_UP).toString() + " virtual seconds");
-		System.out.println("Average squared traveling time: " +  ((new BigDecimal(totalTravelingTime)).pow(2)).divide((new BigDecimal(passengerAmount)).pow(2), 2, RoundingMode.HALF_UP).toString() + " virtual seconds");
+		System.out.println("Average squared traveling time: " +  squaredTravelingTime.toString() + " virtual seconds");
 		System.out.println("Bot calls served: " + bt);
 		System.out.println("Top calls served: " + tt);
 		System.out.println("Shuttle calls served: " + st);
@@ -638,6 +653,7 @@ public class Main {
 
 						} else {
 							debug+=1;
+                            finishedRides.add(k);
 						} 
 
 				}

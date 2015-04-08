@@ -10,7 +10,6 @@ import java.util.LinkedList;
  */
 public class SearchBasedCollective extends Algorithm {
     /* Fields */
-    private ElevatorSpecs specs;
     private SelectiveCollectiveTest sc;
     
     /* Constructor */
@@ -141,7 +140,6 @@ public class SearchBasedCollective extends Algorithm {
         //Iterate through all new calls
         while(!calls.isEmpty()) {
             Passenger p = calls.removeFirst();
-            
             //Check which type of ride this call belongs to
             int rideType = 0;
             if (containsFloor(allElevators.get(0), p.getOrigin(), p.getDestination())) {
@@ -157,7 +155,6 @@ public class SearchBasedCollective extends Algorithm {
  				System.out.println("ERROR IN MANAGECALL, SIMULATION ABORTED");
  				System.exit(0);
  			}
-            
             //Fetch the elevator list for the specified ride type
             ArrayList<ElevatorInterface> elevators = allElevators.get(rideType);
             
@@ -169,6 +166,7 @@ public class SearchBasedCollective extends Algorithm {
 
             //Update allElevators
             allElevators.get(rideType).set(elIndex, e);
+            
         }
         return allElevators;
     }

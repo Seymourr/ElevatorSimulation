@@ -1,4 +1,4 @@
-7  //Number of simulationdays (repeat of simulations)
+14  //Number of simulationdays (repeat of simulations)
 7200 //Amount of minutes in a traffic period
 2500 //Low traffic passenger amount
 6000 //Medium traffic passenger amount
@@ -8,11 +8,10 @@
 10   //Distance between floors
 40 //Number of shafts 
 400 //Building height
-12  //Car carry capacity
+15  //Car carry capacity
 20   //Car speed (Average)
 10  //Floor delay
-single //local elevator
-single //shuttle elevator
+double //local elevator
+double //shuttle elevator
 16   //Number of shuttles was 10
-false //Is equally distributed zoning used? (Not implemented yet)
-//TODO: BESTÄM ORDENTLIGT VAD SOM SKA GÄLLA, INGA MER ÄNDRINGAR PLIX
+true //Is equally distributed zoning used? 
