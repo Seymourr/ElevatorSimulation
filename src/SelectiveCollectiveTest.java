@@ -136,13 +136,13 @@ public class SelectiveCollectiveTest extends Algorithm {
             if (pickUpIndex != 0) {
                 throw new RuntimeException("Wierd argument in getDropOffPoint.");
             }
-            System.out.println("Returned 1");
+         //   System.out.println("Returned 1");
             return 1;
         }
         
         //obvious
         if (pickUpIndex == iQ.size()) {
-            System.out.println("Returned 2");
+       //     System.out.println("Returned 2");
             return pickUpIndex + 1;
         }
         
@@ -166,7 +166,7 @@ public class SelectiveCollectiveTest extends Algorithm {
         
         //check if should pick up before loop
         if (isBetween(pickUpFloor, getUpperFloor(iQ.get(pickUpIndex)), floor)) {
-            System.out.println("Returned 3");
+    //        System.out.println("Returned 3");
             return pickUpIndex + 1;
         }
         
@@ -205,14 +205,14 @@ public class SelectiveCollectiveTest extends Algorithm {
 
             //between these queue objects, perfect
             if (isBetween(t1, t2, floor)) {
-                System.out.println("Returned 5");
+    //            System.out.println("Returned 5");
                 return i + 2;
             }
 
 			if (preDir != dir && preDir != 0) {
                //elevator turning but passenger further in previous direction
                 if ((floor - t2) / Math.abs(floor - t2) == preDir) {
-                    System.out.println("Returned 6");
+           //         System.out.println("Returned 6");
                     if (iQ.get(i).getActionType() == ElevatorAction.PICKUP) {
                         //Append first
                         return i + 1;
@@ -225,6 +225,10 @@ public class SelectiveCollectiveTest extends Algorithm {
                     System.out.println("Pickupindex was: " + pickUpIndex);
                     System.out.println("pickUpFloor was: " + pickUpFloor);
                     System.out.println("Drop off floor should be: " + floor);
+                    System.out.println("Predir: " + preDir);
+                    System.out.println("T2: " + t2);
+                    System.out.println("i is: " + i);
+                    System.out.println("Type: " + iQ.get(i).getActionType());
                     System.out.println();
                     System.out.print("Queue is: ");
                     for (int j = 0; j < iQ.size(); j++) {
@@ -244,7 +248,7 @@ public class SelectiveCollectiveTest extends Algorithm {
             //update previous dir
             preDir = dir;
 		}
-        System.out.println("Returned 7");
+     //   System.out.println("Returned 7");
         return e.getQueue().size() + 1;
     }
     

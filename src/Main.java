@@ -110,7 +110,7 @@ public class Main {
 		}
        
         //Perform the simulation
-		int trafficAmount = specs.getHeavyTraffic();
+		int trafficAmount = specs.getLowTraffic();
 		int cnt = 0;
 		System.out.println(allElevators.get(0).size());
 		System.out.println(allElevators.get(1).size());

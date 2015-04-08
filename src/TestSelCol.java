@@ -50,12 +50,30 @@ public class TestSelCol {
     /* Main */
     public static void main (String[] args) {
         //Generate some calls 
+     /* 
+        Call c1 = new Call(0, 0, 5);
+        Call c2 = new Call(0, 44, 3);
         Call c3 = new Call(0, 7, 1);
+        Call c4 = new Call(0, 30, 3);
 		Call c5 = new Call(0, 3, 8);
-        Call c8 = new Call(0, 8, 9);
+        Call c6 = new Call(0, 2, 1);
 		Call c7 = new Call(0, 0, 11);
-		
+        Call c8 = new Call(0, 8, 9);
+        Call c9 = new Call(0, 48, 49);
+        Call c10 = new Call(0, 0, 11);
+        Call c11 = new Call(0, 0, 11);
+        Call c12 = new Call(1, 6, 3);
+        Call c13 = new Call(1,33,7);
+        Call c14 = new Call(0, 0, 11);
+        Call c15 = new Call(0, 11, 22);
+	  /*
+        Call c1 = new Call(0, 7, 1);
+        Call c2 = new Call(0, 3, 4);
+        Call c3 = new Call(0, 5, 3);    */
         //Load specs
+        Call c2 = new Call(0, 80, 81);
+        Call c3 = new Call (0, 81, 77);
+        Call c4 = new Call(0, 87, 50);
         ElevatorSpecs specs;
 		try {
 			specs = getSpecs();
@@ -63,7 +81,7 @@ public class TestSelCol {
 			specs = null;
 		}
         
-        Call[] calls = {c3, c5, c8, c7};
+        Call[] calls = {c2, c3, c4};
         
         //Convert calls to passengers
         LinkedList<Passenger> passengers = new LinkedList<Passenger>();
@@ -72,14 +90,13 @@ public class TestSelCol {
         }
         
         //Specify elevator range
-        int[] floors = new int[specs.getSkylobbyfloor()];
+        int[] floors = new int[specs.getFloors() -specs.getSkylobbyfloor()];
         for(int i = 0; i < floors.length; i++) {
-        	floors[i] = i;
+        	floors[i] = i + specs.getSkylobbyfloor();
         }
         
         //Create the elevator
-        ElevatorInterface e = new Elevator(specs, floors, 0);
-
+        ElevatorInterface e = new Elevator(specs, floors, 50);
         //Create the algorithm object
         alg = new SelectiveCollectiveTest(specs);
         

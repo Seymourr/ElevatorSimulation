@@ -8,7 +8,7 @@
 10   //Distance between floors
 40 //Number of shafts 
 400 //Building height
-5000  //Car carry capacity
+12  //Car carry capacity
 20   //Car speed (Average)
 10  //Floor delay
 single //local elevator
